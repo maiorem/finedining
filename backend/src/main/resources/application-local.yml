@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/fdt_local?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:fdt_app}
+    password: ${SPRING_DATASOURCE_PASSWORD:change-me}
+
+logging:
+  level:
+    com.finediningtheater: DEBUG

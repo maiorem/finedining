@@ -1,0 +1,44 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
+import { describe, expect, it } from "vitest";
+import "../../i18n";
+import { Header } from "./Header";
+
+function renderHeader() {
+  return render(
+    <MemoryRouter>
+      <Header />
+    </MemoryRouter>,
+  );
+}
+
+describe("Header", () => {
+  it("작품·소개·예약·협업제안·리뷰 내비게이션 링크를 렌더한다", () => {
+    renderHeader();
+
+    expect(screen.getAllByRole("link", { name: "작품" })[0]).toHaveAttribute(
+      "href",
+      "/productions",
+    );
+    expect(screen.getAllByRole("link", { name: "소개" })[0]).toHaveAttribute("href", "/about");
+    expect(screen.getAllByRole("link", { name: "예약" })[0]).toHaveAttribute("href", "/booking");
+    expect(screen.getAllByRole("link", { name: "협업제안" })[0]).toHaveAttribute(
+      "href",
+      "/proposal",
+    );
+    expect(screen.getAllByRole("link", { name: "리뷰" })[0]).toHaveAttribute("href", "/reviews");
+  });
+
+  it("모바일 메뉴 버튼을 누르면 패널이 열리고 닫힌다", async () => {
+    const user = userEvent.setup();
+    renderHeader();
+
+    const menuButton = screen.getByRole("button", { name: "메뉴 열기" });
+    expect(screen.getAllByRole("link", { name: "작품" })).toHaveLength(1);
+
+    await user.click(menuButton);
+    expect(screen.getAllByRole("link", { name: "작품" })).toHaveLength(2);
+    expect(screen.getByRole("button", { name: "메뉴 닫기" })).toBeInTheDocument();
+  });
+});

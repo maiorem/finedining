@@ -1,0 +1,59 @@
+# 컴포즈 파일·nginx.conf 변경 전용 워크플로 — 여기가 잘못되면 전체가 죽으므로
+# 세 번째 워크플로로 분리하고 수동 승인을 건다 (CLAUDE.md §13.6).
+#
+# **필수 설정**: 저장소 Settings → Environments → `infra-deploy` 환경을 만들고
+# "Required reviewers"를 최소 1명 지정해야 한다. 이 파일만으로는 승인이 강제되지 않는다 —
+# GitHub 환경 보호 규칙은 UI에서만 설정할 수 있다.
+#
+#   Secrets   : AWS_DEPLOY_ROLE_ARN  (§13.7)
+#   Variables : AWS_REGION, S3_ARTIFACT_BUCKET, EC2_SSM_INSTANCE_ID
+
+name: deploy (compose / nginx)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "deploy/**"
+      - "docker-compose.yml"
+      - "docker-compose.local.yml"
+      - ".github/workflows/deploy.yml"
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    environment: infra-deploy # 수동 승인은 이 환경의 Required reviewers 설정이 건다
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Package infra files and upload to S3 (tag=commit SHA)
+        run: |
+          tar -czf infra.tar.gz docker-compose.yml docker-compose.local.yml deploy
+          aws s3 cp infra.tar.gz "s3://${{ vars.S3_ARTIFACT_BUCKET }}/infra/${{ github.sha }}.tar.gz"
+
+      - name: Sync to server and reload nginx via SSM Run Command
+        env:
+          S3_KEY: infra/${{ github.sha }}.tar.gz
+        run: |
+          aws ssm send-command \
+            --instance-ids "${{ vars.EC2_SSM_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "infra deploy ${{ github.sha }}" \
+            --parameters "{\"commands\":[
+              \"set -e\",
+              \"cd /opt/finedining\",
+              \"aws s3 cp s3://${{ vars.S3_ARTIFACT_BUCKET }}/$S3_KEY infra.tar.gz\",
+              \"tar -xzf infra.tar.gz\",
+              \"docker compose config --quiet\",
+              \"docker compose up -d nginx\"
+            ]}" \
+            --output text

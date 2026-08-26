@@ -1,0 +1,104 @@
+# frontend/ 변경에만 반응한다 (CLAUDE.md §13.6). 프론트 배포는 backend 컨테이너를
+# 재시작하지 않는다 — 정적 파일 교체와 CloudFront invalidation뿐이다.
+#
+# deploy 잡은 AWS 쪽 설정이 끝나야 실제로 동작한다. 저장소 Settings에 아래를 채워 넣는다:
+#   Secrets   : AWS_DEPLOY_ROLE_ARN        (GitHub OIDC로 assume할 IAM 역할, §13.7)
+#   Variables : AWS_REGION                 예: ap-northeast-2
+#               S3_ARTIFACT_BUCKET         빌드 아티팩트를 올릴 버킷
+#               EC2_SSM_INSTANCE_ID        배포 대상 EC2 인스턴스 ID
+#               CLOUDFRONT_DISTRIBUTION_ID
+# 이 값들이 비어 있어도 test/build 잡은 정상적으로 통과한다 — deploy 잡만 건너뛴다.
+
+name: frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend.yml"
+
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@9 --activate
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: frontend/dist
+          retention-days: 14
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write # OIDC — 장기 액세스 키를 Secrets에 두지 않는다 (§13.6)
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: dist
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Package and upload to S3 (tag=commit SHA)
+        run: |
+          tar -czf frontend-dist.tar.gz -C dist .
+          aws s3 cp frontend-dist.tar.gz "s3://${{ vars.S3_ARTIFACT_BUCKET }}/frontend/${{ github.sha }}.tar.gz"
+
+      - name: Extract on server + rollback snapshot via SSM Run Command
+        env:
+          S3_KEY: frontend/${{ github.sha }}.tar.gz
+          SHA: ${{ github.sha }}
+        run: |
+          aws ssm send-command \
+            --instance-ids "${{ vars.EC2_SSM_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "frontend deploy $SHA" \
+            --parameters "{\"commands\":[
+              \"set -e\",
+              \"cd /tmp\",
+              \"aws s3 cp s3://${{ vars.S3_ARTIFACT_BUCKET }}/$S3_KEY frontend-dist.tar.gz\",
+              \"rm -rf frontend-dist && mkdir frontend-dist\",
+              \"tar -xzf frontend-dist.tar.gz -C frontend-dist\",
+              \"docker run --rm -v finedining_web-dist:/web-dist -v /tmp/frontend-dist:/src:ro alpine sh -c 'cp -r /src/. /web-dist/ && mkdir -p /web-dist/releases && cp /src/index.html /web-dist/releases/$SHA.html'\"
+            ]}" \
+            --output text
+
+      - name: Invalidate CloudFront (/ and /index.html only)
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/" "/index.html"

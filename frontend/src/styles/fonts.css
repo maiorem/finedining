@@ -1,0 +1,25 @@
+/*
+ * self-host 폰트 선언 (CLAUDE.md §8.4). 실제 폰트 파일(Hahmlet, Pretendard Variable,
+ * IBM Plex Mono)은 라이선스 확인 후 /public/fonts/ 에 받아 넣는 후속 작업이 필요하다.
+ * 파일이 없는 동안은 각 font-family의 시스템 폴백(serif / sans-serif / monospace)으로 렌더된다.
+ */
+@font-face {
+  font-family: "Hahmlet";
+  src: url("/fonts/Hahmlet-Variable.woff2") format("woff2-variations");
+  font-weight: 300 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations");
+  font-weight: 45 920;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/IBMPlexMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}

@@ -1,0 +1,17 @@
+{
+  "app.name": "파인다이닝 씨어터",
+  "nav.main": "주 메뉴",
+  "nav.productions": "작품",
+  "nav.about": "소개",
+  "nav.booking": "예약",
+  "nav.proposal": "협업제안",
+  "nav.reviews": "리뷰",
+  "nav.language": "언어 변경",
+  "nav.openMenu": "메뉴 열기",
+  "nav.closeMenu": "메뉴 닫기",
+  "page.productions.placeholder": "작품 정보를 준비하고 있습니다.",
+  "page.about.placeholder": "소개 페이지를 준비하고 있습니다.",
+  "page.booking.placeholder": "회차 정보를 준비하고 있습니다.",
+  "page.proposal.placeholder": "협업제안 접수 페이지를 준비하고 있습니다.",
+  "page.reviews.placeholder": "리뷰 페이지를 준비하고 있습니다."
+}

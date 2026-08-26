@@ -1,0 +1,35 @@
+# 로컬 전용 override. dev/prod는 RDS를 쓴다 — 컨테이너 mysql은 여기에만 존재한다 (CLAUDE.md §13.4).
+#
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: fdt_local
+      MYSQL_USER: fdt_app
+      MYSQL_PASSWORD: change-me
+      MYSQL_ROOT_PASSWORD: change-me-root
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pchange-me-root"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/fdt_local?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: fdt_app
+      SPRING_DATASOURCE_PASSWORD: change-me
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql-data:

@@ -1,0 +1,61 @@
+# 배포 단위 컴포즈. 개발 중에는 쓰지 않는다 — 매 수정마다 이미지를 다시 빌드하면
+# 핫리로드가 사라진다 (CLAUDE.md §14). 전체 스택 통합 확인에만 쓴다.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    volumes:
+      - web-dist:/web-dist
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend:
+    # 로컬/CI에서는 --build로 소스에서 빌드해 이 태그로 저장한다. 프로덕션 배포는
+    # BACKEND_IMAGE를 ECR 이미지(레지스트리/저장소:커밋SHA)로 지정한 뒤
+    # `docker compose pull backend && docker compose up -d backend`만 실행한다 —
+    # build:가 남아 있어도 이미 같은 태그의 이미지가 있으면 다시 빌드하지 않는다(§13.6, 서버에서 빌드 안 함).
+    image: ${BACKEND_IMAGE:-finedining-backend:local}
+    build:
+      context: ./backend
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - web-dist:/srv/web:ro
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      frontend:
+        condition: service_completed_successfully
+      backend:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  web-dist:

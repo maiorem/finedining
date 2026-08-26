@@ -1,0 +1,30 @@
+# Gradle / Java
+backend/.gradle/
+backend/build/
+backend/out/
+!backend/gradle/wrapper/gradle-wrapper.jar
+*.class
+*.hprof
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+frontend/*.tsbuildinfo
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Docker build output shared volume (local only)
+web-dist/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store

@@ -1,0 +1,17 @@
+{
+  "app.name": "Fine Dining Theater",
+  "nav.main": "Main navigation",
+  "nav.productions": "Productions",
+  "nav.about": "About",
+  "nav.booking": "Booking",
+  "nav.proposal": "Collaboration",
+  "nav.reviews": "Reviews",
+  "nav.language": "Change language",
+  "nav.openMenu": "Open menu",
+  "nav.closeMenu": "Close menu",
+  "page.productions.placeholder": "Production listings are coming soon.",
+  "page.about.placeholder": "The about page is coming soon.",
+  "page.booking.placeholder": "Showing schedules are coming soon.",
+  "page.proposal.placeholder": "The collaboration proposal form is coming soon.",
+  "page.reviews.placeholder": "The reviews page is coming soon."
+}
