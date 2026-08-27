@@ -38,6 +38,7 @@
   "booking.empty": "No showings this month. Try another month.",
   "footer.copyright": "© 2026 Fine Dining Theater",
   "footer.login": "Log in",
+  "footer.adminLogout": "ADMIN LOGOUT",
   "login.eyebrow": "Login",
   "login.heading": "Log in",
   "login.kakao": "Log in with Kakao",

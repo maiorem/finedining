@@ -21,11 +21,17 @@
   color: var(--c-ink-35);
 }
 
-/* 로그인 진입점은 내비게이션에 노출하지 않고 여기 작게 둔다 (CLAUDE.md §3.5). */
+/* 로그인 진입점은 내비게이션에 노출하지 않고 여기 작게 둔다 (CLAUDE.md §3.5).
+   로그인 상태에선 같은 자리에 로그아웃 버튼이 온다 — <a>와 <button> 둘 다 써서 기본 스타일을 지운다. */
 .loginLink {
+  font-family: var(--f-body);
   font-size: var(--t-caption);
   color: var(--c-ink-35);
   text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .loginLink:hover,
@@ -36,4 +42,11 @@
 .loginLink:focus-visible {
   outline: 2px solid var(--c-spot);
   outline-offset: 3px;
+}
+
+/* ADMIN 토글(LoginPage)과 같은 유틸리티 표기 — 로그인 상태임을 시각적으로도 구분한다. */
+.adminLogout {
+  composes: loginLink;
+  font-family: var(--f-util);
+  letter-spacing: var(--ls-wide);
 }

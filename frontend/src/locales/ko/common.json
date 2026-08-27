@@ -38,6 +38,7 @@
   "booking.empty": "이 달에는 등록된 회차가 없습니다. 다음 달을 확인해 주세요.",
   "footer.copyright": "© 2026 파인다이닝 씨어터",
   "footer.login": "로그인",
+  "footer.adminLogout": "ADMIN LOGOUT",
   "login.eyebrow": "Login",
   "login.heading": "로그인",
   "login.kakao": "카카오로 로그인",
