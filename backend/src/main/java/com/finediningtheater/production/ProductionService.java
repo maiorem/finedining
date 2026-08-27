@@ -3,13 +3,15 @@ package com.finediningtheater.production;
 import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.ContentStatus;
+import com.finediningtheater.global.support.SiteLocale;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 공개 조회만 다룬다. 쓰기(ProductionEditController)는 관리자 로그인 단계에서 추가한다. */
+/** 공개 조회 + 작품 편집(2순위: 작품 아카이빙). 이미지 파이프라인은 다음 단계에서 붙인다. */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,5 +29,56 @@ public class ProductionService {
         return productionRepository
                 .findBySlugAndStatus(slug, ContentStatus.PUBLISHED)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+    }
+
+    /** 관리자용. 상태 무관 — DRAFT도 봐야 편집할 수 있다. */
+    public Production getForAdmin(Long id) {
+        return productionRepository
+                .findWithTranslationsById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+    }
+
+    public List<Production> listForAdmin() {
+        return productionRepository.findAllByOrderByCreatedAtAsc();
+    }
+
+    @Transactional
+    public Production create(String slug) {
+        if (productionRepository.existsBySlug(slug)) {
+            throw new BusinessException(ErrorCode.DUPLICATE_SLUG);
+        }
+        return productionRepository.save(new Production(slug));
+    }
+
+    /** "임시저장" — 공개본(title/subtitle)은 건드리지 않고 draft에만 쓴다 (CLAUDE.md §3.9). */
+    @Transactional
+    public void saveDraftTranslation(Long id, SiteLocale locale, String title, String subtitle) {
+        Production production = getForAdmin(id);
+        ProductionTranslation translation = production.translationRowFor(locale);
+        if (translation == null) {
+            translation = production.addTranslation(locale, null, null);
+        }
+        translation.updateDraft(title, subtitle);
+    }
+
+    /** "발행" — draft를 공개본으로 승격하고 PUBLISHED로 바꾼다. 한국어 제목 없이는 발행할 수 없다. */
+    @Transactional
+    @CacheEvict(value = {"productions", "productionDetail"}, allEntries = true)
+    public Production publish(Long id, Long adminId) {
+        Production production = getForAdmin(id);
+        production.promoteAllDrafts();
+        if (production.titleFor(SiteLocale.KO) == null) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "한국어 제목을 먼저 입력해 주세요.");
+        }
+        production.publish(adminId);
+        return production;
+    }
+
+    @Transactional
+    @CacheEvict(value = {"productions", "productionDetail"}, allEntries = true)
+    public Production unpublish(Long id) {
+        Production production = getForAdmin(id);
+        production.unpublish();
+        return production;
     }
 }

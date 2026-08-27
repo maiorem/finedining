@@ -14,4 +14,13 @@ public interface ProductionRepository extends JpaRepository<Production, Long> {
 
     @EntityGraph(attributePaths = "translations")
     List<Production> findAllByStatusOrderByCreatedAtAsc(ContentStatus status);
+
+    // 관리자용: 상태 무관 조회. DRAFT도 봐야 편집할 수 있다 (CLAUDE.md §3.9).
+    @EntityGraph(attributePaths = "translations")
+    Optional<Production> findWithTranslationsById(Long id);
+
+    @EntityGraph(attributePaths = "translations")
+    List<Production> findAllByOrderByCreatedAtAsc();
+
+    boolean existsBySlug(String slug);
 }
