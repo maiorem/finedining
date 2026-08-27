@@ -97,7 +97,15 @@ public class SecurityConfig {
                                                 "/api/auth/admin/logout")
                                         .permitAll()
                                         .requestMatchers(
-                                                HttpMethod.GET, "/api/productions/**", "/api/showings/**")
+                                                HttpMethod.GET,
+                                                "/api/productions/**",
+                                                "/api/showings/**",
+                                                "/api/artists/**",
+                                                "/api/castings/**")
+                                        // /manage 하위 경로도 이 와일드카드에 걸리지만 안전하다 — 그쪽은
+                                        // ArtistEditController/CastingEditController의 클래스 레벨
+                                        // @PreAuthorize가 별도 AOP 계층에서 여전히 막는다. 여기서
+                                        // permitAll은 "필터 체인을 통과시킨다"는 뜻이지 인가를 면제하지 않는다.
                                         .permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/showings/*/booking-click")
                                         .permitAll()
