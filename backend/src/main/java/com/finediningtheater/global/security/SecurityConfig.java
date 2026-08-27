@@ -101,6 +101,9 @@ public class SecurityConfig {
                                         .permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/showings/*/booking-click")
                                         .permitAll()
+                                        // 협업제안은 카카오 로그인이 붙기 전까지 로그인 없이 받는다(2026-08-27, §3.7).
+                                        .requestMatchers(HttpMethod.POST, "/api/proposals")
+                                        .permitAll()
                                         .requestMatchers("/actuator/health/**")
                                         .permitAll()
                                         .requestMatchers("/api/**")
