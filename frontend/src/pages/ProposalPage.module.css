@@ -1,0 +1,140 @@
+.page {
+  padding: var(--section-y-mobile) var(--gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--section-y-desktop) var(--gutter-desktop);
+  }
+}
+
+.heading {
+  font-family: var(--f-display);
+  font-size: var(--t-h1);
+  font-weight: 400;
+  margin: 0 0 0.75rem;
+}
+
+.lead {
+  max-width: 38em;
+  color: var(--c-ink-60);
+  margin: 0 0 2.5rem;
+}
+
+.form {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field label {
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+}
+
+.field input,
+.field textarea {
+  padding: 0.7em 0.9em;
+  border: 1px solid var(--c-line);
+  background: var(--c-white);
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+}
+
+.field input {
+  min-height: 44px;
+}
+
+.field textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
+/* 허니팟 — 화면에는 안 보이지만 DOM에는 있어야 봇이 채운다 (CLAUDE.md §7.7). */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+  line-height: var(--lh-body);
+}
+
+.consent input {
+  margin-top: 0.2em;
+}
+
+.consentDetail {
+  display: block;
+  color: var(--c-ink-35);
+  margin-top: 0.3em;
+}
+
+.submit {
+  align-self: flex-start;
+  min-height: 48px;
+  padding: 0 1.5em;
+  border: 1px solid var(--c-ink);
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+  cursor: pointer;
+}
+
+.submit:hover:not(:disabled),
+.submit:focus-visible {
+  border-color: var(--c-spot);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.submit:disabled {
+  color: var(--c-ink-35);
+  border-color: var(--c-line);
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 0;
+  border: 1px solid var(--c-line);
+  padding: 0.6em 0.8em;
+  font-size: var(--t-caption);
+  color: var(--c-ink);
+}
+
+.success {
+  max-width: 480px;
+  border: 1px solid var(--c-line);
+  padding: 1.5rem;
+}
+
+.success p {
+  margin: 0;
+  color: var(--c-ink);
+}

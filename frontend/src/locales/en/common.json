@@ -12,7 +12,6 @@
   "nav.closeMenu": "Close menu",
   "page.productions.placeholder": "Production listings are coming soon.",
   "page.about.placeholder": "The about page is coming soon.",
-  "page.proposal.placeholder": "The collaboration proposal form is coming soon.",
   "page.reviews.placeholder": "The reviews page is coming soon.",
   "page.artists.placeholder": "Artist profiles are coming soon.",
   "booking.reserve": "Go to Naver Booking",
@@ -53,5 +52,17 @@
   "login.error.ACCOUNT_LOCKED": "Too many attempts. Please try again later.",
   "login.error.RATE_LIMITED": "Too many requests. Please try again later.",
   "login.error.VALIDATION_ERROR": "Please check your input.",
-  "login.error.generic": "Login failed."
+  "login.error.generic": "Login failed.",
+  "proposal.lead": "Tell us what you'd like to collaborate on. We'll review it and reply by email.",
+  "proposal.name": "Name",
+  "proposal.contactEmail": "Reply email",
+  "proposal.title": "Title",
+  "proposal.body": "Message",
+  "proposal.consent": "I agree to the collection and use of my personal information.",
+  "proposal.consentDetail": "Collected: name, email · Purpose: reviewing and replying to this proposal · Retention: deleted automatically after 3 years",
+  "proposal.submit": "Send proposal",
+  "proposal.success": "Your proposal has been sent. We'll review it and get back to you.",
+  "proposal.error.VALIDATION_ERROR": "Please check your input.",
+  "proposal.error.RATE_LIMITED": "Too many requests. Please try again later.",
+  "proposal.error.generic": "Submission failed. Please try again later."
 }
