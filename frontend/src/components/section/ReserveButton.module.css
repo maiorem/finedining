@@ -1,0 +1,35 @@
+/* 1px 아웃라인 CTA. 채운 버튼이 아니다 (CLAUDE.md §8.2). */
+.reserve,
+.disabled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  min-height: 44px;
+  padding: 0 1.25em;
+  border: 1px solid var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+  background: transparent;
+  color: var(--c-ink);
+  text-decoration: none;
+  transition:
+    border-color var(--d-fast) var(--e-out),
+    color var(--d-fast) var(--e-out);
+}
+
+.reserve:hover,
+.reserve:focus-visible {
+  border-color: var(--c-spot);
+}
+
+.reserve:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.disabled {
+  border-color: var(--c-line);
+  color: var(--c-ink-35);
+  cursor: not-allowed;
+}

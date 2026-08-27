@@ -1,0 +1,122 @@
+.page {
+  padding: var(--section-y-mobile) var(--gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--section-y-desktop) var(--gutter-desktop);
+  }
+}
+
+.heading {
+  font-family: var(--f-display);
+  font-size: var(--t-h1);
+  font-weight: 400;
+  margin: 0 0 1.5rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--c-line);
+  margin-bottom: 1.5rem;
+}
+
+.monthNav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--f-util);
+}
+
+.monthNav button {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font-size: var(--t-body);
+}
+
+.monthNav button:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.monthLabel {
+  font-size: var(--t-lead);
+  min-width: 8em;
+  text-align: center;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filters select {
+  min-height: 44px;
+  border: 1px solid var(--c-line);
+  background: var(--c-paper);
+  color: var(--c-ink);
+  padding: 0 0.75em;
+  font-family: var(--f-body);
+}
+
+.langFilterGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* 사이트 UI 언어(헤더 KO/EN 토글)와 다른 축이라는 걸 라벨로 분명히 한다 —
+   회차 진행 언어(spokenLanguage) 필터다 (CLAUDE.md §7.6). */
+.langFilterLabel {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  color: var(--c-ink-35);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+}
+
+.langFilter {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.langFilter button {
+  min-height: 44px;
+  padding: 0 1em;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink-60);
+  font-family: var(--f-body);
+}
+
+.langFilter button[aria-pressed="true"] {
+  border-color: var(--c-ink);
+  color: var(--c-ink);
+}
+
+.langFilter button:focus-visible,
+.filters select:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.status {
+  color: var(--c-ink-60);
+  padding: 2rem 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

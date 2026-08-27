@@ -1,0 +1,59 @@
+.card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--c-line);
+}
+
+@media (max-width: 767px) {
+  .card {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.time {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--f-util);
+  min-width: 6.5em;
+}
+
+.date {
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+  letter-spacing: var(--ls-wide);
+}
+
+.clock {
+  font-size: var(--t-lead);
+  color: var(--c-ink);
+}
+
+.title {
+  font-family: var(--f-display);
+  font-size: var(--t-h2);
+  font-weight: 400;
+  margin: 0 0 0.4em;
+}
+
+.meta {
+  margin: 0 0 0.6em;
+  color: var(--c-ink-60);
+  font-size: var(--t-body);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.langNote {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+}
