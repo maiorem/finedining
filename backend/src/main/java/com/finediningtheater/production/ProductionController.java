@@ -2,6 +2,8 @@ package com.finediningtheater.production;
 
 import com.finediningtheater.global.response.ApiResponse;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaService;
+import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.production.dto.ProductionDetailResponse;
 import com.finediningtheater.production.dto.ProductionSummaryResponse;
 import java.util.List;
@@ -19,13 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductionController {
 
     private final ProductionService productionService;
+    private final MediaService mediaService;
 
     @GetMapping
     public ApiResponse<List<ProductionSummaryResponse>> list(
             @RequestParam(defaultValue = "KO") SiteLocale lang) {
         List<ProductionSummaryResponse> body =
                 productionService.listPublished().stream()
-                        .map(production -> ProductionSummaryResponse.from(production, lang))
+                        .map(production -> ProductionSummaryResponse.from(production, lang, thumbnailFor(production)))
                         .toList();
         return ApiResponse.success(body);
     }
@@ -34,6 +37,20 @@ public class ProductionController {
     public ApiResponse<ProductionDetailResponse> detail(
             @PathVariable String slug, @RequestParam(defaultValue = "KO") SiteLocale lang) {
         Production production = productionService.getPublished(slug);
-        return ApiResponse.success(ProductionDetailResponse.from(production, lang));
+        List<MediaAssetResponse> images = imagesFor(production);
+        return ApiResponse.success(ProductionDetailResponse.from(production, lang, images));
+    }
+
+    private MediaAssetResponse thumbnailFor(Production production) {
+        return mediaService.listPublished(production.getId()).stream()
+                .findFirst()
+                .map(asset -> MediaAssetResponse.from(asset, mediaService))
+                .orElse(null);
+    }
+
+    private List<MediaAssetResponse> imagesFor(Production production) {
+        return mediaService.listPublished(production.getId()).stream()
+                .map(asset -> MediaAssetResponse.from(asset, mediaService))
+                .toList();
     }
 }

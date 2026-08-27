@@ -6,6 +6,8 @@ import com.finediningtheater.global.security.AdminPrincipal;
 import com.finediningtheater.global.security.SudoMode;
 import com.finediningtheater.global.support.ClientIp;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaService;
+import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.production.dto.CreateProductionRequest;
 import com.finediningtheater.production.dto.ProductionAdminResponse;
 import com.finediningtheater.production.dto.UpsertTranslationRequest;
@@ -25,8 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 작품 편집(2순위: 작품 아카이빙, 텍스트만 — 이미지 파이프라인은 다음 단계). 발행/발행취소는
- * 파괴적·공개적 동작이라 sudo 모드를 요구한다(CLAUDE.md §3.4). 모든 쓰기에 감사 로그를 남긴다(§7.7).
+ * 작품 편집(2순위: 작품 아카이빙) + 이미지 목록 조회. 이미지 자체의 업로드·삭제는
+ * {@code MediaEditController}가 맡는다. 발행/발행취소는 파괴적·공개적 동작이라 sudo 모드를
+ * 요구한다(CLAUDE.md §3.4). 모든 쓰기에 감사 로그를 남긴다(§7.7).
  */
 @RestController
 @RequestMapping("/api/productions")
@@ -35,19 +38,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductionEditController {
 
     private final ProductionService productionService;
+    private final MediaService mediaService;
     private final AuditLogger auditLogger;
     private final SudoMode sudoMode;
 
     @GetMapping("/manage")
     public ApiResponse<List<ProductionAdminResponse>> listForAdmin() {
         List<ProductionAdminResponse> body =
-                productionService.listForAdmin().stream().map(ProductionAdminResponse::from).toList();
+                productionService.listForAdmin().stream().map(this::toAdminResponse).toList();
         return ApiResponse.success(body);
     }
 
     @GetMapping("/manage/{id}")
     public ApiResponse<ProductionAdminResponse> getForAdmin(@PathVariable Long id) {
-        return ApiResponse.success(ProductionAdminResponse.from(productionService.getForAdmin(id)));
+        return ApiResponse.success(toAdminResponse(productionService.getForAdmin(id)));
     }
 
     @PostMapping
@@ -66,7 +70,7 @@ public class ProductionEditController {
                 Map.of("slug", request.slug()),
                 ClientIp.resolve(httpRequest));
 
-        return ApiResponse.success(ProductionAdminResponse.from(production));
+        return ApiResponse.success(toAdminResponse(production));
     }
 
     /** "임시저장" — 공개본에는 영향이 없다(§3.9). */
@@ -96,7 +100,7 @@ public class ProductionEditController {
                 Map.of("draftTitle", request.title(), "draftSubtitle", String.valueOf(request.subtitle())),
                 ClientIp.resolve(httpRequest));
 
-        return ApiResponse.success(ProductionAdminResponse.from(productionService.getForAdmin(id)));
+        return ApiResponse.success(toAdminResponse(productionService.getForAdmin(id)));
     }
 
     /** 파괴적·공개적 동작 — PIN sudo 모드가 열려 있어야 한다(§3.4). */
@@ -119,7 +123,7 @@ public class ProductionEditController {
                 Map.of("status", after.getStatus().name()),
                 ClientIp.resolve(httpRequest));
 
-        return ApiResponse.success(ProductionAdminResponse.from(after));
+        return ApiResponse.success(toAdminResponse(after));
     }
 
     @PostMapping("/{id}/unpublish")
@@ -141,6 +145,15 @@ public class ProductionEditController {
                 Map.of("status", after.getStatus().name()),
                 ClientIp.resolve(httpRequest));
 
-        return ApiResponse.success(ProductionAdminResponse.from(after));
+        return ApiResponse.success(toAdminResponse(after));
+    }
+
+    // 관리자는 PENDING·FAILED 이미지도 봐야 재시도·삭제할 수 있으므로 listForAdmin(전체)을 쓴다.
+    private ProductionAdminResponse toAdminResponse(Production production) {
+        List<MediaAssetResponse> images =
+                mediaService.listForAdmin(production.getId()).stream()
+                        .map(asset -> MediaAssetResponse.from(asset, mediaService))
+                        .toList();
+        return ProductionAdminResponse.from(production, images);
     }
 }

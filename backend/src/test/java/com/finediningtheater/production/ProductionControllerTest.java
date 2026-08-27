@@ -10,6 +10,7 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.security.JwtProvider;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ class ProductionControllerTest {
     @Autowired private MockMvc mockMvc;
 
     @MockitoBean private ProductionService productionService;
+
+    // 이미지 파이프라인(§7.5) 연동으로 생긴 의존성. 이 슬라이스는 응답 모양만 보므로 목록은 비워둔다.
+    @MockitoBean private MediaService mediaService;
 
     // JwtAuthenticationFilter가 Filter로 스캔되면서 딸려오는 의존성 — 이 슬라이스에선 실행되지
     // 않지만(addFilters=false) 빈 그래프를 만족시켜야 컨텍스트가 뜬다.

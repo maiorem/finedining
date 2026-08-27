@@ -10,6 +10,7 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.ContentStatus;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -21,9 +22,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ProductionServiceTest {
 
     @Mock private ProductionRepository productionRepository;
+    @Mock private MediaService mediaService;
 
     private ProductionService productionService() {
-        return new ProductionService(productionRepository);
+        return new ProductionService(productionRepository, mediaService);
     }
 
     @Test

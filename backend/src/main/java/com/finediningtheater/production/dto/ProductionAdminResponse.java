@@ -1,10 +1,15 @@
 package com.finediningtheater.production.dto;
 
+import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.production.Production;
 import java.util.List;
 
 public record ProductionAdminResponse(
-        Long id, String slug, String status, List<TranslationView> translations) {
+        Long id,
+        String slug,
+        String status,
+        List<TranslationView> translations,
+        List<MediaAssetResponse> images) {
 
     public record TranslationView(
             String locale,
@@ -14,7 +19,7 @@ public record ProductionAdminResponse(
             String draftSubtitle,
             boolean hasPendingDraft) {}
 
-    public static ProductionAdminResponse from(Production production) {
+    public static ProductionAdminResponse from(Production production, List<MediaAssetResponse> images) {
         List<TranslationView> views =
                 production.getTranslations().stream()
                         .map(
@@ -28,6 +33,6 @@ public record ProductionAdminResponse(
                                                 t.getDraftTitle() != null))
                         .toList();
         return new ProductionAdminResponse(
-                production.getId(), production.getSlug(), production.getStatus().name(), views);
+                production.getId(), production.getSlug(), production.getStatus().name(), views, images);
     }
 }

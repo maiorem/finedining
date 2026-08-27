@@ -38,6 +38,12 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
+    // 이미지 업로드 presign + 파생본 저장 (CLAUDE.md §7.5). 로컬은 MinIO, 배포 시 환경변수만
+    // 바꾸면 실제 AWS S3로 전환된다 — 엔드포인트 오버라이드 하나로 같은 코드가 양쪽에 다 붙는다.
+    // S3Presigner는 별도 아티팩트가 아니라 s3 모듈 안에 포함되어 있다.
+    implementation(platform("software.amazon.awssdk:bom:2.29.15"))
+    implementation("software.amazon.awssdk:s3")
+
     runtimeOnly("com.mysql:mysql-connector-j")
 
     compileOnly("org.projectlombok:lombok")

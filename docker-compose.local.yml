@@ -3,6 +3,25 @@
 #   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
 
 services:
+  # 로컬 전용 S3 호환 스토리지. dev/prod는 환경변수로 실제 AWS S3를 가리킨다 — 코드는 그대로다
+  # (CLAUDE.md §7.5). 콘솔(9001)은 브라우저에서 버킷 내용을 눈으로 확인할 때만 쓴다.
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   mysql:
     image: mysql:8.0
     environment:
@@ -27,9 +46,17 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/fdt_local?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: fdt_app
       SPRING_DATASOURCE_PASSWORD: change-me
+      # backend 컨테이너는 컴포즈 네트워크로 minio에 접속한다. 단, 이 값은 presigned URL의
+      # 호스트에도 그대로 박히므로 호스트 브라우저가 PUT을 못 하는 문제가 남는다 — 전체 스택을
+      # 컨테이너로 띄우는 건 §14가 말하는 "통합 확인용"이지 일상 개발 흐름이 아니다. 일상
+      # 개발(`./gradlew bootRun` on host)에서는 application.yml 기본값(localhost:9000)을 그대로 쓴다.
+      S3_ENDPOINT: http://minio:9000
     depends_on:
       mysql:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
 volumes:
   mysql-data:
+  minio-data:

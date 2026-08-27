@@ -4,6 +4,7 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.ContentStatus;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -11,13 +12,14 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 공개 조회 + 작품 편집(2순위: 작품 아카이빙). 이미지 파이프라인은 다음 단계에서 붙인다. */
+/** 공개 조회 + 작품 편집(2순위: 작품 아카이빙) + 이미지 파이프라인 연동(§7.5). */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProductionService {
 
     private final ProductionRepository productionRepository;
+    private final MediaService mediaService;
 
     @Cacheable("productions")
     public List<Production> listPublished() {
@@ -71,6 +73,7 @@ public class ProductionService {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "한국어 제목을 먼저 입력해 주세요.");
         }
         production.publish(adminId);
+        mediaService.publishAllForProduction(id);
         return production;
     }
 
