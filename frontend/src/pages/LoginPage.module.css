@@ -1,0 +1,168 @@
+.page {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--section-y-mobile) var(--gutter-mobile);
+}
+
+.card {
+  width: 100%;
+  max-width: 360px;
+}
+
+.eyebrow {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--c-ink-60);
+  margin: 0 0 0.5rem;
+}
+
+.heading {
+  font-family: var(--f-display);
+  font-size: var(--t-h1);
+  font-weight: 400;
+  margin: 0 0 2rem;
+}
+
+.kakaoButton {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink-35);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+  cursor: not-allowed;
+}
+
+.kakaoNote {
+  margin: 0.5rem 0 0;
+  font-size: var(--t-caption);
+  color: var(--c-ink-35);
+  text-align: center;
+}
+
+.adminToggle {
+  display: block;
+  margin: 2.5rem auto 0;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  color: var(--c-ink-35);
+  cursor: pointer;
+}
+
+.adminToggle:hover,
+.adminToggle:focus-visible {
+  color: var(--c-ink-60);
+}
+
+.adminToggle:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.adminForm {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--c-line);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field label {
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+}
+
+.field input {
+  min-height: 44px;
+  padding: 0 0.9em;
+  border: 1px solid var(--c-line);
+  background: var(--c-white);
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+}
+
+.field input:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
+.submit {
+  min-height: 48px;
+  border: 1px solid var(--c-ink);
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+  cursor: pointer;
+}
+
+.submit:hover:not(:disabled),
+.submit:focus-visible {
+  border-color: var(--c-spot);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.submit:disabled {
+  color: var(--c-ink-35);
+  border-color: var(--c-line);
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 0;
+  color: var(--c-ink);
+  font-size: var(--t-caption);
+  border: 1px solid var(--c-line);
+  padding: 0.6em 0.8em;
+}
+
+.sessionCard {
+  border: 1px solid var(--c-line);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sessionText {
+  margin: 0;
+  font-size: var(--t-body);
+  color: var(--c-ink);
+}
+
+.logoutButton {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 1.25em;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink-60);
+  font-family: var(--f-body);
+  cursor: pointer;
+}
+
+.logoutButton:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}

@@ -33,5 +33,22 @@
   "booking.languageFilter.KO": "한국어 진행",
   "booking.languageFilter.EN": "영어 진행",
   "booking.loading": "회차 정보를 불러오는 중입니다.",
-  "booking.empty": "이 달에는 등록된 회차가 없습니다. 다음 달을 확인해 주세요."
+  "booking.empty": "이 달에는 등록된 회차가 없습니다. 다음 달을 확인해 주세요.",
+  "footer.copyright": "© 2026 파인다이닝 씨어터",
+  "footer.login": "로그인",
+  "login.eyebrow": "Login",
+  "login.heading": "로그인",
+  "login.kakao": "카카오로 로그인",
+  "login.kakaoComingSoon": "카카오 로그인은 준비 중입니다.",
+  "login.adminToggle": "ADMIN",
+  "login.adminUsername": "아이디",
+  "login.adminPassword": "비밀번호",
+  "login.adminSubmit": "로그인",
+  "login.loggedInAs": "{{username}}님으로 로그인했습니다 ({{role}})",
+  "login.logout": "로그아웃",
+  "login.error.INVALID_CREDENTIALS": "아이디 또는 비밀번호가 올바르지 않습니다.",
+  "login.error.ACCOUNT_LOCKED": "로그인 시도가 너무 많아 잠겼습니다. 잠시 후 다시 시도해 주세요.",
+  "login.error.RATE_LIMITED": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+  "login.error.VALIDATION_ERROR": "입력값을 확인해 주세요.",
+  "login.error.generic": "로그인에 실패했습니다."
 }

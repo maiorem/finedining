@@ -1,0 +1,39 @@
+.footer {
+  border-top: 1px solid var(--c-line);
+  padding: 2rem var(--gutter-mobile);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .footer {
+    padding: 2rem var(--gutter-desktop);
+  }
+}
+
+.copyright {
+  margin: 0;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  color: var(--c-ink-35);
+}
+
+/* 로그인 진입점은 내비게이션에 노출하지 않고 여기 작게 둔다 (CLAUDE.md §3.5). */
+.loginLink {
+  font-size: var(--t-caption);
+  color: var(--c-ink-35);
+  text-decoration: none;
+}
+
+.loginLink:hover,
+.loginLink:focus-visible {
+  color: var(--c-ink-60);
+}
+
+.loginLink:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}

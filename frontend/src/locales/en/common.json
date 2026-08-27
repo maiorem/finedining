@@ -33,5 +33,22 @@
   "booking.languageFilter.KO": "Korean-spoken",
   "booking.languageFilter.EN": "English-spoken",
   "booking.loading": "Loading showings…",
-  "booking.empty": "No showings this month. Try another month."
+  "booking.empty": "No showings this month. Try another month.",
+  "footer.copyright": "© 2026 Fine Dining Theater",
+  "footer.login": "Log in",
+  "login.eyebrow": "Login",
+  "login.heading": "Log in",
+  "login.kakao": "Log in with Kakao",
+  "login.kakaoComingSoon": "Kakao login is coming soon.",
+  "login.adminToggle": "ADMIN",
+  "login.adminUsername": "Username",
+  "login.adminPassword": "Password",
+  "login.adminSubmit": "Log in",
+  "login.loggedInAs": "Logged in as {{username}} ({{role}})",
+  "login.logout": "Log out",
+  "login.error.INVALID_CREDENTIALS": "Incorrect username or password.",
+  "login.error.ACCOUNT_LOCKED": "Too many attempts. Please try again later.",
+  "login.error.RATE_LIMITED": "Too many requests. Please try again later.",
+  "login.error.VALIDATION_ERROR": "Please check your input.",
+  "login.error.generic": "Login failed."
 }
