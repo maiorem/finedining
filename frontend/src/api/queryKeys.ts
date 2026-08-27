@@ -11,4 +11,11 @@ export const queryKeys = {
     list: (params: { productionSlug?: string; from?: string; to?: string; lang: string }) =>
       ["showings", "list", params] as const,
   },
+  artists: {
+    list: (lang: string) => ["artists", "list", lang] as const,
+    detail: (slug: string, lang: string) => ["artists", "detail", slug, lang] as const,
+  },
+  castings: {
+    list: (lang: string) => ["castings", "list", lang] as const,
+  },
 } as const;

@@ -1,0 +1,70 @@
+.page {
+  padding: var(--section-y-mobile) var(--gutter-mobile);
+  max-width: 640px;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--section-y-desktop) var(--gutter-desktop);
+  }
+}
+
+.eyebrow {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--c-ink-60);
+  margin: 0 0 0.5rem;
+}
+
+.name {
+  font-family: var(--f-display);
+  font-size: var(--t-h1);
+  font-weight: 400;
+  margin: 0 0 1.5rem;
+}
+
+.bio {
+  line-height: var(--lh-body);
+  color: var(--c-ink);
+  white-space: pre-wrap;
+  margin: 0 0 2rem;
+  max-width: 38em;
+}
+
+.link {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: var(--c-ink-60);
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--c-spot);
+}
+
+.productionsHeading {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--c-ink-60);
+  margin: 0 0 0.75rem;
+}
+
+.productionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.productionList li {
+  padding: 0.5em 0;
+  border-bottom: 1px solid var(--c-line);
+}
+
+.status {
+  color: var(--c-ink-60);
+  padding: 1rem 0;
+}

@@ -13,7 +13,6 @@
   "page.productions.placeholder": "Production listings are coming soon.",
   "page.about.placeholder": "The about page is coming soon.",
   "page.reviews.placeholder": "The reviews page is coming soon.",
-  "page.artists.placeholder": "Artist profiles are coming soon.",
   "booking.reserve": "Go to Naver Booking",
   "booking.opensNewWindow": "opens in a new window",
   "booking.unavailable": "Booking page coming soon",
@@ -64,5 +63,11 @@
   "proposal.success": "Your proposal has been sent. We'll review it and get back to you.",
   "proposal.error.VALIDATION_ERROR": "Please check your input.",
   "proposal.error.RATE_LIMITED": "Too many requests. Please try again later.",
-  "proposal.error.generic": "Submission failed. Please try again later."
+  "proposal.error.generic": "Submission failed. Please try again later.",
+  "artists.loading": "Loading…",
+  "artists.empty": "No artists registered yet.",
+  "artists.notFound": "This artist doesn't exist.",
+  "artists.loadError": "Couldn't load this artist.",
+  "artists.castingHeading": "Open Casting Calls",
+  "artists.productionsHeading": "Productions"
 }

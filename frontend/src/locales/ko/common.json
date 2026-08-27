@@ -13,7 +13,6 @@
   "page.productions.placeholder": "작품 정보를 준비하고 있습니다.",
   "page.about.placeholder": "소개 페이지를 준비하고 있습니다.",
   "page.reviews.placeholder": "리뷰 페이지를 준비하고 있습니다.",
-  "page.artists.placeholder": "아티스트 프로필을 준비하고 있습니다.",
   "booking.reserve": "네이버 예약으로 이동",
   "booking.opensNewWindow": "새 창에서 열림",
   "booking.unavailable": "예약 페이지 준비 중",
@@ -64,5 +63,11 @@
   "proposal.success": "제안을 보냈습니다. 검토 후 회신드리겠습니다.",
   "proposal.error.VALIDATION_ERROR": "입력값을 확인해 주세요.",
   "proposal.error.RATE_LIMITED": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
-  "proposal.error.generic": "제출에 실패했습니다. 잠시 후 다시 시도해 주세요."
+  "proposal.error.generic": "제출에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+  "artists.loading": "불러오는 중입니다.",
+  "artists.empty": "등록된 아티스트가 없습니다.",
+  "artists.notFound": "존재하지 않는 아티스트입니다.",
+  "artists.loadError": "아티스트 정보를 불러오지 못했습니다.",
+  "artists.castingHeading": "모집 공고",
+  "artists.productionsHeading": "참여 작품"
 }
