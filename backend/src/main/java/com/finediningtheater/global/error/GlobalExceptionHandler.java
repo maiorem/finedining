@@ -1,7 +1,10 @@
 package com.finediningtheater.global.error;
 
 import com.finediningtheater.global.response.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,6 +16,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
@@ -33,6 +38,16 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ErrorCode.VALIDATION_ERROR, message));
     }
 
+    /**
+     * @PreAuthorize가 막으면(익명, 또는 GET permitAll 와일드카드를 통과했지만 역할이 부족한 경우)
+     * Spring Security 6.3+는 이 예외를 던진다 — 잡지 않으면 500으로 새어나간다(2026-08-27 발견).
+     */
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthorizationDenied(AuthorizationDeniedException e) {
+        return ResponseEntity.status(ErrorCode.FORBIDDEN.getStatus())
+                .body(ApiResponse.error(ErrorCode.FORBIDDEN));
+    }
+
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoResourceFound(NoResourceFoundException e) {
         return ResponseEntity.status(ErrorCode.ENTITY_NOT_FOUND.getStatus())
@@ -41,6 +56,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleUnexpectedException(Exception e) {
+        // 응답에는 절대 노출하지 않지만(§7.2), 서버 로그에는 남겨야 원인을 추적할 수 있다.
+        log.error("예상하지 못한 예외", e);
         return ResponseEntity.status(ErrorCode.INTERNAL_ERROR.getStatus())
                 .body(ApiResponse.error(ErrorCode.INTERNAL_ERROR));
     }

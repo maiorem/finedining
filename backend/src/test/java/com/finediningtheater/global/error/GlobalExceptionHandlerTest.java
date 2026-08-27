@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 class GlobalExceptionHandlerTest {
@@ -30,5 +32,21 @@ class GlobalExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(response.getBody().error().message()).doesNotContain("secret internal detail");
+    }
+
+    /**
+     * @PreAuthorize 거부는 500이 아니라 403으로 내려가야 한다 — GET permitAll 와일드카드 아래
+     * 놓인 /manage 관리자 엔드포인트를 익명으로 두드렸을 때 이걸 놓치면 500이 새어나간다
+     * (2026-08-27 발견, Artist/Casting 작업 중).
+     */
+    @Test
+    void PreAuthorize_거부는_500이_아니라_403으로_내려간다() {
+        AuthorizationDeniedException e =
+                new AuthorizationDeniedException("Access Denied", new AuthorizationDecision(false));
+
+        ResponseEntity<ApiResponse<Void>> response = handler.handleAuthorizationDenied(e);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getBody().error().code()).isEqualTo("FORBIDDEN");
     }
 }
