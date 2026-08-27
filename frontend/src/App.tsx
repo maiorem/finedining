@@ -3,6 +3,7 @@ import { Header } from "./components/layout/Header";
 import { Footer } from "./components/layout/Footer";
 import HomePage from "./pages/HomePage";
 import ProductionsPage from "./pages/ProductionsPage";
+import ProductionDetailPage from "./pages/ProductionDetailPage";
 import AboutPage from "./pages/AboutPage";
 import BookingPage from "./pages/BookingPage";
 import ProposalPage from "./pages/ProposalPage";
@@ -18,6 +19,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/productions" element={<ProductionsPage />} />
+        <Route path="/productions/:slug" element={<ProductionDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/proposal" element={<ProposalPage />} />

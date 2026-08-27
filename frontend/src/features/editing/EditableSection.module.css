@@ -1,0 +1,29 @@
+.wrapper {
+  position: relative;
+  outline: 1px dashed var(--c-spot);
+  outline-offset: 8px;
+}
+
+.badge {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-white);
+  border: 1px solid var(--c-spot);
+  color: var(--c-spot);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}

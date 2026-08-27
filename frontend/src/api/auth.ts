@@ -42,3 +42,16 @@ export function refreshAdminSession(): Promise<AdminSession> {
 export async function logoutAdmin(): Promise<void> {
   await fetch("/api/auth/admin/logout", { method: "POST" });
 }
+
+/** PIN 확인 → 통과하면 서버가 15분짜리 sudo 모드를 연다 (CLAUDE.md §3.4). */
+export async function verifySudoPin(accessToken: string, pin: string): Promise<void> {
+  const response = await fetch("/api/auth/admin/sudo", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ pin }),
+  });
+  const envelope = (await response.json()) as ApiEnvelope<null>;
+  if (!envelope.success) {
+    throw new ApiError(envelope.error?.code ?? "UNKNOWN", envelope.error?.message ?? "요청이 실패했습니다.");
+  }
+}

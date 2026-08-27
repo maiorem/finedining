@@ -1,14 +1,26 @@
 import { useTranslation } from "react-i18next";
+import { useProductions } from "../api/productions";
+import { ProductionCard } from "../components/section/ProductionCard";
+import styles from "./ProductionsPage.module.css";
 
 export default function ProductionsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { data: productions, isLoading } = useProductions(i18n.language);
 
   return (
-    <main style={{ padding: "var(--section-y-mobile) var(--gutter-mobile)" }}>
-      <h1 style={{ fontFamily: "var(--f-display)", fontSize: "var(--t-h1)" }}>
-        {t("nav.productions")}
-      </h1>
-      <p style={{ color: "var(--c-ink-60)" }}>{t("page.productions.placeholder")}</p>
+    <main className={styles.page}>
+      <h1 className={styles.heading}>{t("nav.productions")}</h1>
+
+      {isLoading && <p className={styles.status}>{t("productions.loading")}</p>}
+      {!isLoading && productions?.length === 0 && <p className={styles.status}>{t("productions.empty")}</p>}
+
+      <ul className={styles.grid}>
+        {productions?.map((production) => (
+          <li key={production.id}>
+            <ProductionCard production={production} />
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }

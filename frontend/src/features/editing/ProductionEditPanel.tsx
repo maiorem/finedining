@@ -1,0 +1,236 @@
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAdminAuth } from "../../contexts/AdminAuthContext";
+import {
+  getProductionForAdmin,
+  publishProduction,
+  saveDraftTranslation,
+  unpublishProduction,
+} from "../../api/productionAdmin";
+import { ApiError } from "../../api/http";
+import { queryKeys } from "../../api/queryKeys";
+import { ImageDropzone } from "./ImageDropzone";
+import { PinModal } from "./PinModal";
+import styles from "./ProductionEditPanel.module.css";
+
+type Locale = "KO" | "EN";
+const LOCALES: Locale[] = ["KO", "EN"];
+
+type DraftState = Record<Locale, { title: string; subtitle: string }>;
+
+type ProductionEditPanelProps = {
+  productionId: number;
+};
+
+const EMPTY_DRAFTS: DraftState = {
+  KO: { title: "", subtitle: "" },
+  EN: { title: "", subtitle: "" },
+};
+
+/**
+ * §3.9의 "같은 페이지, 편집 패널" 그 자체. 이 모듈은 `features/editing/`에 있으므로
+ * React.lazy로만 import된다 — 익명 방문자 번들에 섞이지 않는다(§3.5·§9).
+ */
+export default function ProductionEditPanel({ productionId }: ProductionEditPanelProps) {
+  const { t } = useTranslation();
+  const { session } = useAdminAuth();
+  const queryClient = useQueryClient();
+  const queryKey = queryKeys.productions.adminDetail(productionId);
+
+  const { data } = useQuery({
+    queryKey,
+    queryFn: () => getProductionForAdmin(session!.accessToken, productionId),
+    enabled: Boolean(session),
+    staleTime: 0, // 편집 모드는 방금 저장한 값이 바로 보여야 한다 (CLAUDE.md §9).
+  });
+
+  const [activeLocale, setActiveLocale] = useState<Locale>("KO");
+  const [drafts, setDrafts] = useState<DraftState>(EMPTY_DRAFTS);
+  const [pinAction, setPinAction] = useState<"publish" | "unpublish" | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [saveNotice, setSaveNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!data) return;
+    setDrafts((prev) => {
+      const next = { ...prev };
+      for (const translation of data.translations) {
+        next[translation.locale] = {
+          title: translation.draftTitle ?? translation.title ?? "",
+          subtitle: translation.draftSubtitle ?? translation.subtitle ?? "",
+        };
+      }
+      return next;
+    });
+  }, [data]);
+
+  function invalidate() {
+    void queryClient.invalidateQueries({ queryKey });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.productions.all });
+  }
+
+  const saveDraftMutation = useMutation({
+    mutationFn: () =>
+      saveDraftTranslation(
+        session!.accessToken,
+        productionId,
+        activeLocale,
+        drafts[activeLocale].title,
+        drafts[activeLocale].subtitle || null,
+      ),
+    onSuccess: () => {
+      setActionError(null);
+      setSaveNotice(t("editing.panel.saved"));
+      invalidate();
+    },
+    onError: (err: unknown) => {
+      setSaveNotice(null);
+      setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
+    },
+  });
+
+  const publishMutation = useMutation({
+    mutationFn: () => publishProduction(session!.accessToken, productionId),
+    onSuccess: () => {
+      setActionError(null);
+      invalidate();
+    },
+    onError: (err: unknown) => {
+      if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
+        setPinAction("publish");
+        return;
+      }
+      setActionError(err instanceof ApiError ? err.message : t("editing.panel.publishFailed"));
+    },
+  });
+
+  const unpublishMutation = useMutation({
+    mutationFn: () => unpublishProduction(session!.accessToken, productionId),
+    onSuccess: () => {
+      setActionError(null);
+      invalidate();
+    },
+    onError: (err: unknown) => {
+      if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
+        setPinAction("unpublish");
+        return;
+      }
+      setActionError(err instanceof ApiError ? err.message : t("editing.panel.publishFailed"));
+    },
+  });
+
+  if (!data) {
+    return <aside className={styles.panel}>{t("editing.panel.loading")}</aside>;
+  }
+
+  const koTranslation = data.translations.find((tr) => tr.locale === "KO");
+  const enTranslation = data.translations.find((tr) => tr.locale === "EN");
+  const hasKoTitle = Boolean(koTranslation?.title ?? koTranslation?.draftTitle);
+  const hasEnTitle = Boolean(enTranslation?.title ?? enTranslation?.draftTitle);
+
+  return (
+    <aside className={styles.panel} aria-label={t("editing.panel.heading")}>
+      <div className={styles.tabs} role="tablist">
+        {LOCALES.map((locale) => (
+          <button
+            key={locale}
+            type="button"
+            role="tab"
+            aria-selected={activeLocale === locale}
+            className={activeLocale === locale ? `${styles.tab} ${styles.tabActive}` : styles.tab}
+            onClick={() => setActiveLocale(locale)}
+          >
+            {locale}
+          </button>
+        ))}
+      </div>
+
+      <label className={styles.field}>
+        <span>{t("editing.panel.titleLabel")}</span>
+        <input
+          type="text"
+          value={drafts[activeLocale].title}
+          onChange={(e) =>
+            setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], title: e.target.value } }))
+          }
+        />
+      </label>
+
+      <label className={styles.field}>
+        <span>{t("editing.panel.subtitleLabel")}</span>
+        <input
+          type="text"
+          value={drafts[activeLocale].subtitle}
+          onChange={(e) =>
+            setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], subtitle: e.target.value } }))
+          }
+        />
+      </label>
+
+      {saveNotice && <p className={styles.notice}>{saveNotice}</p>}
+      {actionError && (
+        <p className={styles.error} role="alert">
+          {actionError}
+        </p>
+      )}
+
+      <button
+        type="button"
+        className={styles.saveButton}
+        disabled={saveDraftMutation.isPending}
+        onClick={() => {
+          setSaveNotice(null);
+          setActionError(null);
+          saveDraftMutation.mutate();
+        }}
+      >
+        {t("editing.panel.saveDraft")}
+      </button>
+
+      <hr className={styles.divider} />
+
+      <h3 className={styles.imagesHeading}>{t("editing.panel.imagesHeading")}</h3>
+      <ImageDropzone productionId={productionId} images={data.images} onChanged={invalidate} />
+
+      <hr className={styles.divider} />
+
+      {!hasEnTitle && <p className={styles.warning}>{t("editing.panel.enMissing")}</p>}
+
+      <div className={styles.publishRow}>
+        <span className={styles.statusBadge}>{data.status}</span>
+        {data.status === "PUBLISHED" ? (
+          <button
+            type="button"
+            className={styles.unpublishButton}
+            disabled={unpublishMutation.isPending}
+            onClick={() => unpublishMutation.mutate()}
+          >
+            {t("editing.panel.unpublish")}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={styles.publishButton}
+            disabled={publishMutation.isPending || !hasKoTitle}
+            onClick={() => publishMutation.mutate()}
+          >
+            {t("editing.panel.publish")}
+          </button>
+        )}
+      </div>
+
+      {pinAction && (
+        <PinModal
+          onClose={() => setPinAction(null)}
+          onVerified={() => {
+            const action = pinAction;
+            setPinAction(null);
+            if (action === "publish") publishMutation.mutate();
+            if (action === "unpublish") unpublishMutation.mutate();
+          }}
+        />
+      )}
+    </aside>
+  );
+}

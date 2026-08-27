@@ -1,0 +1,139 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dropzone {
+  border: 1px dashed var(--c-line);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
+}
+
+.dropzone:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
+.dropzoneActive {
+  border-color: var(--c-spot);
+  color: var(--c-ink);
+}
+
+.hiddenInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.pendingItem {
+  border: 1px solid var(--c-line);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: var(--t-caption);
+}
+
+.fileName {
+  font-family: var(--f-util);
+  color: var(--c-ink-60);
+}
+
+.altRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.altRow label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: var(--c-ink-60);
+}
+
+.altRow input {
+  min-height: 40px;
+  padding: 0 0.7em;
+  border: 1px solid var(--c-line);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+}
+
+.altRow button {
+  min-height: 40px;
+  padding: 0 1em;
+  border: 1px solid var(--c-ink);
+  background: transparent;
+  cursor: pointer;
+}
+
+.altRow button:disabled {
+  border-color: var(--c-line);
+  color: var(--c-ink-35);
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 0;
+  color: var(--c-ink);
+}
+
+.imageList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.imageItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid var(--c-line);
+  padding: 0.5rem;
+}
+
+.thumb {
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.thumbPlaceholder {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-paper);
+  color: var(--c-ink-35);
+  font-size: var(--t-caption);
+  flex-shrink: 0;
+}
+
+.imageAlt {
+  flex: 1;
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imageItem button {
+  min-height: 36px;
+  padding: 0 0.9em;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--t-caption);
+}

@@ -1,0 +1,38 @@
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.thumbnail {
+  aspect-ratio: 4 / 3;
+  background-color: var(--c-paper);
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.title {
+  font-family: var(--f-display);
+  font-size: var(--t-h2);
+  font-weight: 400;
+  margin: 0.75rem 0 0;
+  transition: color var(--d-fast) var(--e-out);
+}
+
+.card:hover .title,
+.card:focus-visible .title {
+  color: var(--c-spot);
+}

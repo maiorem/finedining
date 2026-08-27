@@ -1,0 +1,86 @@
+.layout {
+  display: block;
+}
+
+.layoutWithPanel {
+  display: flex;
+  align-items: flex-start;
+}
+
+.page {
+  flex: 1;
+  min-width: 0;
+  padding: var(--section-y-mobile) var(--gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--section-y-desktop) var(--gutter-desktop);
+  }
+}
+
+.status {
+  color: var(--c-ink-60);
+}
+
+.editToggle {
+  margin-bottom: 1.5rem;
+  min-height: 40px;
+  padding: 0 1em;
+  border: 1px dashed var(--c-spot);
+  background: transparent;
+  color: var(--c-spot);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  cursor: pointer;
+}
+
+.editToggle:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.desktopOnlyNotice {
+  border: 1px solid var(--c-line);
+  padding: 0.75em 1em;
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
+}
+
+.title {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: var(--t-h1);
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  color: var(--c-ink-60);
+  font-size: var(--t-lead);
+  margin: 0 0 2rem;
+}
+
+.imageGrid {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--gutter-mobile);
+}
+
+.imageGrid img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.panelLoading {
+  width: 360px;
+  flex-shrink: 0;
+  padding: 1.5rem;
+  border-left: 1px solid var(--c-line);
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
+}
