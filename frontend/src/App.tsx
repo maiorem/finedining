@@ -7,6 +7,7 @@ import AboutPage from "./pages/AboutPage";
 import BookingPage from "./pages/BookingPage";
 import ProposalPage from "./pages/ProposalPage";
 import ReviewsPage from "./pages/ReviewsPage";
+import ArtistsPage from "./pages/ArtistsPage";
 import LoginPage from "./pages/LoginPage";
 
 export function App() {
@@ -20,6 +21,7 @@ export function App() {
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/proposal" element={<ProposalPage />} />
         <Route path="/reviews" element={<ReviewsPage />} />
+        <Route path="/artists" element={<ArtistsPage />} />
         {/* 내비게이션엔 노출하지 않는다 — 진입점은 Footer의 작은 링크뿐이다 (CLAUDE.md §3.5). */}
         <Route path="/login" element={<LoginPage />} />
       </Routes>

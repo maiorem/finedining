@@ -14,7 +14,7 @@ function renderHeader() {
 }
 
 describe("Header", () => {
-  it("작품·소개·예약·협업제안·리뷰 내비게이션 링크를 렌더한다", () => {
+  it("작품·소개·예약·협업제안·리뷰·아티스트 내비게이션 링크를 렌더한다", () => {
     renderHeader();
 
     expect(screen.getAllByRole("link", { name: "작품" })[0]).toHaveAttribute(
@@ -28,6 +28,10 @@ describe("Header", () => {
       "/proposal",
     );
     expect(screen.getAllByRole("link", { name: "리뷰" })[0]).toHaveAttribute("href", "/reviews");
+    expect(screen.getAllByRole("link", { name: "아티스트" })[0]).toHaveAttribute(
+      "href",
+      "/artists",
+    );
   });
 
   it("모바일 메뉴 버튼을 누르면 패널이 열리고 닫힌다", async () => {

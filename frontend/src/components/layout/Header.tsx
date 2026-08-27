@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { to: "/booking", labelKey: "nav.booking" },
   { to: "/proposal", labelKey: "nav.proposal" },
   { to: "/reviews", labelKey: "nav.reviews" },
+  { to: "/artists", labelKey: "nav.artists" },
 ] as const;
 
 export function Header() {
