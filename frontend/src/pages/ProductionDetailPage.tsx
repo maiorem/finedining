@@ -65,6 +65,7 @@ export default function ProductionDetailPage() {
         <EditableSection active={showPanel}>
           {production.title && <h1 className={styles.title}>{production.title}</h1>}
           {production.subtitle && <p className={styles.subtitle}>{production.subtitle}</p>}
+          {production.description && <p className={styles.description}>{production.description}</p>}
         </EditableSection>
 
         {production.images.length > 0 && (

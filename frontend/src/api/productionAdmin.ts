@@ -5,8 +5,10 @@ export type ProductionTranslationView = {
   locale: "KO" | "EN";
   title: string | null;
   subtitle: string | null;
+  description: string | null;
   draftTitle: string | null;
   draftSubtitle: string | null;
+  draftDescription: string | null;
   hasPendingDraft: boolean;
 };
 
@@ -34,10 +36,12 @@ export function saveDraftTranslation(
   locale: "KO" | "EN",
   title: string,
   subtitle: string | null,
+  description: string | null,
 ): Promise<ProductionAdmin> {
   return apiAdminPut<ProductionAdmin>(`/api/productions/${id}/translations/${locale}`, accessToken, {
     title,
     subtitle,
+    description,
   });
 }
 

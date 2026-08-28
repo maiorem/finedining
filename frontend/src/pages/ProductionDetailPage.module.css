@@ -61,6 +61,14 @@
   margin: 0 0 2rem;
 }
 
+.description {
+  max-width: 38em;
+  color: var(--c-ink);
+  line-height: var(--lh-body);
+  white-space: pre-wrap;
+  margin: 0 0 2rem;
+}
+
 .imageGrid {
   list-style: none;
   margin: 2rem 0 0;

@@ -88,6 +88,7 @@
   "editing.panel.loading": "불러오는 중입니다.",
   "editing.panel.titleLabel": "제목",
   "editing.panel.subtitleLabel": "부제",
+  "editing.panel.descriptionLabel": "설명",
   "editing.panel.saveDraft": "임시저장",
   "editing.panel.saved": "임시저장되었습니다.",
   "editing.panel.saveFailed": "임시저장에 실패했습니다.",

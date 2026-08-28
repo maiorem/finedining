@@ -44,9 +44,9 @@
   color: var(--c-ink-60);
 }
 
-.field input {
-  min-height: 44px;
-  padding: 0 0.9em;
+.field input,
+.field textarea {
+  padding: 0.6em 0.9em;
   border: 1px solid var(--c-line);
   background: var(--c-white);
   color: var(--c-ink);
@@ -54,7 +54,17 @@
   font-size: var(--t-body);
 }
 
-.field input:focus-visible {
+.field input {
+  min-height: 44px;
+}
+
+.field textarea {
+  line-height: var(--lh-body);
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
   outline: 2px solid var(--c-spot);
   outline-offset: 2px;
 }

@@ -17,15 +17,15 @@ import styles from "./ProductionEditPanel.module.css";
 type Locale = "KO" | "EN";
 const LOCALES: Locale[] = ["KO", "EN"];
 
-type DraftState = Record<Locale, { title: string; subtitle: string }>;
+type DraftState = Record<Locale, { title: string; subtitle: string; description: string }>;
 
 type ProductionEditPanelProps = {
   productionId: number;
 };
 
 const EMPTY_DRAFTS: DraftState = {
-  KO: { title: "", subtitle: "" },
-  EN: { title: "", subtitle: "" },
+  KO: { title: "", subtitle: "", description: "" },
+  EN: { title: "", subtitle: "", description: "" },
 };
 
 /**
@@ -59,6 +59,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
         next[translation.locale] = {
           title: translation.draftTitle ?? translation.title ?? "",
           subtitle: translation.draftSubtitle ?? translation.subtitle ?? "",
+          description: translation.draftDescription ?? translation.description ?? "",
         };
       }
       return next;
@@ -78,6 +79,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
         activeLocale,
         drafts[activeLocale].title,
         drafts[activeLocale].subtitle || null,
+        drafts[activeLocale].description || null,
       ),
     onSuccess: () => {
       setActionError(null);
@@ -164,6 +166,20 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
           value={drafts[activeLocale].subtitle}
           onChange={(e) =>
             setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], subtitle: e.target.value } }))
+          }
+        />
+      </label>
+
+      <label className={styles.field}>
+        <span>{t("editing.panel.descriptionLabel")}</span>
+        <textarea
+          rows={6}
+          value={drafts[activeLocale].description}
+          onChange={(e) =>
+            setDrafts((prev) => ({
+              ...prev,
+              [activeLocale]: { ...prev[activeLocale], description: e.target.value },
+            }))
           }
         />
       </label>

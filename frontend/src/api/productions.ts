@@ -17,6 +17,7 @@ export type ProductionDetail = {
   slug: string;
   title: string | null;
   subtitle: string | null;
+  description: string | null;
   images: MediaAsset[];
 };
 

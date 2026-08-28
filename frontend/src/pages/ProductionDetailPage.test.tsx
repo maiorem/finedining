@@ -52,6 +52,7 @@ describe("ProductionDetailPage", () => {
             slug: "showcase",
             title: "쇼케이스",
             subtitle: "부제",
+            description: "9코스로 이어지는 공연형 다이닝입니다.",
             images: [
               {
                 id: 2,
@@ -72,6 +73,7 @@ describe("ProductionDetailPage", () => {
 
     expect(await screen.findByRole("heading", { name: "쇼케이스" })).toBeInTheDocument();
     expect(screen.getByText("부제")).toBeInTheDocument();
+    expect(screen.getByText("9코스로 이어지는 공연형 다이닝입니다.")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "무대 사진" })).toHaveAttribute("src", "http://example.com/640.jpg");
     expect(screen.queryByRole("button", { name: "편집 모드 켜기" })).not.toBeInTheDocument();
   });

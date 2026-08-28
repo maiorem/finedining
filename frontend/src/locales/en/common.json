@@ -88,6 +88,7 @@
   "editing.panel.loading": "Loading…",
   "editing.panel.titleLabel": "Title",
   "editing.panel.subtitleLabel": "Subtitle",
+  "editing.panel.descriptionLabel": "Description",
   "editing.panel.saveDraft": "Save draft",
   "editing.panel.saved": "Draft saved.",
   "editing.panel.saveFailed": "Couldn't save the draft.",
