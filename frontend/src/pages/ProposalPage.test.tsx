@@ -2,10 +2,30 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "../i18n";
+import { AdminAuthProvider } from "../contexts/AdminAuthContext";
 import ProposalPage from "./ProposalPage";
 
 function jsonResponse(body: unknown): Response {
   return { json: async () => body } as Response;
+}
+
+function renderPage() {
+  return render(
+    <AdminAuthProvider>
+      <ProposalPage />
+    </AdminAuthProvider>,
+  );
+}
+
+function mockUnauthenticatedRefreshThen(response: unknown) {
+  return (input: string) => {
+    if (input.includes("/api/auth/admin/refresh")) {
+      return Promise.resolve(
+        jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+      );
+    }
+    return Promise.resolve(jsonResponse(response));
+  };
 }
 
 async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
@@ -30,16 +50,16 @@ describe("ProposalPage", () => {
 
   it("제출에 성공하면 완료 메시지를 보여준다", async () => {
     const user = userEvent.setup();
-    fetchMock.mockResolvedValueOnce(jsonResponse({ success: true, data: null, error: null }));
+    fetchMock.mockImplementation(mockUnauthenticatedRefreshThen({ success: true, data: null, error: null }));
 
-    render(<ProposalPage />);
+    renderPage();
     await fillRequiredFields(user);
     await user.click(screen.getByRole("button", { name: "제안 보내기" }));
 
     expect(await screen.findByText("제안을 보냈습니다. 검토 후 회신드리겠습니다.")).toBeInTheDocument();
 
-    const [, options] = fetchMock.mock.calls[0];
-    const sentBody = JSON.parse(options.body as string);
+    const submitCall = fetchMock.mock.calls.find(([input]) => input === "/api/proposals");
+    const sentBody = JSON.parse(submitCall![1].body as string);
     expect(sentBody).toMatchObject({
       name: "김철수",
       contactEmail: "chulsoo@example.com",
@@ -52,15 +72,11 @@ describe("ProposalPage", () => {
 
   it("레이트리밋에 걸리면 에러 메시지를 보여준다", async () => {
     const user = userEvent.setup();
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse({
-        success: false,
-        data: null,
-        error: { code: "RATE_LIMITED", message: "x" },
-      }),
+    fetchMock.mockImplementation(
+      mockUnauthenticatedRefreshThen({ success: false, data: null, error: { code: "RATE_LIMITED", message: "x" } }),
     );
 
-    render(<ProposalPage />);
+    renderPage();
     await fillRequiredFields(user);
     await user.click(screen.getByRole("button", { name: "제안 보내기" }));
 
@@ -69,11 +85,32 @@ describe("ProposalPage", () => {
     );
   });
 
-  it("허니팟 필드는 접근성 트리와 탭 순서에서 제외돼 있다", () => {
-    render(<ProposalPage />);
+  it("허니팟 필드는 접근성 트리와 탭 순서에서 제외돼 있다", async () => {
+    fetchMock.mockImplementation(mockUnauthenticatedRefreshThen({ success: true, data: null, error: null }));
 
-    const honeypot = screen.getByLabelText("Website", { selector: "input" });
+    renderPage();
+
+    const honeypot = await screen.findByLabelText("Website", { selector: "input" });
     expect(honeypot).toHaveAttribute("tabindex", "-1");
     expect(honeypot.closest('[aria-hidden="true"]')).not.toBeNull();
+  });
+
+  it("관리자로 로그인했으면 제안 목록 보기 토글이 보인다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: { accessToken: "t", username: "admin", role: "EDITOR" },
+            error: null,
+          }),
+        );
+      }
+      return Promise.resolve(jsonResponse({ success: true, data: null, error: null }));
+    });
+
+    renderPage();
+
+    expect(await screen.findByRole("button", { name: "제안 목록 보기" })).toBeInTheDocument();
   });
 });

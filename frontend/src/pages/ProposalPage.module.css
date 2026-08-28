@@ -21,6 +21,29 @@
   margin: 0 0 2.5rem;
 }
 
+.reviewToggle {
+  margin-bottom: 1.5rem;
+  min-height: 40px;
+  padding: 0 1em;
+  border: 1px dashed var(--c-spot);
+  background: transparent;
+  color: var(--c-spot);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  cursor: pointer;
+}
+
+.reviewToggle:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.status {
+  color: var(--c-ink-60);
+  padding: 1rem 0;
+}
+
 .form {
   max-width: 480px;
   display: flex;

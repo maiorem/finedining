@@ -1,8 +1,13 @@
-import { useState, type FormEvent } from "react";
+import { lazy, Suspense, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../api/http";
 import { submitProposal } from "../api/proposals";
+import { useCan } from "../hooks/useCan";
 import styles from "./ProposalPage.module.css";
+
+// 관리자 전용 API 경로가 익명 방문자 번들에 섞이면 안 되므로 React.lazy로만 import한다
+// (CLAUDE.md §3.5·§9).
+const ProposalReviewList = lazy(() => import("../features/editing/ProposalReviewList"));
 
 const KNOWN_ERROR_CODES = ["VALIDATION_ERROR", "RATE_LIMITED"] as const;
 
@@ -14,6 +19,8 @@ function errorMessageKey(code: string): string {
 
 export default function ProposalPage() {
   const { t } = useTranslation();
+  const canReview = useCan("proposal:review");
+  const [reviewing, setReviewing] = useState(false);
   const [name, setName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [title, setTitle] = useState("");
@@ -39,10 +46,29 @@ export default function ProposalPage() {
     }
   }
 
+  const reviewToggle = canReview && (
+    <button
+      type="button"
+      className={styles.reviewToggle}
+      aria-pressed={reviewing}
+      onClick={() => setReviewing((prev) => !prev)}
+    >
+      {reviewing ? t("editing.exitEditMode") : t("proposal.admin.reviewToggle")}
+    </button>
+  );
+
+  const reviewPanel = reviewing && (
+    <Suspense fallback={<p className={styles.status}>{t("proposal.admin.loading")}</p>}>
+      <ProposalReviewList />
+    </Suspense>
+  );
+
   if (submitted) {
     return (
       <main className={styles.page}>
         <h1 className={styles.heading}>{t("nav.proposal")}</h1>
+        {reviewToggle}
+        {reviewPanel}
         <div className={styles.success}>
           <p>{t("proposal.success")}</p>
         </div>
@@ -53,6 +79,8 @@ export default function ProposalPage() {
   return (
     <main className={styles.page}>
       <h1 className={styles.heading}>{t("nav.proposal")}</h1>
+      {reviewToggle}
+      {reviewPanel}
       <p className={styles.lead}>{t("proposal.lead")}</p>
 
       <form className={styles.form} onSubmit={handleSubmit}>

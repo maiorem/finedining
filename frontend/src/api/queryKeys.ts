@@ -30,4 +30,8 @@ export const queryKeys = {
     adminList: ["reviews", "admin", "list"] as const,
     adminDetail: (id: number) => ["reviews", "admin", "detail", id] as const,
   },
+  proposals: {
+    all: ["proposals"] as const,
+    adminList: ["proposals", "admin", "list"] as const,
+  },
 } as const;
