@@ -22,6 +22,11 @@ export function getProductionForAdmin(accessToken: string, id: number): Promise<
   return apiAdminGet<ProductionAdmin>(`/api/productions/manage/${id}`, accessToken);
 }
 
+/** 목록에서 "새 작품 추가"로 호출한다. 슬러그만 받아 DRAFT로 만든다(CLAUDE.md §3.9). */
+export function createProduction(accessToken: string, slug: string): Promise<ProductionAdmin> {
+  return apiAdminPost<ProductionAdmin>("/api/productions", accessToken, { slug });
+}
+
 /** "임시저장" — 공개본에는 영향이 없다(CLAUDE.md §3.9). */
 export function saveDraftTranslation(
   accessToken: string,

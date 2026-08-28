@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "./http";
+import { apiAdminGet } from "./adminHttp";
 import { toApiLocale } from "./locale";
 import { queryKeys } from "./queryKeys";
 import type { MediaAsset } from "./media";
@@ -29,12 +30,21 @@ export function useProductions(i18nLanguage: string) {
   });
 }
 
-export function useProduction(slug: string, i18nLanguage: string) {
+/**
+ * previewAccessToken이 있으면 관리자 미리보기(?preview=true, CLAUDE.md §3.9)로 조회한다 —
+ * 아직 발행되지 않은 방금 만든 작품도 관리자는 같은 URL에서 편집 패널에 붙을 수 있어야 한다.
+ * 미리보기는 방금 저장한 값이 바로 보여야 하므로 staleTime을 두지 않는다(§9).
+ */
+export function useProduction(slug: string, i18nLanguage: string, previewAccessToken?: string) {
   const lang = toApiLocale(i18nLanguage);
+  const preview = Boolean(previewAccessToken);
   return useQuery({
-    queryKey: queryKeys.productions.detail(slug, lang),
-    queryFn: () => apiGet<ProductionDetail>(`/api/productions/${slug}?lang=${lang}`),
-    staleTime: 60 * 60 * 1000,
+    queryKey: preview ? [...queryKeys.productions.detail(slug, lang), "preview"] : queryKeys.productions.detail(slug, lang),
+    queryFn: () =>
+      preview
+        ? apiAdminGet<ProductionDetail>(`/api/productions/${slug}?lang=${lang}&preview=true`, previewAccessToken!)
+        : apiGet<ProductionDetail>(`/api/productions/${slug}?lang=${lang}`),
+    staleTime: preview ? 0 : 60 * 60 * 1000,
     enabled: slug.length > 0,
   });
 }

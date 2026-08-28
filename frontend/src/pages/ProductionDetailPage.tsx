@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useProduction } from "../api/productions";
 import { ApiError } from "../api/http";
+import { useAdminAuth } from "../contexts/AdminAuthContext";
 import { useCan } from "../hooks/useCan";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { EditableSection } from "../features/editing/EditableSection";
@@ -14,8 +15,15 @@ const ProductionEditPanel = lazy(() => import("../features/editing/ProductionEdi
 export default function ProductionDetailPage() {
   const { slug = "" } = useParams();
   const { t, i18n } = useTranslation();
-  const { data: production, isLoading, error } = useProduction(slug, i18n.language);
   const canEdit = useCan("production:edit");
+  const { session } = useAdminAuth();
+  // 관리자는 아직 발행되지 않은(DRAFT) 작품도 같은 URL에서 볼 수 있어야 편집 패널에 붙을 수
+  // 있다 — 방금 "새 작품 추가"로 만든 작품이 대표적이다(§3.9 ?preview=true).
+  const { data: production, isLoading, error } = useProduction(
+    slug,
+    i18n.language,
+    canEdit ? session?.accessToken : undefined,
+  );
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [editMode, setEditMode] = useState(false);
 
