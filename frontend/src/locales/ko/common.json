@@ -11,7 +11,6 @@
   "nav.openMenu": "메뉴 열기",
   "nav.closeMenu": "메뉴 닫기",
   "page.about.placeholder": "소개 페이지를 준비하고 있습니다.",
-  "page.reviews.placeholder": "리뷰 페이지를 준비하고 있습니다.",
   "booking.reserve": "네이버 예약으로 이동",
   "booking.opensNewWindow": "새 창에서 열림",
   "booking.unavailable": "예약 페이지 준비 중",
@@ -105,5 +104,16 @@
   "editing.image.uploadFailed": "업로드에 실패했습니다.",
   "editing.image.saveFailed": "저장에 실패했습니다.",
   "editing.image.delete": "삭제",
-  "editing.image.noAlt": "대체 텍스트 없음"
+  "editing.image.noAlt": "대체 텍스트 없음",
+  "reviews.writeComingSoon": "리뷰 작성은 카카오 로그인이 붙으면 열립니다.",
+  "reviews.moderationToggle": "모더레이션 모드",
+  "reviews.loading": "불러오는 중입니다.",
+  "reviews.empty": "등록된 리뷰가 없습니다.",
+  "reviews.notFound": "존재하지 않는 리뷰입니다.",
+  "reviews.loadError": "리뷰를 불러오지 못했습니다.",
+  "reviews.hide": "숨기기",
+  "reviews.restore": "복구",
+  "reviews.delete": "삭제",
+  "reviews.bodyLabel": "본문",
+  "reviews.commentsHeading": "댓글"
 }

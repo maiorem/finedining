@@ -1,0 +1,68 @@
+.status {
+  color: var(--c-ink-60);
+  padding: 1rem 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  border-bottom: 1px solid var(--c-line);
+  padding: 1.25rem 0;
+}
+
+.itemLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.itemLink:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.itemTitle {
+  font-family: var(--f-body);
+  font-weight: 600;
+  font-size: var(--t-lead);
+  margin: 0;
+}
+
+.itemLink:hover .itemTitle,
+.itemLink:focus-visible .itemTitle {
+  color: var(--c-spot);
+}
+
+.moderationRow {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.statusBadge {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  color: var(--c-ink-60);
+}
+
+.moderationRow button {
+  min-height: 36px;
+  padding: 0 0.9em;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--t-caption);
+}
+
+.moderationRow button:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}

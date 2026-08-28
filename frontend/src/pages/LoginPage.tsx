@@ -1,7 +1,8 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../api/http";
 import { useAdminAuth } from "../contexts/AdminAuthContext";
+import { useNoIndex } from "../hooks/useNoIndex";
 import styles from "./LoginPage.module.css";
 
 const KNOWN_ERROR_CODES = [
@@ -15,19 +16,6 @@ function errorMessageKey(code: string): string {
   return (KNOWN_ERROR_CODES as readonly string[]).includes(code)
     ? `login.error.${code}`
     : "login.error.generic";
-}
-
-// 로그인 진입점은 /login 하나뿐이고 검색엔진에는 노출하지 않는다 (CLAUDE.md §3.5·§10).
-function useNoIndex() {
-  useEffect(() => {
-    const meta = document.createElement("meta");
-    meta.name = "robots";
-    meta.content = "noindex, nofollow";
-    document.head.appendChild(meta);
-    return () => {
-      document.head.removeChild(meta);
-    };
-  }, []);
 }
 
 export default function LoginPage() {

@@ -11,7 +11,6 @@
   "nav.openMenu": "Open menu",
   "nav.closeMenu": "Close menu",
   "page.about.placeholder": "The about page is coming soon.",
-  "page.reviews.placeholder": "The reviews page is coming soon.",
   "booking.reserve": "Go to Naver Booking",
   "booking.opensNewWindow": "opens in a new window",
   "booking.unavailable": "Booking page coming soon",
@@ -105,5 +104,16 @@
   "editing.image.uploadFailed": "Upload failed.",
   "editing.image.saveFailed": "Save failed.",
   "editing.image.delete": "Delete",
-  "editing.image.noAlt": "No alt text"
+  "editing.image.noAlt": "No alt text",
+  "reviews.writeComingSoon": "Writing a review will open once Kakao login ships.",
+  "reviews.moderationToggle": "Moderation mode",
+  "reviews.loading": "Loading…",
+  "reviews.empty": "No reviews yet.",
+  "reviews.notFound": "This review doesn't exist.",
+  "reviews.loadError": "Couldn't load this review.",
+  "reviews.hide": "Hide",
+  "reviews.restore": "Restore",
+  "reviews.delete": "Delete",
+  "reviews.bodyLabel": "Body",
+  "reviews.commentsHeading": "Comments"
 }

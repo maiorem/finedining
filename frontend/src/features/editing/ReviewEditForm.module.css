@@ -1,0 +1,122 @@
+.status {
+  color: var(--c-ink-60);
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+}
+
+.field input,
+.field textarea {
+  padding: 0.6em 0.9em;
+  border: 1px solid var(--c-line);
+  background: var(--c-white);
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
+.notice {
+  margin: 0;
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+}
+
+.error {
+  margin: 0;
+  font-size: var(--t-caption);
+  color: var(--c-ink);
+  border: 1px solid var(--c-line);
+  padding: 0.5em 0.7em;
+}
+
+.saveButton {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 1.25em;
+  border: 1px solid var(--c-ink);
+  background: transparent;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+
+.saveButton:hover:not(:disabled),
+.saveButton:focus-visible {
+  border-color: var(--c-spot);
+}
+
+.saveButton:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.saveButton:disabled {
+  color: var(--c-ink-35);
+  cursor: not-allowed;
+}
+
+.comments {
+  border-top: 1px solid var(--c-line);
+  padding-top: 1.5rem;
+}
+
+.commentsHeading {
+  font-family: var(--f-body);
+  font-weight: 600;
+  font-size: var(--t-body);
+  margin: 0 0 1rem;
+}
+
+.commentList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--c-line);
+  padding-bottom: 1rem;
+}
+
+.commentBody {
+  margin: 0;
+  color: var(--c-ink);
+  line-height: var(--lh-body);
+  white-space: pre-wrap;
+}
+
+.comment button {
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 0 0.9em;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--t-caption);
+}
