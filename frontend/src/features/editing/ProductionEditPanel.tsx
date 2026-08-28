@@ -207,7 +207,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
       <hr className={styles.divider} />
 
       <h3 className={styles.imagesHeading}>{t("editing.panel.imagesHeading")}</h3>
-      <ImageDropzone productionId={productionId} images={data.images} onChanged={invalidate} />
+      <ImageDropzone ownerType="PRODUCTION" ownerId={productionId} images={data.images} onChanged={invalidate} />
 
       <hr className={styles.divider} />
 

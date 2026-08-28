@@ -1,6 +1,13 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { completeMediaUpload, deleteMedia, presignUpload, uploadToPresignedUrl, type MediaAsset } from "../../api/media";
+import {
+  completeMediaUpload,
+  deleteMedia,
+  presignUpload,
+  uploadToPresignedUrl,
+  type MediaAsset,
+  type MediaOwnerType,
+} from "../../api/media";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
 import styles from "./ImageDropzone.module.css";
 
@@ -14,18 +21,23 @@ type PendingUpload = {
 };
 
 type ImageDropzoneProps = {
-  productionId: number;
+  ownerType: MediaOwnerType;
+  ownerId: number;
   images: MediaAsset[];
   onChanged: () => void;
+  /** 프로필 사진처럼 "딱 1장"이어야 하는 경우 지정한다 — 지정하지 않으면 갤러리처럼 무제한이다. */
+  maxImages?: number;
 };
 
 /** 드래그&드롭 → presign → S3 직접 업로드 → 완료(alt 필수) (CLAUDE.md §3.9·§7.5·§8.8). */
-export function ImageDropzone({ productionId, images, onChanged }: ImageDropzoneProps) {
+export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages }: ImageDropzoneProps) {
   const { t } = useTranslation();
   const { session } = useAdminAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<PendingUpload[]>([]);
   const [dragOver, setDragOver] = useState(false);
+
+  const atLimit = maxImages !== undefined && images.length + pending.length >= maxImages;
 
   function updatePending(localId: string, patch: Partial<PendingUpload>) {
     setPending((prev) => prev.map((item) => (item.localId === localId ? { ...item, ...patch } : item)));
@@ -37,7 +49,7 @@ export function ImageDropzone({ productionId, images, onChanged }: ImageDropzone
     setPending((prev) => [...prev, { localId, fileName: file.name, stage: "UPLOADING", altText: "" }]);
 
     try {
-      const { mediaAssetId, uploadUrl } = await presignUpload(session.accessToken, productionId, file);
+      const { mediaAssetId, uploadUrl } = await presignUpload(session.accessToken, ownerType, ownerId, file);
       await uploadToPresignedUrl(uploadUrl, file);
       updatePending(localId, { stage: "NEEDS_ALT", mediaAssetId });
     } catch {
@@ -59,8 +71,11 @@ export function ImageDropzone({ productionId, images, onChanged }: ImageDropzone
   }
 
   function handleFiles(files: FileList | null) {
-    if (!files) return;
-    Array.from(files).forEach((file) => void startUpload(file));
+    if (!files || atLimit) return;
+    const remaining = maxImages !== undefined ? maxImages - images.length - pending.length : files.length;
+    Array.from(files)
+      .slice(0, Math.max(remaining, 0))
+      .forEach((file) => void startUpload(file));
   }
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
@@ -82,31 +97,35 @@ export function ImageDropzone({ productionId, images, onChanged }: ImageDropzone
 
   return (
     <div className={styles.wrapper}>
-      <div
-        className={dragOver ? `${styles.dropzone} ${styles.dropzoneActive}` : styles.dropzone}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={handleDrop}
-        onClick={() => inputRef.current?.click()}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
-        }}
-      >
-        <p>{t("editing.image.dropHint")}</p>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-          className={styles.hiddenInput}
-          onChange={handleInputChange}
-        />
-      </div>
+      {atLimit ? (
+        <p className={styles.limitNotice}>{t("editing.image.limitReached")}</p>
+      ) : (
+        <div
+          className={dragOver ? `${styles.dropzone} ${styles.dropzoneActive}` : styles.dropzone}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          onClick={() => inputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
+          }}
+        >
+          <p>{t("editing.image.dropHint")}</p>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple={maxImages !== 1}
+            className={styles.hiddenInput}
+            onChange={handleInputChange}
+          />
+        </div>
+      )}
 
       {pending.map((item) => (
         <div key={item.localId} className={styles.pendingItem}>

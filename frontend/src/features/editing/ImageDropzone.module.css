@@ -23,6 +23,13 @@
   color: var(--c-ink);
 }
 
+.limitNotice {
+  border: 1px solid var(--c-line);
+  padding: 0.75em 1em;
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
+}
+
 .hiddenInput {
   position: absolute;
   width: 1px;

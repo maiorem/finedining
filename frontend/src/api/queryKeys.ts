@@ -17,8 +17,11 @@ export const queryKeys = {
     adminList: ["showings", "admin", "list"] as const,
   },
   artists: {
+    all: ["artists"] as const,
     list: (lang: string) => ["artists", "list", lang] as const,
     detail: (slug: string, lang: string) => ["artists", "detail", slug, lang] as const,
+    adminDetail: (id: number) => ["artists", "admin", id] as const,
+    adminList: ["artists", "admin", "list"] as const,
   },
   castings: {
     list: (lang: string) => ["castings", "list", lang] as const,

@@ -1,4 +1,15 @@
+.layout {
+  display: block;
+}
+
+.layoutWithPanel {
+  display: flex;
+  align-items: flex-start;
+}
+
 .page {
+  flex: 1;
+  min-width: 0;
   padding: var(--section-y-mobile) var(--gutter-mobile);
   max-width: 640px;
 }
@@ -7,6 +18,39 @@
   .page {
     padding: var(--section-y-desktop) var(--gutter-desktop);
   }
+}
+
+.editToggle {
+  margin-bottom: 1.5rem;
+  min-height: 40px;
+  padding: 0 1em;
+  border: 1px dashed var(--c-spot);
+  background: transparent;
+  color: var(--c-spot);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  cursor: pointer;
+}
+
+.editToggle:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.desktopOnlyNotice {
+  border: 1px solid var(--c-line);
+  padding: 0.75em 1em;
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  margin: 0 0 1.5rem;
 }
 
 .eyebrow {
@@ -67,4 +111,13 @@
 .status {
   color: var(--c-ink-60);
   padding: 1rem 0;
+}
+
+.panelLoading {
+  width: 360px;
+  flex-shrink: 0;
+  padding: 1.5rem;
+  border-left: 1px solid var(--c-line);
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
 }

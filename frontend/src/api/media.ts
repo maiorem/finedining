@@ -1,5 +1,7 @@
 import { apiAdminDelete, apiAdminPost } from "./adminHttp";
 
+export type MediaOwnerType = "PRODUCTION" | "ARTIST";
+
 // 뷰어 무관 데이터라 공개·관리자 응답 모두 이 모양을 공유한다 (CLAUDE.md §7.2 — 백엔드
 // MediaAssetResponse와 1:1로 대응).
 export type MediaAsset = {
@@ -20,11 +22,13 @@ type PresignResult = { mediaAssetId: number; uploadUrl: string };
 
 export function presignUpload(
   accessToken: string,
-  productionId: number,
+  ownerType: MediaOwnerType,
+  ownerId: number,
   file: File,
 ): Promise<PresignResult> {
   return apiAdminPost<PresignResult>("/api/media/presign", accessToken, {
-    productionId,
+    ownerType,
+    ownerId,
     contentType: file.type,
     contentLengthBytes: file.size,
   });

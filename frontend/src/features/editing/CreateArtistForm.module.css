@@ -1,0 +1,65 @@
+.form {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  border: 1px dashed var(--c-spot);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+}
+
+.field input {
+  min-height: 44px;
+  padding: 0 0.9em;
+  border: 1px solid var(--c-line);
+  background: var(--c-white);
+  color: var(--c-ink);
+  font-family: var(--f-util);
+  font-size: var(--t-body);
+}
+
+.field input:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
+.error {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: var(--t-caption);
+  color: var(--c-ink);
+  border: 1px solid var(--c-line);
+  padding: 0.5em 0.7em;
+}
+
+.submit {
+  min-height: 44px;
+  padding: 0 1.25em;
+  border: 1px solid var(--c-ink);
+  background: transparent;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+
+.submit:hover:not(:disabled),
+.submit:focus-visible {
+  border-color: var(--c-spot);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.submit:disabled {
+  color: var(--c-ink-35);
+  cursor: not-allowed;
+}
