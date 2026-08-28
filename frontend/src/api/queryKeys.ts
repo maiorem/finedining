@@ -26,6 +26,10 @@ export const queryKeys = {
   castings: {
     list: (lang: string) => ["castings", "list", lang] as const,
   },
+  about: {
+    detail: (lang: string) => ["about", "detail", lang] as const,
+    admin: ["about", "admin"] as const,
+  },
   reviews: {
     all: ["reviews"] as const,
     list: ["reviews", "list"] as const,
