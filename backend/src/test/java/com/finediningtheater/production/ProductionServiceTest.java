@@ -77,10 +77,13 @@ class ProductionServiceTest {
         production.addTranslation(SiteLocale.KO, "쇼케이스", "부제");
         when(productionRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(production));
 
-        productionService().saveDraftTranslation(1L, SiteLocale.KO, "새 제목", "새 부제");
+        productionService().saveDraftTranslation(1L, SiteLocale.KO, "새 제목", "새 부제", "새 설명");
 
         assertThat(production.titleFor(SiteLocale.KO)).isEqualTo("쇼케이스");
-        assertThat(production.translationRowFor(SiteLocale.KO).effectiveTitle()).isEqualTo("새 제목");
+        ProductionTranslation ko = production.translationRowFor(SiteLocale.KO);
+        assertThat(ko.effectiveTitle()).isEqualTo("새 제목");
+        assertThat(ko.effectiveDescription()).isEqualTo("새 설명");
+        assertThat(ko.getDescription()).isNull();
     }
 
     @Test

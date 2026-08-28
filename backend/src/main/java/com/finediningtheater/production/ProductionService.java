@@ -60,15 +60,15 @@ public class ProductionService {
         return productionRepository.save(new Production(slug));
     }
 
-    /** "임시저장" — 공개본(title/subtitle)은 건드리지 않고 draft에만 쓴다 (CLAUDE.md §3.9). */
+    /** "임시저장" — 공개본(title/subtitle/description)은 건드리지 않고 draft에만 쓴다 (CLAUDE.md §3.9). */
     @Transactional
-    public void saveDraftTranslation(Long id, SiteLocale locale, String title, String subtitle) {
+    public void saveDraftTranslation(Long id, SiteLocale locale, String title, String subtitle, String description) {
         Production production = getForAdmin(id);
         ProductionTranslation translation = production.translationRowFor(locale);
         if (translation == null) {
             translation = production.addTranslation(locale, null, null);
         }
-        translation.updateDraft(title, subtitle);
+        translation.updateDraft(title, subtitle, description);
     }
 
     /** "발행" — draft를 공개본으로 승격하고 PUBLISHED로 바꾼다. 한국어 제목 없이는 발행할 수 없다. */

@@ -87,9 +87,10 @@ public class ProductionEditController {
                         ? null
                         : Map.of(
                                 "draftTitle", String.valueOf(beforeRow.getDraftTitle()),
-                                "draftSubtitle", String.valueOf(beforeRow.getDraftSubtitle()));
+                                "draftSubtitle", String.valueOf(beforeRow.getDraftSubtitle()),
+                                "draftDescription", String.valueOf(beforeRow.getDraftDescription()));
 
-        productionService.saveDraftTranslation(id, locale, request.title(), request.subtitle());
+        productionService.saveDraftTranslation(id, locale, request.title(), request.subtitle(), request.description());
 
         auditLogger.record(
                 principal.id(),
@@ -97,7 +98,10 @@ public class ProductionEditController {
                 "Production",
                 id,
                 before,
-                Map.of("draftTitle", request.title(), "draftSubtitle", String.valueOf(request.subtitle())),
+                Map.of(
+                        "draftTitle", request.title(),
+                        "draftSubtitle", String.valueOf(request.subtitle()),
+                        "draftDescription", String.valueOf(request.description())),
                 ClientIp.resolve(httpRequest));
 
         return ApiResponse.success(toAdminResponse(productionService.getForAdmin(id)));

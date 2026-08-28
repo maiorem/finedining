@@ -7,7 +7,7 @@ import com.finediningtheater.production.ProductionTranslation;
 import java.util.List;
 
 public record ProductionDetailResponse(
-        Long id, String slug, String title, String subtitle, List<MediaAssetResponse> images) {
+        Long id, String slug, String title, String subtitle, String description, List<MediaAssetResponse> images) {
 
     public static ProductionDetailResponse from(
             Production production, SiteLocale locale, List<MediaAssetResponse> images) {
@@ -17,6 +17,7 @@ public record ProductionDetailResponse(
                 production.getSlug(),
                 translation == null ? null : translation.getTitle(),
                 translation == null ? null : translation.getSubtitle(),
+                translation == null ? null : translation.getDescription(),
                 images);
     }
 }

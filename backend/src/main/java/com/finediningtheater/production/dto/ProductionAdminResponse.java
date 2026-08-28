@@ -15,8 +15,10 @@ public record ProductionAdminResponse(
             String locale,
             String title,
             String subtitle,
+            String description,
             String draftTitle,
             String draftSubtitle,
+            String draftDescription,
             boolean hasPendingDraft) {}
 
     public static ProductionAdminResponse from(Production production, List<MediaAssetResponse> images) {
@@ -28,8 +30,10 @@ public record ProductionAdminResponse(
                                                 t.getLocale().name(),
                                                 t.getTitle(),
                                                 t.getSubtitle(),
+                                                t.getDescription(),
                                                 t.getDraftTitle(),
                                                 t.getDraftSubtitle(),
+                                                t.getDraftDescription(),
                                                 t.getDraftTitle() != null))
                         .toList();
         return new ProductionAdminResponse(

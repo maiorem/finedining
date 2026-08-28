@@ -125,7 +125,7 @@ class ProductionEditControllerTest {
                                 .content("{\"title\":\"새 제목\",\"subtitle\":null}"))
                 .andExpect(status().isOk());
 
-        verify(productionService).saveDraftTranslation(1L, SiteLocale.KO, "새 제목", null);
+        verify(productionService).saveDraftTranslation(1L, SiteLocale.KO, "새 제목", null, null);
     }
 
     @Test

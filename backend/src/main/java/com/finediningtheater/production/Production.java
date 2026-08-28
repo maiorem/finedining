@@ -65,7 +65,11 @@ public class Production extends Publishable {
     }
 
     public ProductionTranslation addTranslation(SiteLocale locale, String title, String subtitle) {
-        ProductionTranslation translation = new ProductionTranslation(this, locale, title, subtitle);
+        return addTranslation(locale, title, subtitle, null);
+    }
+
+    public ProductionTranslation addTranslation(SiteLocale locale, String title, String subtitle, String description) {
+        ProductionTranslation translation = new ProductionTranslation(this, locale, title, subtitle, description);
         translations.add(translation);
         return translation;
     }

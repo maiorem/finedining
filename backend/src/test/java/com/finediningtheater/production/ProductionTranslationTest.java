@@ -51,4 +51,21 @@ class ProductionTranslationTest {
         assertThat(translation.getTitle()).isEqualTo("쇼케이스");
         assertThat(translation.getSubtitle()).isEqualTo("부제");
     }
+
+    @Test
+    void 설명도_제목_부제와_같은_draft_publish_패턴을_따른다() {
+        Production production = new Production("showcase");
+        ProductionTranslation translation =
+                production.addTranslation(SiteLocale.KO, "쇼케이스", "부제", "원래 설명");
+
+        translation.updateDraft("쇼케이스", "부제", "새 설명");
+
+        assertThat(translation.effectiveDescription()).isEqualTo("새 설명");
+        // 임시저장은 공개본을 건드리지 않는다 (CLAUDE.md §3.9).
+        assertThat(translation.getDescription()).isEqualTo("원래 설명");
+
+        translation.promoteDraftToPublished();
+
+        assertThat(translation.getDescription()).isEqualTo("새 설명");
+    }
 }
