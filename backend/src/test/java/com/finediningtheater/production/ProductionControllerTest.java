@@ -1,21 +1,30 @@
 package com.finediningtheater.production;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.finediningtheater.account.AdminRole;
 import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
+import com.finediningtheater.global.security.AdminPrincipal;
 import com.finediningtheater.global.security.JwtProvider;
 import com.finediningtheater.global.support.SiteLocale;
 import com.finediningtheater.media.MediaService;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -59,5 +68,38 @@ class ProductionControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.error.code").value("ENTITY_NOT_FOUND"));
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void 비로그인_요청은_preview_파라미터를_무시한다() throws Exception {
+        when(productionService.getPublished("draft-show"))
+                .thenThrow(new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+
+        mockMvc.perform(get("/api/productions/draft-show?preview=true")).andExpect(status().isNotFound());
+
+        verify(productionService, never()).getForPreview("draft-show");
+    }
+
+    @Test
+    void 관리자가_preview를_요청하면_상태_무관으로_조회한다() throws Exception {
+        AdminPrincipal principal = new AdminPrincipal(1L, "admin", AdminRole.SUPER_ADMIN);
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken(
+                        principal, null, List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Production production = new Production("draft-show");
+        when(productionService.getForPreview("draft-show")).thenReturn(production);
+
+        mockMvc.perform(get("/api/productions/draft-show?preview=true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.slug").value("draft-show"));
+
+        verify(productionService, never()).getPublished("draft-show");
     }
 }

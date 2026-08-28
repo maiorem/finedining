@@ -40,6 +40,14 @@ public class ProductionService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
     }
 
+    /**
+     * 관리자 미리보기(§3.9 {@code ?preview=true}) 전용. 상태 무관으로 조회하고 캐시하지 않는다 —
+     * DRAFT가 캐시에 올라가면 그다음 익명 요청이 캐시를 맞고 초안을 볼 위험이 생긴다.
+     */
+    public Production getForPreview(String slug) {
+        return productionRepository.findBySlug(slug).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+    }
+
     public List<Production> listForAdmin() {
         return productionRepository.findAllByOrderByCreatedAtAsc();
     }

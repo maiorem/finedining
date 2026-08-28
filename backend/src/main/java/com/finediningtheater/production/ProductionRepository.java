@@ -22,5 +22,9 @@ public interface ProductionRepository extends JpaRepository<Production, Long> {
     @EntityGraph(attributePaths = "translations")
     List<Production> findAllByOrderByCreatedAtAsc();
 
+    // 관리자 미리보기 전용(§3.9 ?preview=true) — 상태 무관으로 슬러그만으로 찾는다.
+    @EntityGraph(attributePaths = "translations")
+    Optional<Production> findBySlug(String slug);
+
     boolean existsBySlug(String slug);
 }
