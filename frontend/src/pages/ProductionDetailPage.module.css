@@ -23,6 +23,89 @@
   color: var(--c-ink-60);
 }
 
+/* 풀블리드 히어로 — .page의 패딩을 정확히 상쇄해 뷰포트 끝까지 이미지를 채운다. 히어로가
+   맨 처음 자식이어야 이 트릭이 성립한다(§8.2 "풀블리드 이미지 위 최소 텍스트"). */
+.hero {
+  position: relative;
+  margin: calc(-1 * var(--section-y-mobile)) calc(-1 * var(--gutter-mobile)) var(--section-y-mobile);
+  height: 70svh;
+  min-height: 420px;
+  overflow: hidden;
+  background: var(--c-black);
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    margin: calc(-1 * var(--section-y-desktop)) calc(-1 * var(--gutter-desktop)) var(--section-y-desktop);
+    height: 80svh;
+  }
+}
+
+.heroImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroScrim {
+  position: absolute;
+  inset: 0;
+  /* 무채색 팔레트 안의 불투명도 그라디언트다 — 색상 그라디언트가 아니다(§8.2). */
+  background: linear-gradient(to top, rgba(11, 11, 12, 0.65), rgba(11, 11, 12, 0) 55%);
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--gutter-mobile);
+  color: var(--c-white);
+}
+
+@media (min-width: 1024px) {
+  .heroOverlay {
+    padding: var(--gutter-desktop);
+  }
+}
+
+.heroEyebrow {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--c-line);
+  margin: 0 0 0.5rem;
+}
+
+.heroTitle {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: var(--t-h1);
+  line-height: var(--lh-tight);
+  margin: 0;
+}
+
+/* 이미지가 없는 작품(드물다)만 쓰는 기본 헤더 — 히어로 없이 텍스트만 있다. */
+.eyebrow {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--c-ink-60);
+  margin: 0 0 0.5rem;
+}
+
+.title {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: var(--t-h1);
+  margin: 0 0 2rem;
+}
+
 .editToggle {
   margin-bottom: 1.5rem;
   min-height: 40px;
@@ -42,46 +125,84 @@
 }
 
 .desktopOnlyNotice {
+  margin-bottom: 1.5rem;
   border: 1px solid var(--c-line);
   padding: 0.75em 1em;
   color: var(--c-ink-60);
   font-size: var(--t-caption);
 }
 
-.title {
-  font-family: var(--f-display);
-  font-weight: 400;
-  font-size: var(--t-h1);
-  margin: 0 0 0.5rem;
-}
-
-.subtitle {
-  color: var(--c-ink-60);
-  font-size: var(--t-lead);
-  margin: 0 0 2rem;
-}
-
-.description {
+.lead {
   max-width: 38em;
   color: var(--c-ink);
+  font-size: var(--t-lead);
   line-height: var(--lh-body);
   white-space: pre-wrap;
-  margin: 0 0 2rem;
+  margin: 0 0 var(--section-y-mobile);
 }
 
-.imageGrid {
-  list-style: none;
-  margin: 2rem 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--gutter-mobile);
+@media (min-width: 1024px) {
+  .lead {
+    margin: 0 0 var(--section-y-desktop);
+  }
 }
 
-.imageGrid img {
+/* 편집형 세로 스토리텔링 — 남은 이미지를 하나씩, 좌우로 번갈아 큼직하게 배치한다(§8.2).
+   텍스트 짝을 인위로 만들지 않고, 이미지 자체의 캡션(alt)과 여백만으로 리듬을 준다. */
+.editorial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-y-mobile);
+}
+
+@media (min-width: 1024px) {
+  .editorial {
+    gap: var(--section-y-desktop);
+  }
+}
+
+.editorialRow {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .editorialRow {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+  }
+
+  .editorialRow > .editorialImage {
+    grid-column: 1 / 8;
+  }
+
+  .editorialRowReverse > .editorialImage {
+    grid-column: 6 / 13;
+  }
+}
+
+.editorialImage {
   width: 100%;
   height: auto;
   display: block;
+}
+
+.editorialCaption {
+  margin-top: 0.75rem;
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
+  line-height: var(--lh-body);
+}
+
+@media (min-width: 1024px) {
+  .editorialRow > .editorialCaption {
+    grid-column: 1 / 8;
+  }
+
+  .editorialRowReverse > .editorialCaption {
+    grid-column: 6 / 13;
+  }
 }
 
 .panelLoading {

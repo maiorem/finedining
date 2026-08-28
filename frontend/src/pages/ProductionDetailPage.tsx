@@ -45,10 +45,35 @@ export default function ProductionDetailPage() {
   }
 
   const showPanel = canEdit && editMode;
+  const [heroImage, ...editorialImages] = production.images;
 
   return (
     <div className={showPanel ? styles.layoutWithPanel : styles.layout}>
       <main className={styles.page}>
+        {heroImage ? (
+          <EditableSection active={showPanel}>
+            <section className={styles.hero}>
+              <img
+                className={styles.heroImage}
+                src={heroImage.url1600 ?? heroImage.url960 ?? heroImage.url640 ?? undefined}
+                alt={heroImage.altText ?? ""}
+                loading="eager"
+                fetchPriority="high"
+              />
+              <div className={styles.heroScrim} />
+              <div className={styles.heroOverlay}>
+                {production.subtitle && <p className={styles.heroEyebrow}>{production.subtitle}</p>}
+                {production.title && <h1 className={styles.heroTitle}>{production.title}</h1>}
+              </div>
+            </section>
+          </EditableSection>
+        ) : (
+          <EditableSection active={showPanel}>
+            {production.subtitle && <p className={styles.eyebrow}>{production.subtitle}</p>}
+            {production.title && <h1 className={styles.title}>{production.title}</h1>}
+          </EditableSection>
+        )}
+
         {canEdit && (
           <button
             type="button"
@@ -62,30 +87,40 @@ export default function ProductionDetailPage() {
 
         {showPanel && !isDesktop && <p className={styles.desktopOnlyNotice}>{t("editing.desktopOnly")}</p>}
 
-        <EditableSection active={showPanel}>
-          {production.title && <h1 className={styles.title}>{production.title}</h1>}
-          {production.subtitle && <p className={styles.subtitle}>{production.subtitle}</p>}
-          {production.description && <p className={styles.description}>{production.description}</p>}
-        </EditableSection>
-
-        {production.images.length > 0 && (
+        {production.description && (
           <EditableSection active={showPanel}>
-            <ul className={styles.imageGrid}>
-              {production.images.map((image) => (
-                <li key={image.id}>
-                  {image.url640 && (
-                    <img
-                      src={image.url640}
-                      alt={image.altText ?? ""}
-                      width={image.width ?? undefined}
-                      height={image.height ?? undefined}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                </li>
-              ))}
-            </ul>
+            <p className={styles.lead}>{production.description}</p>
+          </EditableSection>
+        )}
+
+        {editorialImages.length > 0 && (
+          <EditableSection active={showPanel}>
+            <div className={styles.editorial}>
+              {editorialImages.map((image, index) => {
+                const src = image.url1600 ?? image.url960 ?? image.url640;
+                return (
+                  <figure
+                    key={image.id}
+                    className={
+                      index % 2 === 1 ? `${styles.editorialRow} ${styles.editorialRowReverse}` : styles.editorialRow
+                    }
+                  >
+                    {src && (
+                      <img
+                        className={styles.editorialImage}
+                        src={src}
+                        alt={image.altText ?? ""}
+                        width={image.width ?? undefined}
+                        height={image.height ?? undefined}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                    {image.altText && <figcaption className={styles.editorialCaption}>{image.altText}</figcaption>}
+                  </figure>
+                );
+              })}
+            </div>
           </EditableSection>
         )}
       </main>

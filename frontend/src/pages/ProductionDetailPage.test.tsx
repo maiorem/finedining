@@ -78,6 +78,45 @@ describe("ProductionDetailPage", () => {
     expect(screen.queryByRole("button", { name: "편집 모드 켜기" })).not.toBeInTheDocument();
   });
 
+  it("이미지가 여러 장이면 첫 장은 히어로로, 나머지는 에디토리얼 섹션에 캡션과 함께 보여준다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: {
+            id: 1,
+            slug: "showcase",
+            title: "쇼케이스",
+            subtitle: "부제",
+            description: "설명",
+            images: [
+              { id: 1, status: "READY", altText: "히어로 사진", url1600: "http://example.com/1-1600.jpg" },
+              { id: 2, status: "READY", altText: "두번째 사진", url1600: "http://example.com/2-1600.jpg" },
+              { id: 3, status: "READY", altText: "세번째 사진", url1600: "http://example.com/3-1600.jpg" },
+            ],
+          },
+          error: null,
+        }),
+      );
+    });
+
+    renderAt("/productions/showcase");
+
+    expect(await screen.findByRole("img", { name: "히어로 사진" })).toHaveAttribute(
+      "src",
+      "http://example.com/1-1600.jpg",
+    );
+    expect(screen.getByRole("img", { name: "두번째 사진" })).toHaveAttribute("src", "http://example.com/2-1600.jpg");
+    expect(screen.getByRole("img", { name: "세번째 사진" })).toHaveAttribute("src", "http://example.com/3-1600.jpg");
+    expect(screen.getByText("두번째 사진")).toBeInTheDocument(); // figcaption
+    expect(screen.getByText("세번째 사진")).toBeInTheDocument();
+  });
+
   it("존재하지 않는 작품이면 안내 문구를 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
