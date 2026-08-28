@@ -6,16 +6,12 @@ export type ArtistTranslationView = {
   name: string | null;
   role: string | null;
   bio: string | null;
+  credits: string | null;
   draftName: string | null;
   draftRole: string | null;
   draftBio: string | null;
+  draftCredits: string | null;
   hasPendingDraft: boolean;
-};
-
-export type ArtistProductionRef = {
-  id: number;
-  slug: string;
-  title: string | null;
 };
 
 export type ArtistAdmin = {
@@ -24,7 +20,6 @@ export type ArtistAdmin = {
   status: "DRAFT" | "PUBLISHED";
   linkUrl: string | null;
   translations: ArtistTranslationView[];
-  productions: ArtistProductionRef[];
   images: MediaAsset[];
 };
 
@@ -45,17 +40,18 @@ export function saveArtistDraftTranslation(
   name: string,
   role: string | null,
   bio: string | null,
+  credits: string | null,
 ): Promise<ArtistAdmin> {
-  return apiAdminPut<ArtistAdmin>(`/api/artists/${id}/translations/${locale}`, accessToken, { name, role, bio });
+  return apiAdminPut<ArtistAdmin>(`/api/artists/${id}/translations/${locale}`, accessToken, {
+    name,
+    role,
+    bio,
+    credits,
+  });
 }
 
 export function changeArtistLinkUrl(accessToken: string, id: number, linkUrl: string | null): Promise<ArtistAdmin> {
   return apiAdminPut<ArtistAdmin>(`/api/artists/${id}/link`, accessToken, { linkUrl });
-}
-
-/** 참여작품 전체를 이 목록으로 치환한다(추가/삭제가 아니라 교체) — 백엔드도 같은 의미다. */
-export function updateArtistProductions(accessToken: string, id: number, productionIds: number[]): Promise<ArtistAdmin> {
-  return apiAdminPut<ArtistAdmin>(`/api/artists/${id}/productions`, accessToken, { productionIds });
 }
 
 export function publishArtist(accessToken: string, id: number): Promise<ArtistAdmin> {

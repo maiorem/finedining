@@ -37,7 +37,7 @@ describe("ArtistDetailPage", () => {
     vi.unstubAllGlobals();
   });
 
-  it("비로그인 방문자에게 이름·사진·소개·참여작품을 보여주고 편집 토글은 없다", async () => {
+  it("비로그인 방문자에게 이름·사진·소개·참여 작품(자유 텍스트)을 보여주고 편집 토글은 없다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
         return Promise.resolve(
@@ -53,6 +53,7 @@ describe("ArtistDetailPage", () => {
             name: "김아무개",
             role: "연출",
             bio: "소개 문구",
+            credits: "쇼케이스 출연 (2024)\n다른 극단 공연 참여 (2023)",
             linkUrl: "https://instagram.com/kimartist",
             photo: {
               id: 5,
@@ -62,7 +63,6 @@ describe("ArtistDetailPage", () => {
               width: 640,
               height: 640,
             },
-            productions: [{ id: 1, slug: "showcase", title: "쇼케이스" }],
           },
           error: null,
         }),
@@ -73,7 +73,9 @@ describe("ArtistDetailPage", () => {
 
     expect(await screen.findByRole("heading", { name: "김아무개" })).toBeInTheDocument();
     expect(screen.getByText("소개 문구")).toBeInTheDocument();
-    expect(screen.getByText("쇼케이스")).toBeInTheDocument();
+    // RTL의 기본 텍스트 매칭은 공백을 정규화한다(줄바꿈 → 스페이스) — pre-wrap으로 렌더된 실제
+    // 줄바꿈은 스냅샷이 아니라 정규화 여부 자체로 충분히 검증된다.
+    expect(screen.getByText("쇼케이스 출연 (2024) 다른 극단 공연 참여 (2023)")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "프로필 사진" })).toHaveAttribute("src", "http://example.com/640.jpg");
     expect(screen.getByRole("link", { name: /새 창에서 열림/ })).toHaveAttribute("target", "_blank");
     expect(screen.queryByRole("button", { name: "편집 모드 켜기" })).not.toBeInTheDocument();
@@ -116,9 +118,9 @@ describe("ArtistDetailPage", () => {
             name: "김아무개",
             role: null,
             bio: null,
+            credits: null,
             linkUrl: null,
             photo: null,
-            productions: [],
           },
           error: null,
         }),

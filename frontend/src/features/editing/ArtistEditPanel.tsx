@@ -8,9 +8,7 @@ import {
   publishArtist,
   saveArtistDraftTranslation,
   unpublishArtist,
-  updateArtistProductions,
 } from "../../api/artistAdmin";
-import { listProductionsForAdmin } from "../../api/productionAdmin";
 import { ApiError } from "../../api/http";
 import { queryKeys } from "../../api/queryKeys";
 import { ImageDropzone } from "./ImageDropzone";
@@ -20,21 +18,22 @@ import styles from "./ArtistEditPanel.module.css";
 type Locale = "KO" | "EN";
 const LOCALES: Locale[] = ["KO", "EN"];
 
-type DraftState = Record<Locale, { name: string; role: string; bio: string }>;
+type DraftState = Record<Locale, { name: string; role: string; bio: string; credits: string }>;
 
 type ArtistEditPanelProps = {
   artistId: number;
 };
 
 const EMPTY_DRAFTS: DraftState = {
-  KO: { name: "", role: "", bio: "" },
-  EN: { name: "", role: "", bio: "" },
+  KO: { name: "", role: "", bio: "", credits: "" },
+  EN: { name: "", role: "", bio: "", credits: "" },
 };
 
 /**
  * §3.9의 "같은 페이지, 편집 패널" — Production 패턴을 그대로 따른다. `features/editing/`에
  * 있으므로 React.lazy로만 import된다(§3.5·§9). 프로필 사진은 아티스트당 1장으로 제한한다
- * (ImageDropzone의 maxImages).
+ * (ImageDropzone의 maxImages). 참여 작품은 이 사이트의 Production 선택형이 아니라 자유
+ * 텍스트다(2026-08-29 결정) — 외부 프로젝트 이력도 적을 수 있어야 한다.
  */
 export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
   const { t } = useTranslation();
@@ -52,7 +51,6 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
   const [activeLocale, setActiveLocale] = useState<Locale>("KO");
   const [drafts, setDrafts] = useState<DraftState>(EMPTY_DRAFTS);
   const [linkUrlDraft, setLinkUrlDraft] = useState("");
-  const [selectedProductionIds, setSelectedProductionIds] = useState<number[]>([]);
   const [pinAction, setPinAction] = useState<"publish" | "unpublish" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
@@ -66,20 +64,13 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
           name: translation.draftName ?? translation.name ?? "",
           role: translation.draftRole ?? translation.role ?? "",
           bio: translation.draftBio ?? translation.bio ?? "",
+          credits: translation.draftCredits ?? translation.credits ?? "",
         };
       }
       return next;
     });
     setLinkUrlDraft(data.linkUrl ?? "");
-    setSelectedProductionIds(data.productions.map((p) => p.id));
   }, [data]);
-
-  const productionsQuery = useQuery({
-    queryKey: queryKeys.productions.adminList,
-    queryFn: () => listProductionsForAdmin(session!.accessToken),
-    enabled: Boolean(session),
-    staleTime: 0,
-  });
 
   function invalidate() {
     void queryClient.invalidateQueries({ queryKey });
@@ -95,6 +86,7 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
         drafts[activeLocale].name,
         drafts[activeLocale].role || null,
         drafts[activeLocale].bio || null,
+        drafts[activeLocale].credits || null,
       ),
     onSuccess: () => {
       setActionError(null);
@@ -109,19 +101,6 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
 
   const linkMutation = useMutation({
     mutationFn: () => changeArtistLinkUrl(session!.accessToken, artistId, linkUrlDraft || null),
-    onSuccess: () => {
-      setActionError(null);
-      setSaveNotice(t("editing.panel.saved"));
-      invalidate();
-    },
-    onError: (err: unknown) => {
-      setSaveNotice(null);
-      setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
-    },
-  });
-
-  const productionsMutation = useMutation({
-    mutationFn: () => updateArtistProductions(session!.accessToken, artistId, selectedProductionIds),
     onSuccess: () => {
       setActionError(null);
       setSaveNotice(t("editing.panel.saved"));
@@ -220,6 +199,18 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
         />
       </label>
 
+      <label className={styles.field}>
+        <span>{t("editing.panel.artistCreditsLabel")}</span>
+        <textarea
+          rows={5}
+          value={drafts[activeLocale].credits}
+          onChange={(e) =>
+            setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], credits: e.target.value } }))
+          }
+          placeholder={t("editing.panel.artistCreditsPlaceholder")}
+        />
+      </label>
+
       {saveNotice && <p className={styles.notice}>{saveNotice}</p>}
       {actionError && (
         <p className={styles.error} role="alert">
@@ -265,51 +256,6 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
           setSaveNotice(null);
           setActionError(null);
           linkMutation.mutate();
-        }}
-      >
-        {t("editing.image.save")}
-      </button>
-
-      <hr className={styles.divider} />
-
-      <h3 className={styles.imagesHeading}>{t("editing.panel.artistProductionsHeading")}</h3>
-      {productionsQuery.data && productionsQuery.data.length > 0 ? (
-        <ul className={styles.productionsList}>
-          {productionsQuery.data.map((production) => {
-            const title =
-              production.translations.find((tr) => tr.locale === "KO")?.title ??
-              production.translations.find((tr) => tr.locale === "EN")?.title ??
-              production.slug;
-            const checked = selectedProductionIds.includes(production.id);
-            return (
-              <li key={production.id}>
-                <label className={styles.checkboxRow}>
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={(e) =>
-                      setSelectedProductionIds((prev) =>
-                        e.target.checked ? [...prev, production.id] : prev.filter((id) => id !== production.id),
-                      )
-                    }
-                  />
-                  <span>{title}</span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
-      ) : (
-        <p className={styles.notice}>{t("editing.panel.artistProductionsEmpty")}</p>
-      )}
-      <button
-        type="button"
-        className={styles.saveButton}
-        disabled={productionsMutation.isPending}
-        onClick={() => {
-          setSaveNotice(null);
-          setActionError(null);
-          productionsMutation.mutate();
         }}
       >
         {t("editing.image.save")}

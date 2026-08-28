@@ -13,21 +13,15 @@ export type ArtistSummary = {
   photo: MediaAsset | null;
 };
 
-export type ArtistProductionRef = {
-  id: number;
-  slug: string;
-  title: string | null;
-};
-
 export type ArtistDetail = {
   id: number;
   slug: string;
   name: string | null;
   role: string | null;
   bio: string | null;
+  credits: string | null;
   linkUrl: string | null;
   photo: MediaAsset | null;
-  productions: ArtistProductionRef[];
 };
 
 export function useArtists(i18nLanguage: string) {

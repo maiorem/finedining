@@ -88,14 +88,10 @@ export default function ArtistDetailPage() {
           )}
         </EditableSection>
 
-        {artist.productions.length > 0 && (
+        {artist.credits && (
           <section>
             <h2 className={styles.productionsHeading}>{t("artists.productionsHeading")}</h2>
-            <ul className={styles.productionList}>
-              {artist.productions.map((production) => (
-                <li key={production.id}>{production.title}</li>
-              ))}
-            </ul>
+            <p className={styles.credits}>{artist.credits}</p>
           </section>
         )}
       </main>

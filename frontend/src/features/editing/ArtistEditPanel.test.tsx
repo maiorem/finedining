@@ -21,9 +21,11 @@ function adminData(status: "DRAFT" | "PUBLISHED") {
         name: "김아무개",
         role: null,
         bio: null,
+        credits: null,
         draftName: null,
         draftRole: null,
         draftBio: null,
+        draftCredits: null,
         hasPendingDraft: false,
       },
       {
@@ -31,13 +33,14 @@ function adminData(status: "DRAFT" | "PUBLISHED") {
         name: "Kim",
         role: null,
         bio: null,
+        credits: null,
         draftName: null,
         draftRole: null,
         draftBio: null,
+        draftCredits: null,
         hasPendingDraft: false,
       },
     ],
-    productions: [],
     images: [],
   };
 }
@@ -86,23 +89,11 @@ describe("ArtistEditPanel", () => {
     expect(screen.queryByRole("button", { name: "발행취소" })).not.toBeInTheDocument();
   });
 
-  it("SNS 링크와 참여작품 목록을 보여주고, 이미 연결된 작품은 체크되어 있다", async () => {
+  it("SNS 링크와 참여 작품(자유 텍스트)을 현재 값으로 채워 보여준다", async () => {
     const fetchMock = vi.fn((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
         return Promise.resolve(
           jsonResponse({ success: true, data: { accessToken: "t", username: "admin", role: "EDITOR" }, error: null }),
-        );
-      }
-      if (input.includes("/api/productions/manage")) {
-        return Promise.resolve(
-          jsonResponse({
-            success: true,
-            data: [
-              { id: 1, slug: "showcase", status: "PUBLISHED", translations: [{ locale: "KO", title: "쇼케이스" }], images: [] },
-              { id: 2, slug: "second", status: "DRAFT", translations: [{ locale: "KO", title: "두번째 작품" }], images: [] },
-            ],
-            error: null,
-          }),
         );
       }
       return Promise.resolve(
@@ -111,7 +102,21 @@ describe("ArtistEditPanel", () => {
           data: {
             ...adminData("PUBLISHED"),
             linkUrl: "https://instagram.com/kimartist",
-            productions: [{ id: 1, slug: "showcase", title: "쇼케이스" }],
+            translations: [
+              {
+                locale: "KO",
+                name: "김아무개",
+                role: null,
+                bio: null,
+                credits: "쇼케이스 출연 (2024)\n한밤의 만찬 협업 (2023)",
+                draftName: null,
+                draftRole: null,
+                draftBio: null,
+                draftCredits: null,
+                hasPendingDraft: false,
+              },
+              adminData("PUBLISHED").translations[1],
+            ],
           },
           error: null,
         }),
@@ -129,7 +134,8 @@ describe("ArtistEditPanel", () => {
     );
 
     expect(await screen.findByDisplayValue("https://instagram.com/kimartist")).toBeInTheDocument();
-    expect(await screen.findByRole("checkbox", { name: "쇼케이스" })).toBeChecked();
-    expect(screen.getByRole("checkbox", { name: "두번째 작품" })).not.toBeChecked();
+    // getByDisplayValue도 getByText와 같은 기본 정규화(공백 압축)를 적용한다.
+    expect(screen.getByDisplayValue("쇼케이스 출연 (2024) 한밤의 만찬 협업 (2023)")).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
   });
 });

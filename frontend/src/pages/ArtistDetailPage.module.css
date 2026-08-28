@@ -97,15 +97,12 @@
   margin: 0 0 0.75rem;
 }
 
-.productionList {
-  list-style: none;
+.credits {
   margin: 0;
-  padding: 0;
-}
-
-.productionList li {
-  padding: 0.5em 0;
-  border-bottom: 1px solid var(--c-line);
+  color: var(--c-ink);
+  line-height: var(--lh-body);
+  white-space: pre-wrap;
+  max-width: 38em;
 }
 
 .status {
