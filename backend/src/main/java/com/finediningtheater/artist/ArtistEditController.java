@@ -3,7 +3,6 @@ package com.finediningtheater.artist;
 import com.finediningtheater.artist.dto.ArtistAdminResponse;
 import com.finediningtheater.artist.dto.ChangeArtistLinkRequest;
 import com.finediningtheater.artist.dto.CreateArtistRequest;
-import com.finediningtheater.artist.dto.LinkProductionsRequest;
 import com.finediningtheater.artist.dto.UpsertArtistTranslationRequest;
 import com.finediningtheater.global.audit.AuditLogger;
 import com.finediningtheater.global.response.ApiResponse;
@@ -82,7 +81,8 @@ public class ArtistEditController {
             @PathVariable Long id,
             @PathVariable SiteLocale locale,
             @Valid @RequestBody UpsertArtistTranslationRequest request) {
-        artistService.saveDraftTranslation(id, locale, request.name(), request.role(), request.bio());
+        artistService.saveDraftTranslation(
+                id, locale, request.name(), request.role(), request.bio(), request.credits());
         return ApiResponse.success(toAdminResponse(artistService.getForAdmin(id)));
     }
 
@@ -90,12 +90,6 @@ public class ArtistEditController {
     public ApiResponse<ArtistAdminResponse> changeLink(
             @PathVariable Long id, @Valid @RequestBody ChangeArtistLinkRequest request) {
         return ApiResponse.success(toAdminResponse(artistService.changeLinkUrl(id, request.linkUrl())));
-    }
-
-    @PutMapping("/{id}/productions")
-    public ApiResponse<ArtistAdminResponse> updateProductions(
-            @PathVariable Long id, @Valid @RequestBody LinkProductionsRequest request) {
-        return ApiResponse.success(toAdminResponse(artistService.updateProductions(id, request.productionIds())));
     }
 
     /** 파괴적·공개적 동작 — PIN sudo 모드가 열려 있어야 한다(§3.4). */

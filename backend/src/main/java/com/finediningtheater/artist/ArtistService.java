@@ -6,11 +6,7 @@ import com.finediningtheater.global.support.ContentStatus;
 import com.finediningtheater.global.support.SiteLocale;
 import com.finediningtheater.media.MediaOwnerType;
 import com.finediningtheater.media.MediaService;
-import com.finediningtheater.production.Production;
-import com.finediningtheater.production.ProductionRepository;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArtistService {
 
     private final ArtistRepository artistRepository;
-    private final ProductionRepository productionRepository;
     private final MediaService mediaService;
 
     @Cacheable("artists")
@@ -64,13 +59,14 @@ public class ArtistService {
     }
 
     @Transactional
-    public void saveDraftTranslation(Long id, SiteLocale locale, String name, String role, String bio) {
+    public void saveDraftTranslation(
+            Long id, SiteLocale locale, String name, String role, String bio, String credits) {
         Artist artist = getForAdmin(id);
         ArtistTranslation translation = artist.translationRowFor(locale);
         if (translation == null) {
-            translation = artist.addTranslation(locale, null, null, null);
+            translation = artist.addTranslation(locale, null, null, null, null);
         }
-        translation.updateDraft(name, role, bio);
+        translation.updateDraft(name, role, bio, credits);
     }
 
     // draft*처럼 발행을 거치지 않고 즉시 공개본에 반영되는 필드라, 이미 PUBLISHED인 아티스트라면
@@ -81,15 +77,6 @@ public class ArtistService {
     public Artist changeLinkUrl(Long id, String linkUrl) {
         Artist artist = getForAdmin(id);
         artist.changeLinkUrl(linkUrl);
-        return artist;
-    }
-
-    @Transactional
-    @CacheEvict(value = {"artists", "artistDetail"}, allEntries = true)
-    public Artist updateProductions(Long id, List<Long> productionIds) {
-        Artist artist = getForAdmin(id);
-        Set<Production> productions = new HashSet<>(productionRepository.findAllById(productionIds));
-        artist.replaceProductions(productions);
         return artist;
     }
 

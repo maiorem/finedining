@@ -108,7 +108,7 @@ class ArtistEditControllerTest {
         sudoMode.activate(1L);
         Artist before = new Artist("kim-artist");
         Artist after = new Artist("kim-artist");
-        after.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개");
+        after.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개", "참여작품");
         after.publish(1L);
         when(artistService.getForAdmin(1L)).thenReturn(before);
         when(artistService.publish(1L, 1L)).thenReturn(after);

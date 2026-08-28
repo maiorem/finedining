@@ -48,6 +48,11 @@ public class ArtistTranslation extends BaseTimeEntity {
     @Column(length = 2000)
     private String bio;
 
+    // 참여 작품 이력 — 자유 텍스트다(2026-08-29 결정). Production과의 N:M 선택 대신, 이
+    // 사이트 밖 작품 경력도 적을 수 있게 했다.
+    @Column(length = 2000)
+    private String credits;
+
     @Column(length = 100)
     private String draftName;
 
@@ -57,20 +62,25 @@ public class ArtistTranslation extends BaseTimeEntity {
     @Column(length = 2000)
     private String draftBio;
 
+    @Column(length = 2000)
+    private String draftCredits;
+
     protected ArtistTranslation() {}
 
-    ArtistTranslation(Artist artist, SiteLocale locale, String name, String role, String bio) {
+    ArtistTranslation(Artist artist, SiteLocale locale, String name, String role, String bio, String credits) {
         this.artist = artist;
         this.locale = locale;
         this.name = name;
         this.role = role;
         this.bio = bio;
+        this.credits = credits;
     }
 
-    public void updateDraft(String name, String role, String bio) {
+    public void updateDraft(String name, String role, String bio, String credits) {
         this.draftName = name;
         this.draftRole = role;
         this.draftBio = bio;
+        this.draftCredits = credits;
     }
 
     public void promoteDraftToPublished() {
@@ -78,6 +88,7 @@ public class ArtistTranslation extends BaseTimeEntity {
             this.name = draftName;
             this.role = draftRole;
             this.bio = draftBio;
+            this.credits = draftCredits;
         }
     }
 
@@ -91,5 +102,9 @@ public class ArtistTranslation extends BaseTimeEntity {
 
     public String effectiveBio() {
         return draftName != null ? draftBio : bio;
+    }
+
+    public String effectiveCredits() {
+        return draftName != null ? draftCredits : credits;
     }
 }

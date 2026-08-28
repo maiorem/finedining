@@ -4,7 +4,6 @@ import com.finediningtheater.artist.Artist;
 import com.finediningtheater.artist.ArtistTranslation;
 import com.finediningtheater.global.support.SiteLocale;
 import com.finediningtheater.media.dto.MediaAssetResponse;
-import java.util.List;
 
 public record ArtistDetailResponse(
         Long id,
@@ -12,22 +11,20 @@ public record ArtistDetailResponse(
         String name,
         String role,
         String bio,
+        String credits,
         String linkUrl,
-        MediaAssetResponse photo,
-        List<ProductionRef> productions) {
+        MediaAssetResponse photo) {
 
     public static ArtistDetailResponse from(Artist artist, SiteLocale locale, MediaAssetResponse photo) {
         ArtistTranslation translation = artist.translationFor(locale);
-        List<ProductionRef> productions =
-                artist.getProductions().stream().map(p -> ProductionRef.from(p, locale)).toList();
         return new ArtistDetailResponse(
                 artist.getId(),
                 artist.getSlug(),
                 translation == null ? null : translation.getName(),
                 translation == null ? null : translation.getRole(),
                 translation == null ? null : translation.getBio(),
+                translation == null ? null : translation.getCredits(),
                 artist.getLinkUrl(),
-                photo,
-                productions);
+                photo);
     }
 }

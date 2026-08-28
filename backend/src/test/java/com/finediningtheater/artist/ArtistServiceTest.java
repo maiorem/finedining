@@ -8,9 +8,6 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.SiteLocale;
 import com.finediningtheater.media.MediaService;
-import com.finediningtheater.production.Production;
-import com.finediningtheater.production.ProductionRepository;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,11 +18,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ArtistServiceTest {
 
     @Mock private ArtistRepository artistRepository;
-    @Mock private ProductionRepository productionRepository;
     @Mock private MediaService mediaService;
 
     private ArtistService service() {
-        return new ArtistService(artistRepository, productionRepository, mediaService);
+        return new ArtistService(artistRepository, mediaService);
     }
 
     @Test
@@ -41,13 +37,14 @@ class ArtistServiceTest {
     @Test
     void 임시저장은_공개본을_바꾸지_않는다() {
         Artist artist = new Artist("kim-artist");
-        artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개");
+        artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개", "참여작품");
         when(artistRepository.findWithDetailsById(1L)).thenReturn(Optional.of(artist));
 
-        service().saveDraftTranslation(1L, SiteLocale.KO, "새 이름", "새 역할", "새 소개");
+        service().saveDraftTranslation(1L, SiteLocale.KO, "새 이름", "새 역할", "새 소개", "새 참여작품");
 
         assertThat(artist.nameFor(SiteLocale.KO)).isEqualTo("김아무개");
         assertThat(artist.translationRowFor(SiteLocale.KO).effectiveName()).isEqualTo("새 이름");
+        assertThat(artist.translationRowFor(SiteLocale.KO).effectiveCredits()).isEqualTo("새 참여작품");
     }
 
     @Test
@@ -64,25 +61,13 @@ class ArtistServiceTest {
     @Test
     void 발행하면_draft가_공개본으로_승격되고_PUBLISHED가_된다() {
         Artist artist = new Artist("kim-artist");
-        ArtistTranslation ko = artist.addTranslation(SiteLocale.KO, null, null, null);
-        ko.updateDraft("새 이름", "연출", "소개");
+        ArtistTranslation ko = artist.addTranslation(SiteLocale.KO, null, null, null, null);
+        ko.updateDraft("새 이름", "연출", "소개", "참여작품");
         when(artistRepository.findWithDetailsById(1L)).thenReturn(Optional.of(artist));
 
         Artist result = service().publish(1L, 99L);
 
         assertThat(result.isPublished()).isTrue();
         assertThat(result.nameFor(SiteLocale.KO)).isEqualTo("새 이름");
-    }
-
-    @Test
-    void updateProductions는_기존_연결을_새_목록으로_치환한다() {
-        Artist artist = new Artist("kim-artist");
-        Production production = new Production("show-1");
-        when(artistRepository.findWithDetailsById(1L)).thenReturn(Optional.of(artist));
-        when(productionRepository.findAllById(List.of(10L))).thenReturn(List.of(production));
-
-        Artist result = service().updateProductions(1L, List.of(10L));
-
-        assertThat(result.getProductions()).containsExactly(production);
     }
 }

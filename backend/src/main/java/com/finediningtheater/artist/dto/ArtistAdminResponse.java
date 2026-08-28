@@ -1,7 +1,6 @@
 package com.finediningtheater.artist.dto;
 
 import com.finediningtheater.artist.Artist;
-import com.finediningtheater.global.support.SiteLocale;
 import com.finediningtheater.media.dto.MediaAssetResponse;
 import java.util.List;
 
@@ -11,7 +10,6 @@ public record ArtistAdminResponse(
         String status,
         String linkUrl,
         List<TranslationView> translations,
-        List<ProductionRef> productions,
         List<MediaAssetResponse> images) {
 
     public record TranslationView(
@@ -19,9 +17,11 @@ public record ArtistAdminResponse(
             String name,
             String role,
             String bio,
+            String credits,
             String draftName,
             String draftRole,
             String draftBio,
+            String draftCredits,
             boolean hasPendingDraft) {}
 
     public static ArtistAdminResponse from(Artist artist, List<MediaAssetResponse> images) {
@@ -34,22 +34,14 @@ public record ArtistAdminResponse(
                                                 t.getName(),
                                                 t.getRole(),
                                                 t.getBio(),
+                                                t.getCredits(),
                                                 t.getDraftName(),
                                                 t.getDraftRole(),
                                                 t.getDraftBio(),
+                                                t.getDraftCredits(),
                                                 t.getDraftName() != null))
                         .toList();
-        List<ProductionRef> productions =
-                artist.getProductions().stream()
-                        .map(p -> ProductionRef.from(p, SiteLocale.KO))
-                        .toList();
         return new ArtistAdminResponse(
-                artist.getId(),
-                artist.getSlug(),
-                artist.getStatus().name(),
-                artist.getLinkUrl(),
-                views,
-                productions,
-                images);
+                artist.getId(), artist.getSlug(), artist.getStatus().name(), artist.getLinkUrl(), views, images);
     }
 }

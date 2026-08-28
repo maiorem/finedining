@@ -48,7 +48,7 @@ class ArtistControllerTest {
     @Test
     void 발행된_아티스트_목록을_반환한다() throws Exception {
         Artist artist = new Artist("kim-artist");
-        artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개");
+        artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개", "참여작품");
         when(artistService.listPublished()).thenReturn(List.of(artist));
 
         mockMvc.perform(get("/api/artists"))

@@ -2,7 +2,6 @@ package com.finediningtheater.artist;
 
 import com.finediningtheater.global.support.Publishable;
 import com.finediningtheater.global.support.SiteLocale;
-import com.finediningtheater.production.Production;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,9 +9,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
@@ -39,18 +35,9 @@ public class Artist extends Publishable {
     @Column(length = 500)
     private String linkUrl;
 
-    // Set이다 — List(bag)로 두면 productions.translations(다른 bag)와 한 쿼리에서 fetch join할 때
-    // Hibernate가 MultipleBagFetchException을 던진다(2026-08-27 발견). 번역은 순서가 의미 없으니
-    // Set이 자연스럽기도 하다.
+    // 번역은 순서가 의미 없으니 List(bag)가 아니라 Set이 자연스럽다.
     @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<ArtistTranslation> translations = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "artist_production",
-            joinColumns = @JoinColumn(name = "artist_id"),
-            inverseJoinColumns = @JoinColumn(name = "production_id"))
-    private Set<Production> productions = new HashSet<>();
 
     protected Artist() {}
 
@@ -81,8 +68,8 @@ public class Artist extends Publishable {
         return translations.stream().filter(t -> t.getLocale() == locale).findFirst().orElse(null);
     }
 
-    public ArtistTranslation addTranslation(SiteLocale locale, String name, String role, String bio) {
-        ArtistTranslation translation = new ArtistTranslation(this, locale, name, role, bio);
+    public ArtistTranslation addTranslation(SiteLocale locale, String name, String role, String bio, String credits) {
+        ArtistTranslation translation = new ArtistTranslation(this, locale, name, role, bio, credits);
         translations.add(translation);
         return translation;
     }
@@ -93,10 +80,5 @@ public class Artist extends Publishable {
 
     public void changeLinkUrl(String linkUrl) {
         this.linkUrl = linkUrl;
-    }
-
-    public void replaceProductions(Set<Production> newProductions) {
-        this.productions.clear();
-        this.productions.addAll(newProductions);
     }
 }
