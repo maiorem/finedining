@@ -3,6 +3,7 @@ package com.finediningtheater.production;
 import com.finediningtheater.global.response.ApiResponse;
 import com.finediningtheater.global.security.AdminPrincipal;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaOwnerType;
 import com.finediningtheater.media.MediaService;
 import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.production.dto.ProductionDetailResponse;
@@ -53,14 +54,14 @@ public class ProductionController {
     }
 
     private MediaAssetResponse thumbnailFor(Production production) {
-        return mediaService.listPublished(production.getId()).stream()
+        return mediaService.listPublished(MediaOwnerType.PRODUCTION, production.getId()).stream()
                 .findFirst()
                 .map(asset -> MediaAssetResponse.from(asset, mediaService))
                 .orElse(null);
     }
 
     private List<MediaAssetResponse> imagesFor(Production production) {
-        return mediaService.listPublished(production.getId()).stream()
+        return mediaService.listPublished(MediaOwnerType.PRODUCTION, production.getId()).stream()
                 .map(asset -> MediaAssetResponse.from(asset, mediaService))
                 .toList();
     }

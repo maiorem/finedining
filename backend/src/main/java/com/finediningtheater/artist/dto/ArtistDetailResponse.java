@@ -3,6 +3,7 @@ package com.finediningtheater.artist.dto;
 import com.finediningtheater.artist.Artist;
 import com.finediningtheater.artist.ArtistTranslation;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.dto.MediaAssetResponse;
 import java.util.List;
 
 public record ArtistDetailResponse(
@@ -12,9 +13,10 @@ public record ArtistDetailResponse(
         String role,
         String bio,
         String linkUrl,
+        MediaAssetResponse photo,
         List<ProductionRef> productions) {
 
-    public static ArtistDetailResponse from(Artist artist, SiteLocale locale) {
+    public static ArtistDetailResponse from(Artist artist, SiteLocale locale, MediaAssetResponse photo) {
         ArtistTranslation translation = artist.translationFor(locale);
         List<ProductionRef> productions =
                 artist.getProductions().stream().map(p -> ProductionRef.from(p, locale)).toList();
@@ -25,6 +27,7 @@ public record ArtistDetailResponse(
                 translation == null ? null : translation.getRole(),
                 translation == null ? null : translation.getBio(),
                 artist.getLinkUrl(),
+                photo,
                 productions);
     }
 }

@@ -6,6 +6,7 @@ import com.finediningtheater.global.security.AdminPrincipal;
 import com.finediningtheater.global.security.SudoMode;
 import com.finediningtheater.global.support.ClientIp;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaOwnerType;
 import com.finediningtheater.media.MediaService;
 import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.production.dto.CreateProductionRequest;
@@ -155,7 +156,7 @@ public class ProductionEditController {
     // 관리자는 PENDING·FAILED 이미지도 봐야 재시도·삭제할 수 있으므로 listForAdmin(전체)을 쓴다.
     private ProductionAdminResponse toAdminResponse(Production production) {
         List<MediaAssetResponse> images =
-                mediaService.listForAdmin(production.getId()).stream()
+                mediaService.listForAdmin(MediaOwnerType.PRODUCTION, production.getId()).stream()
                         .map(asset -> MediaAssetResponse.from(asset, mediaService))
                         .toList();
         return ProductionAdminResponse.from(production, images);

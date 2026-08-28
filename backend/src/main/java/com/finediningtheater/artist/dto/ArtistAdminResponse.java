@@ -2,6 +2,7 @@ package com.finediningtheater.artist.dto;
 
 import com.finediningtheater.artist.Artist;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.dto.MediaAssetResponse;
 import java.util.List;
 
 public record ArtistAdminResponse(
@@ -10,7 +11,8 @@ public record ArtistAdminResponse(
         String status,
         String linkUrl,
         List<TranslationView> translations,
-        List<ProductionRef> productions) {
+        List<ProductionRef> productions,
+        List<MediaAssetResponse> images) {
 
     public record TranslationView(
             String locale,
@@ -22,7 +24,7 @@ public record ArtistAdminResponse(
             String draftBio,
             boolean hasPendingDraft) {}
 
-    public static ArtistAdminResponse from(Artist artist) {
+    public static ArtistAdminResponse from(Artist artist, List<MediaAssetResponse> images) {
         List<TranslationView> views =
                 artist.getTranslations().stream()
                         .map(
@@ -42,6 +44,12 @@ public record ArtistAdminResponse(
                         .map(p -> ProductionRef.from(p, SiteLocale.KO))
                         .toList();
         return new ArtistAdminResponse(
-                artist.getId(), artist.getSlug(), artist.getStatus().name(), artist.getLinkUrl(), views, productions);
+                artist.getId(),
+                artist.getSlug(),
+                artist.getStatus().name(),
+                artist.getLinkUrl(),
+                views,
+                productions,
+                images);
     }
 }

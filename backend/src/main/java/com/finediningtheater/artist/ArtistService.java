@@ -4,6 +4,8 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.ContentStatus;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaOwnerType;
+import com.finediningtheater.media.MediaService;
 import com.finediningtheater.production.Production;
 import com.finediningtheater.production.ProductionRepository;
 import java.util.HashSet;
@@ -15,7 +17,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** 공개 조회 + 아티스트 편집(기능6). 사진(이미지 파이프라인)은 다음 단계에서 붙인다. */
+/** 공개 조회 + 아티스트 편집(기능6) + 프로필 사진 연동(§7.5). */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -23,6 +25,7 @@ public class ArtistService {
 
     private final ArtistRepository artistRepository;
     private final ProductionRepository productionRepository;
+    private final MediaService mediaService;
 
     @Cacheable("artists")
     public List<Artist> listPublished() {
@@ -38,6 +41,14 @@ public class ArtistService {
 
     public Artist getForAdmin(Long id) {
         return artistRepository.findWithDetailsById(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+    }
+
+    /**
+     * 관리자 미리보기(§3.9 {@code ?preview=true}) 전용. 상태 무관으로 조회하고 캐시하지 않는다 —
+     * DRAFT가 캐시에 올라가면 그다음 익명 요청이 캐시를 맞고 초안을 볼 위험이 생긴다.
+     */
+    public Artist getForPreview(String slug) {
+        return artistRepository.findBySlug(slug).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
     }
 
     public List<Artist> listForAdmin() {
@@ -86,6 +97,7 @@ public class ArtistService {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "한국어 이름을 먼저 입력해 주세요.");
         }
         artist.publish(adminId);
+        mediaService.publishAllFor(MediaOwnerType.ARTIST, id);
         return artist;
     }
 

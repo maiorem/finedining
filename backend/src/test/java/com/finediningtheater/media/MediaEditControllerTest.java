@@ -55,14 +55,14 @@ class MediaEditControllerTest {
     @Test
     void presign_요청이_유효하면_업로드_URL을_반환한다() throws Exception {
         loginAs(1L);
-        when(mediaService.presign(1L, 1L, "image/jpeg", 1000))
+        when(mediaService.presign(MediaOwnerType.PRODUCTION, 1L, 1L, "image/jpeg", 1000))
                 .thenReturn(new MediaService.PresignResult(10L, "http://localhost:9000/x"));
 
         mockMvc.perform(
                         post("/api/media/presign")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
-                                        "{\"productionId\":1,\"contentType\":\"image/jpeg\",\"contentLengthBytes\":1000}"))
+                                        "{\"ownerType\":\"PRODUCTION\",\"ownerId\":1,\"contentType\":\"image/jpeg\",\"contentLengthBytes\":1000}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.mediaAssetId").value(10))
                 .andExpect(jsonPath("$.data.uploadUrl").value("http://localhost:9000/x"));
@@ -71,7 +71,7 @@ class MediaEditControllerTest {
     @Test
     void 완료_콜백은_감사로그를_남기고_응답을_반환한다() throws Exception {
         loginAs(1L);
-        MediaAsset asset = new MediaAsset(1L, 0, "originals/x.jpg");
+        MediaAsset asset = new MediaAsset(MediaOwnerType.PRODUCTION, 1L, 0, "originals/x.jpg");
         when(mediaService.completeUpload(eq(10L), eq("설명"))).thenReturn(asset);
 
         mockMvc.perform(

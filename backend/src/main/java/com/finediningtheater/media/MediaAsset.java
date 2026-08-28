@@ -16,10 +16,11 @@ import java.util.stream.Stream;
 import lombok.Getter;
 
 /**
- * 작품에 붙는 이미지 한 장. Production과의 관계는 의도적으로 JPA 연관관계가 아니라 순수
- * {@code productionId} 값이다 — media 패키지를 도메인에 묶지 않고 범용으로 둔다(CLAUDE.md §6).
- * published는 Production의 draft/publish 패턴을 그대로 따른다: 업로드 직후에는 false이고,
- * 작품이 (재)발행될 때 함께 true로 승격된다 — 그래야 편집 중인 이미지가 방문자에게 새지 않는다.
+ * 작품·아티스트 등에 붙는 이미지 한 장. 소유자와의 관계는 의도적으로 JPA 연관관계가 아니라
+ * 순수 {@code ownerType}+{@code ownerId} 값이다 — media 패키지를 특정 도메인에 묶지 않고
+ * 범용으로 둔다(CLAUDE.md §6). published는 소유자의 draft/publish 패턴을 그대로 따른다:
+ * 업로드 직후에는 false이고, 소유자가 (재)발행될 때 함께 true로 승격된다 — 그래야 편집 중인
+ * 이미지가 방문자에게 새지 않는다.
  */
 @Entity
 @Getter
@@ -30,8 +31,12 @@ public class MediaAsset extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private MediaOwnerType ownerType;
+
     @Column(nullable = false)
-    private Long productionId;
+    private Long ownerId;
 
     @Column(nullable = false)
     private int sortOrder;
@@ -72,8 +77,9 @@ public class MediaAsset extends BaseTimeEntity {
 
     protected MediaAsset() {}
 
-    public MediaAsset(Long productionId, int sortOrder, String originalKey) {
-        this.productionId = productionId;
+    public MediaAsset(MediaOwnerType ownerType, Long ownerId, int sortOrder, String originalKey) {
+        this.ownerType = ownerType;
+        this.ownerId = ownerId;
         this.sortOrder = sortOrder;
         this.originalKey = originalKey;
     }

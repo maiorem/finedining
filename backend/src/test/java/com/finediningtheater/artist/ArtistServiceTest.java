@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaService;
 import com.finediningtheater.production.Production;
 import com.finediningtheater.production.ProductionRepository;
 import java.util.List;
@@ -21,9 +22,10 @@ class ArtistServiceTest {
 
     @Mock private ArtistRepository artistRepository;
     @Mock private ProductionRepository productionRepository;
+    @Mock private MediaService mediaService;
 
     private ArtistService service() {
-        return new ArtistService(artistRepository, productionRepository);
+        return new ArtistService(artistRepository, productionRepository, mediaService);
     }
 
     @Test

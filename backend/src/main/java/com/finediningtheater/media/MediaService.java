@@ -17,7 +17,8 @@ import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 /**
  * 이미지 업로드 파이프라인 (CLAUDE.md §7.5). presign 발급 → 브라우저가 S3/MinIO에 직접 PUT →
  * 완료 콜백에서 매직 바이트 검증 + 파생본 생성까지 이 서비스가 맡는다. 파생본 생성은 콘텐츠
- * 규모가 작으므로 비동기/폴링 없이 완료 요청 안에서 동기로 끝낸다.
+ * 규모가 작으므로 비동기/폴링 없이 완료 요청 안에서 동기로 끝낸다. Production·Artist 등
+ * 여러 도메인이 공유하는 범용 서비스다(§6) — ownerType+ownerId로만 대상을 구분한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -39,7 +40,8 @@ public class MediaService {
     public record PresignResult(Long mediaAssetId, String uploadUrl) {}
 
     @Transactional
-    public PresignResult presign(Long productionId, Long adminId, String contentType, long contentLengthBytes) {
+    public PresignResult presign(
+            MediaOwnerType ownerType, Long ownerId, Long adminId, String contentType, long contentLengthBytes) {
         if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "이미지 파일만 업로드할 수 있습니다.");
         }
@@ -53,8 +55,8 @@ public class MediaService {
         presignRateLimiter.recordFailure(rateLimitKey);
 
         String key = "originals/" + UUID.randomUUID() + extensionFor(contentType);
-        int sortOrder = mediaAssetRepository.countByProductionId(productionId);
-        MediaAsset asset = mediaAssetRepository.save(new MediaAsset(productionId, sortOrder, key));
+        int sortOrder = mediaAssetRepository.countByOwnerTypeAndOwnerId(ownerType, ownerId);
+        MediaAsset asset = mediaAssetRepository.save(new MediaAsset(ownerType, ownerId, sortOrder, key));
 
         URL uploadUrl = storageService.presignPut(key, contentType, PRESIGN_VALIDITY);
         return new PresignResult(asset.getId(), uploadUrl.toString());
@@ -108,18 +110,18 @@ public class MediaService {
         mediaAssetRepository.delete(asset);
     }
 
-    public List<MediaAsset> listForAdmin(Long productionId) {
-        return mediaAssetRepository.findByProductionIdOrderBySortOrderAsc(productionId);
+    public List<MediaAsset> listForAdmin(MediaOwnerType ownerType, Long ownerId) {
+        return mediaAssetRepository.findByOwnerTypeAndOwnerIdOrderBySortOrderAsc(ownerType, ownerId);
     }
 
-    public List<MediaAsset> listPublished(Long productionId) {
-        return mediaAssetRepository.findByProductionIdAndPublishedTrueOrderBySortOrderAsc(productionId);
+    public List<MediaAsset> listPublished(MediaOwnerType ownerType, Long ownerId) {
+        return mediaAssetRepository.findByOwnerTypeAndOwnerIdAndPublishedTrueOrderBySortOrderAsc(ownerType, ownerId);
     }
 
-    /** Production.publish()와 같은 트랜잭션에서 호출된다 — 발행 시 READY 이미지를 함께 공개한다. */
+    /** 소유자의 publish()와 같은 트랜잭션에서 호출된다 — 발행 시 READY 이미지를 함께 공개한다. */
     @Transactional
-    public void publishAllForProduction(Long productionId) {
-        mediaAssetRepository.findByProductionIdOrderBySortOrderAsc(productionId).stream()
+    public void publishAllFor(MediaOwnerType ownerType, Long ownerId) {
+        mediaAssetRepository.findByOwnerTypeAndOwnerIdOrderBySortOrderAsc(ownerType, ownerId).stream()
                 .filter(asset -> asset.getStatus() == MediaAssetStatus.READY)
                 .forEach(MediaAsset::publish);
     }

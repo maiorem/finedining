@@ -40,7 +40,11 @@ public class MediaEditController {
             @Valid @RequestBody PresignRequest request, @AuthenticationPrincipal AdminPrincipal principal) {
         MediaService.PresignResult result =
                 mediaService.presign(
-                        request.productionId(), principal.id(), request.contentType(), request.contentLengthBytes());
+                        request.ownerType(),
+                        request.ownerId(),
+                        principal.id(),
+                        request.contentType(),
+                        request.contentLengthBytes());
         return ApiResponse.success(new PresignResponse(result.mediaAssetId(), result.uploadUrl()));
     }
 

@@ -4,6 +4,7 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.ContentStatus;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaOwnerType;
 import com.finediningtheater.media.MediaService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +82,7 @@ public class ProductionService {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "한국어 제목을 먼저 입력해 주세요.");
         }
         production.publish(adminId);
-        mediaService.publishAllForProduction(id);
+        mediaService.publishAllFor(MediaOwnerType.PRODUCTION, id);
         return production;
     }
 

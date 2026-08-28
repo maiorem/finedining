@@ -15,6 +15,7 @@ import com.finediningtheater.global.security.AdminPrincipal;
 import com.finediningtheater.global.security.JwtProvider;
 import com.finediningtheater.global.security.SudoMode;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaService;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,7 @@ class ArtistEditControllerTest {
     @Autowired private SudoMode sudoMode;
 
     @MockitoBean private ArtistService artistService;
+    @MockitoBean private MediaService mediaService;
     @MockitoBean private AuditLogger auditLogger;
     @MockitoBean private JwtProvider jwtProvider;
 

@@ -25,5 +25,9 @@ public interface ArtistRepository extends JpaRepository<Artist, Long> {
     @EntityGraph(attributePaths = {"translations", "productions", "productions.translations"})
     List<Artist> findAllByOrderByCreatedAtAsc();
 
+    // 관리자 미리보기 전용(§3.9 ?preview=true) — 상태 무관으로 슬러그만으로 찾는다.
+    @EntityGraph(attributePaths = {"translations", "productions", "productions.translations"})
+    Optional<Artist> findBySlug(String slug);
+
     boolean existsBySlug(String slug);
 }
