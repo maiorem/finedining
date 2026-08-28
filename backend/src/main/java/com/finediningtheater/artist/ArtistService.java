@@ -73,7 +73,11 @@ public class ArtistService {
         translation.updateDraft(name, role, bio);
     }
 
+    // draft*처럼 발행을 거치지 않고 즉시 공개본에 반영되는 필드라, 이미 PUBLISHED인 아티스트라면
+    // 캐시를 evict하지 않으면 공개 화면에 변경사항이 반영되지 않는다(§7.3 발행 시 캐시 무효화 원칙과
+    // 동일 이유).
     @Transactional
+    @CacheEvict(value = {"artists", "artistDetail"}, allEntries = true)
     public Artist changeLinkUrl(Long id, String linkUrl) {
         Artist artist = getForAdmin(id);
         artist.changeLinkUrl(linkUrl);
@@ -81,6 +85,7 @@ public class ArtistService {
     }
 
     @Transactional
+    @CacheEvict(value = {"artists", "artistDetail"}, allEntries = true)
     public Artist updateProductions(Long id, List<Long> productionIds) {
         Artist artist = getForAdmin(id);
         Set<Production> productions = new HashSet<>(productionRepository.findAllById(productionIds));
