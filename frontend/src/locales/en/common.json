@@ -123,5 +123,22 @@
   "reviews.restore": "Restore",
   "reviews.delete": "Delete",
   "reviews.bodyLabel": "Body",
-  "reviews.commentsHeading": "Comments"
+  "reviews.commentsHeading": "Comments",
+  "showings.manageToggle": "Manage showings",
+  "showings.addNew": "Add new showing",
+  "showings.loading": "Loading…",
+  "showings.error.generic": "The request failed.",
+  "showings.noBookingUrl": "No booking URL yet",
+  "showings.changeBookingUrl": "Change booking URL",
+  "showings.edit": "Edit schedule",
+  "showings.form.production": "Production",
+  "showings.form.startsAt": "Date & time (KST)",
+  "showings.form.durationMinutes": "Duration (minutes)",
+  "showings.form.venueName": "Venue",
+  "showings.form.venueAddress": "Address",
+  "showings.form.spokenLanguage": "Spoken language",
+  "showings.form.save": "Save",
+  "showings.form.cancel": "Cancel",
+  "showings.form.error.noProduction": "Please choose a production first.",
+  "showings.form.error.generic": "Couldn't save."
 }

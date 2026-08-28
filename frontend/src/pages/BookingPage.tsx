@@ -1,9 +1,14 @@
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useProductions } from "../api/productions";
 import { useShowings, type SpokenLanguage } from "../api/showings";
 import { ShowingCard } from "../components/section/ShowingCard";
+import { useCan } from "../hooks/useCan";
 import styles from "./BookingPage.module.css";
+
+// 관리자 전용 API 경로가 익명 방문자 번들에 섞이면 안 되므로 React.lazy로만 import한다
+// (CLAUDE.md §3.5·§9).
+const ShowingManagementPanel = lazy(() => import("../features/editing/ShowingManagementPanel"));
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -22,6 +27,8 @@ type LanguageFilter = "ALL" | SpokenLanguage;
 
 export default function BookingPage() {
   const { t, i18n } = useTranslation();
+  const canEdit = useCan("showing:edit");
+  const [managing, setManaging] = useState(false);
   const now = useMemo(() => new Date(), []);
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
@@ -55,6 +62,23 @@ export default function BookingPage() {
   return (
     <main className={styles.page}>
       <h1 className={styles.heading}>{t("nav.booking")}</h1>
+
+      {canEdit && (
+        <button
+          type="button"
+          className={styles.manageToggle}
+          aria-pressed={managing}
+          onClick={() => setManaging((prev) => !prev)}
+        >
+          {managing ? t("editing.exitEditMode") : t("showings.manageToggle")}
+        </button>
+      )}
+
+      {managing && (
+        <Suspense fallback={<p className={styles.status}>{t("showings.loading")}</p>}>
+          <ShowingManagementPanel />
+        </Suspense>
+      )}
 
       <div className={styles.toolbar}>
         <div className={styles.monthNav}>

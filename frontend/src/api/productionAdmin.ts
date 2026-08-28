@@ -24,6 +24,11 @@ export function getProductionForAdmin(accessToken: string, id: number): Promise<
   return apiAdminGet<ProductionAdmin>(`/api/productions/manage/${id}`, accessToken);
 }
 
+/** 회차 생성 폼의 작품 선택 목록 — DRAFT 작품도 포함한다. */
+export function listProductionsForAdmin(accessToken: string): Promise<ProductionAdmin[]> {
+  return apiAdminGet<ProductionAdmin[]>("/api/productions/manage", accessToken);
+}
+
 /** 목록에서 "새 작품 추가"로 호출한다. 슬러그만 받아 DRAFT로 만든다(CLAUDE.md §3.9). */
 export function createProduction(accessToken: string, slug: string): Promise<ProductionAdmin> {
   return apiAdminPost<ProductionAdmin>("/api/productions", accessToken, { slug });

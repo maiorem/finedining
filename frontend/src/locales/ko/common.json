@@ -123,5 +123,22 @@
   "reviews.restore": "복구",
   "reviews.delete": "삭제",
   "reviews.bodyLabel": "본문",
-  "reviews.commentsHeading": "댓글"
+  "reviews.commentsHeading": "댓글",
+  "showings.manageToggle": "회차 관리",
+  "showings.addNew": "새 회차 추가",
+  "showings.loading": "불러오는 중입니다.",
+  "showings.error.generic": "처리에 실패했습니다.",
+  "showings.noBookingUrl": "예약 URL 미등록",
+  "showings.changeBookingUrl": "예약 URL 변경",
+  "showings.edit": "일정 수정",
+  "showings.form.production": "작품",
+  "showings.form.startsAt": "일시 (한국시간)",
+  "showings.form.durationMinutes": "소요 시간(분)",
+  "showings.form.venueName": "장소",
+  "showings.form.venueAddress": "주소",
+  "showings.form.spokenLanguage": "진행 언어",
+  "showings.form.save": "저장",
+  "showings.form.cancel": "취소",
+  "showings.form.error.noProduction": "작품을 먼저 선택해 주세요.",
+  "showings.form.error.generic": "저장에 실패했습니다."
 }

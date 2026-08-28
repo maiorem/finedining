@@ -115,6 +115,24 @@
   padding: 2rem 0;
 }
 
+.manageToggle {
+  margin-bottom: 1.5rem;
+  min-height: 40px;
+  padding: 0 1em;
+  border: 1px dashed var(--c-spot);
+  background: transparent;
+  color: var(--c-spot);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  cursor: pointer;
+}
+
+.manageToggle:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
 .list {
   list-style: none;
   margin: 0;

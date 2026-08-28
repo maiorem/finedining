@@ -1,7 +1,7 @@
 import { useAdminAuth } from "../contexts/AdminAuthContext";
 import type { AdminRole } from "../api/auth";
 
-export type Capability = "production:edit" | "review:moderate";
+export type Capability = "production:edit" | "review:moderate" | "showing:edit";
 
 // 역할이 아니라 능력을 검사한다 (CLAUDE.md §3.3·§9) — 컴포넌트에 `role === 'EDITOR'`를 박지
 // 않고 이 매핑 표 하나만 고치면 되게 한다. 지금은 EDITOR/SUPER_ADMIN 모두 콘텐츠 편집 권한이
@@ -9,6 +9,7 @@ export type Capability = "production:edit" | "review:moderate";
 const CAPABILITY_ROLES: Record<Capability, readonly AdminRole[]> = {
   "production:edit": ["EDITOR", "SUPER_ADMIN"],
   "review:moderate": ["EDITOR", "SUPER_ADMIN"],
+  "showing:edit": ["EDITOR", "SUPER_ADMIN"],
 };
 
 export function useCan(capability: Capability): boolean {
