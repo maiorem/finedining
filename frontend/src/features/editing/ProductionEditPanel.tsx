@@ -215,16 +215,9 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
 
       <div className={styles.publishRow}>
         <span className={styles.statusBadge}>{data.status}</span>
-        {data.status === "PUBLISHED" ? (
-          <button
-            type="button"
-            className={styles.unpublishButton}
-            disabled={unpublishMutation.isPending}
-            onClick={() => unpublishMutation.mutate()}
-          >
-            {t("editing.panel.unpublish")}
-          </button>
-        ) : (
+        <div className={styles.publishActions}>
+          {/* 발행은 이미 공개된 페이지에서도 항상 눌러야 한다 — 새로 임시저장한 draft를
+              공개본으로 밀어 올리는 동작이라 발행취소와 배타적이지 않다. */}
           <button
             type="button"
             className={styles.publishButton}
@@ -233,7 +226,17 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
           >
             {t("editing.panel.publish")}
           </button>
-        )}
+          {data.status === "PUBLISHED" && (
+            <button
+              type="button"
+              className={styles.unpublishButton}
+              disabled={unpublishMutation.isPending}
+              onClick={() => unpublishMutation.mutate()}
+            >
+              {t("editing.panel.unpublish")}
+            </button>
+          )}
+        </div>
       </div>
 
       {pinAction && (
