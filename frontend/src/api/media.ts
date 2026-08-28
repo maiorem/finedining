@@ -1,4 +1,4 @@
-import { apiAdminDelete, apiAdminPost } from "./adminHttp";
+import { apiAdminDelete, apiAdminPost, apiAdminPut } from "./adminHttp";
 
 export type MediaOwnerType = "PRODUCTION" | "ARTIST";
 
@@ -56,4 +56,9 @@ export function completeMediaUpload(
 
 export function deleteMedia(accessToken: string, mediaAssetId: number): Promise<void> {
   return apiAdminDelete<void>(`/api/media/${mediaAssetId}`, accessToken);
+}
+
+/** 이미 업로드가 끝난 이미지의 캡션(대체 텍스트)만 고친다 — 다시 올리지 않아도 된다. */
+export function updateMediaAltText(accessToken: string, mediaAssetId: number, altText: string): Promise<MediaAsset> {
+  return apiAdminPut<MediaAsset>(`/api/media/${mediaAssetId}`, accessToken, { altText });
 }

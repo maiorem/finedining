@@ -132,6 +132,8 @@
   "editing.image.save": "Save",
   "editing.image.uploadFailed": "Upload failed.",
   "editing.image.saveFailed": "Save failed.",
+  "editing.image.editCaption": "Edit caption",
+  "editing.image.cancel": "Cancel",
   "editing.image.delete": "Delete",
   "editing.image.noAlt": "No alt text",
   "editing.image.limitReached": "Delete the current photo before adding a new one.",

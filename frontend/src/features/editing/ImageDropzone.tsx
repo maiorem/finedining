@@ -4,6 +4,7 @@ import {
   completeMediaUpload,
   deleteMedia,
   presignUpload,
+  updateMediaAltText,
   uploadToPresignedUrl,
   type MediaAsset,
   type MediaOwnerType,
@@ -36,6 +37,10 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
   const inputRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<PendingUpload[]>([]);
   const [dragOver, setDragOver] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
+  const [savingEditId, setSavingEditId] = useState<number | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
 
   const atLimit = maxImages !== undefined && images.length + pending.length >= maxImages;
 
@@ -93,6 +98,31 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
     if (!session) return;
     await deleteMedia(session.accessToken, mediaAssetId);
     onChanged();
+  }
+
+  function startEditCaption(image: MediaAsset) {
+    setEditingId(image.id);
+    setEditText(image.altText ?? "");
+    setEditError(null);
+  }
+
+  function cancelEditCaption() {
+    setEditingId(null);
+    setEditError(null);
+  }
+
+  async function saveEditCaption(mediaAssetId: number) {
+    if (!session || editText.trim().length === 0) return;
+    setSavingEditId(mediaAssetId);
+    try {
+      await updateMediaAltText(session.accessToken, mediaAssetId, editText.trim());
+      setEditingId(null);
+      onChanged();
+    } catch {
+      setEditError(t("editing.image.saveFailed"));
+    } finally {
+      setSavingEditId(null);
+    }
   }
 
   return (
@@ -164,7 +194,39 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
             ) : (
               <span className={styles.thumbPlaceholder}>{image.status}</span>
             )}
-            <span className={styles.imageAlt}>{image.altText ?? t("editing.image.noAlt")}</span>
+
+            {editingId === image.id ? (
+              <div className={styles.altRow}>
+                <label>
+                  <span>{t("editing.image.altLabel")}</span>
+                  <input
+                    type="text"
+                    value={editText}
+                    disabled={savingEditId === image.id}
+                    onChange={(e) => setEditText(e.target.value)}
+                  />
+                </label>
+                <button
+                  type="button"
+                  disabled={savingEditId === image.id || editText.trim().length === 0}
+                  onClick={() => void saveEditCaption(image.id)}
+                >
+                  {t("editing.image.save")}
+                </button>
+                <button type="button" disabled={savingEditId === image.id} onClick={cancelEditCaption}>
+                  {t("editing.image.cancel")}
+                </button>
+                {editError && <p className={styles.error}>{editError}</p>}
+              </div>
+            ) : (
+              <>
+                <span className={styles.imageAlt}>{image.altText ?? t("editing.image.noAlt")}</span>
+                <button type="button" onClick={() => startEditCaption(image)}>
+                  {t("editing.image.editCaption")}
+                </button>
+              </>
+            )}
+
             <button type="button" onClick={() => void handleDelete(image.id)}>
               {t("editing.image.delete")}
             </button>

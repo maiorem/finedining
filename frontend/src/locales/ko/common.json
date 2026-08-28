@@ -132,6 +132,8 @@
   "editing.image.save": "저장",
   "editing.image.uploadFailed": "업로드에 실패했습니다.",
   "editing.image.saveFailed": "저장에 실패했습니다.",
+  "editing.image.editCaption": "캡션 수정",
+  "editing.image.cancel": "취소",
   "editing.image.delete": "삭제",
   "editing.image.noAlt": "대체 텍스트 없음",
   "editing.image.limitReached": "사진을 바꾸려면 기존 사진을 먼저 삭제해 주세요.",
