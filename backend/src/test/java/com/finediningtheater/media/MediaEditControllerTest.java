@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -83,6 +84,24 @@ class MediaEditControllerTest {
 
         verify(auditLogger)
                 .record(eq(1L), eq("MEDIA_UPLOAD_COMPLETE"), eq("MediaAsset"), eq(10L), any(), any(), any());
+    }
+
+    @Test
+    void 캡션_수정은_이전_캡션을_감사로그에_남기고_새_캡션을_반환한다() throws Exception {
+        loginAs(1L);
+        MediaAsset before = new MediaAsset(MediaOwnerType.PRODUCTION, 1L, 0, "originals/x.jpg");
+        before.markReady(100, 100, "d640", "d960", "d1600", "lqip", "옛 캡션");
+        MediaAsset after = new MediaAsset(MediaOwnerType.PRODUCTION, 1L, 0, "originals/x.jpg");
+        after.markReady(100, 100, "d640", "d960", "d1600", "lqip", "새 캡션");
+        when(mediaService.get(10L)).thenReturn(before);
+        when(mediaService.updateAltText(10L, "새 캡션")).thenReturn(after);
+
+        mockMvc.perform(put("/api/media/10").contentType(MediaType.APPLICATION_JSON).content("{\"altText\":\"새 캡션\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.altText").value("새 캡션"));
+
+        verify(auditLogger)
+                .record(eq(1L), eq("MEDIA_ALT_TEXT_UPDATE"), eq("MediaAsset"), eq(10L), eq("옛 캡션"), eq("새 캡션"), any());
     }
 
     @Test

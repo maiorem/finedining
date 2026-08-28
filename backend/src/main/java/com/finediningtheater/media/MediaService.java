@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
@@ -102,12 +103,33 @@ public class MediaService {
         return asset;
     }
 
+    /**
+     * 이미 완료된 이미지의 캡션(대체 텍스트)만 고친다 — 다시 업로드하지 않아도 되게 한다.
+     * media 패키지는 소유자(Production/Artist)를 모르므로(§6), 이미지가 걸린 콘텐츠 캐시를
+     * 전부 비운다 — 이미 발행된 이미지라면 캐시 무효화가 없으면 공개 화면에 반영되지 않는다
+     * (ArtistService.changeLinkUrl과 같은 이유).
+     */
+    @Transactional
+    @CacheEvict(
+            value = {"productions", "productionDetail", "artists", "artistDetail"},
+            allEntries = true)
+    public MediaAsset updateAltText(Long id, String altText) {
+        MediaAsset asset =
+                mediaAssetRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+        asset.updateAltText(altText);
+        return asset;
+    }
+
     @Transactional
     public void delete(Long id) {
         MediaAsset asset =
                 mediaAssetRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
         storageService.deleteObjects(asset.allObjectKeys());
         mediaAssetRepository.delete(asset);
+    }
+
+    public MediaAsset get(Long id) {
+        return mediaAssetRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
     }
 
     public List<MediaAsset> listForAdmin(MediaOwnerType ownerType, Long ownerId) {

@@ -8,6 +8,7 @@ import com.finediningtheater.media.dto.CompleteUploadRequest;
 import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.media.dto.PresignRequest;
 import com.finediningtheater.media.dto.PresignResponse;
+import com.finediningtheater.media.dto.UpdateAltTextRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,6 +65,29 @@ public class MediaEditController {
                 id,
                 null,
                 Map.of("status", asset.getStatus().name()),
+                ClientIp.resolve(httpRequest));
+
+        return ApiResponse.success(MediaAssetResponse.from(asset, mediaService));
+    }
+
+    /** 이미 업로드가 끝난 이미지의 캡션(대체 텍스트)만 고친다 — 다시 올리지 않아도 된다. */
+    @PutMapping("/{id}")
+    public ApiResponse<MediaAssetResponse> updateAltText(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateAltTextRequest request,
+            @AuthenticationPrincipal AdminPrincipal principal,
+            HttpServletRequest httpRequest) {
+        String beforeAltText = mediaService.get(id).getAltText();
+
+        MediaAsset asset = mediaService.updateAltText(id, request.altText());
+
+        auditLogger.record(
+                principal.id(),
+                "MEDIA_ALT_TEXT_UPDATE",
+                "MediaAsset",
+                id,
+                beforeAltText,
+                asset.getAltText(),
                 ClientIp.resolve(httpRequest));
 
         return ApiResponse.success(MediaAssetResponse.from(asset, mediaService));

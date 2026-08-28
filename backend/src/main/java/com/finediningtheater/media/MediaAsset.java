@@ -103,6 +103,11 @@ public class MediaAsset extends BaseTimeEntity {
         this.failureReason = null;
     }
 
+    /** 업로드 시점에만 입력받던 캡션(대체 텍스트)을 업로드 이후에도 고칠 수 있게 한다. */
+    public void updateAltText(String altText) {
+        this.altText = altText;
+    }
+
     public void markFailed(String reason) {
         this.status = MediaAssetStatus.FAILED;
         this.failureReason = reason;
