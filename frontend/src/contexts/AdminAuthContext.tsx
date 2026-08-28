@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { loginAdmin, logoutAdmin, refreshAdminSession, type AdminSession } from "../api/auth";
+import { registerAdminSessionHandlers } from "../api/adminHttp";
 
 type AdminAuthContextValue = {
   session: AdminSession | null;
@@ -29,6 +30,16 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // adminHttp의 401 재시도 로직이 조용히 재발급한 토큰을 이 컨텍스트에도 반영한다 — 그래야
+  // 다음 호출부터 새 토큰을 쓴다. refresh 쿠키마저 만료되면 세션을 비워 로그인 화면으로
+  // 돌려보낸다(§7.4 — 편집 패널이 무한 로딩에 멈추던 버그).
+  useEffect(() => {
+    registerAdminSessionHandlers({
+      onRefreshed: (refreshed) => setSession(refreshed),
+      onExpired: () => setSession(null),
+    });
   }, []);
 
   async function login(username: string, password: string) {
