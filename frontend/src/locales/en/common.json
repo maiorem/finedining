@@ -65,8 +65,6 @@
   "proposal.admin.reviewToggle": "View proposals",
   "proposal.admin.loading": "Loading…",
   "proposal.admin.empty": "No proposals yet.",
-  "proposal.admin.accept": "Accept",
-  "proposal.admin.decline": "Decline",
   "proposal.admin.status.SENT": "New",
   "proposal.admin.status.READ": "Read",
   "proposal.admin.status.ACCEPTED": "Accepted",

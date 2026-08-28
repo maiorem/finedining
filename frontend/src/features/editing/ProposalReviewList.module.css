@@ -55,24 +55,3 @@
   line-height: var(--lh-body);
   white-space: pre-wrap;
 }
-
-.actions {
-  margin-top: 0.5rem;
-  display: flex;
-  gap: 0.75rem;
-}
-
-.actions button {
-  min-height: 40px;
-  padding: 0 1em;
-  border: 1px solid var(--c-ink);
-  background: transparent;
-  color: var(--c-ink);
-  cursor: pointer;
-  font-size: var(--t-caption);
-}
-
-.actions button:focus-visible {
-  outline: 2px solid var(--c-spot);
-  outline-offset: 2px;
-}

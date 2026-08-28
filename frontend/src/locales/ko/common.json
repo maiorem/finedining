@@ -65,8 +65,6 @@
   "proposal.admin.reviewToggle": "제안 목록 보기",
   "proposal.admin.loading": "불러오는 중입니다.",
   "proposal.admin.empty": "접수된 제안이 없습니다.",
-  "proposal.admin.accept": "수락",
-  "proposal.admin.decline": "거절",
   "proposal.admin.status.SENT": "미확인",
   "proposal.admin.status.READ": "확인함",
   "proposal.admin.status.ACCEPTED": "수락함",
