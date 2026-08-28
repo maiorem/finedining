@@ -85,6 +85,22 @@ public class Showing extends Publishable {
         this.bookingUrl = bookingUrl;
     }
 
+    /** 일시·장소·진행 정보 수정. 회차는 작품 제목처럼 초안-발행을 나누지 않는다 — 사실 정보라 바로 바뀐다. */
+    public void updateDetails(
+            Instant startsAt,
+            int durationMinutes,
+            String venueName,
+            String venueAddress,
+            SiteLocale spokenLanguage,
+            boolean interpretationAvailable) {
+        this.startsAt = startsAt;
+        this.durationMinutes = durationMinutes;
+        this.venueName = venueName;
+        this.venueAddress = venueAddress;
+        this.spokenLanguage = spokenLanguage;
+        this.interpretationAvailable = interpretationAvailable;
+    }
+
     /** 예약 URL이 없거나 판매가 끝났으면 버튼을 비활성화한다 (CLAUDE.md §4). */
     public boolean isBookingAvailable() {
         return bookingUrl != null

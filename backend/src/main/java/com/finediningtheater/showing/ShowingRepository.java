@@ -19,4 +19,11 @@ public interface ShowingRepository extends JpaRepository<Showing, Long> {
 
     @EntityGraph(attributePaths = {"production", "production.translations"})
     List<Showing> findByStatusAndProduction_SlugOrderByStartsAtAsc(ContentStatus status, String slug);
+
+    // 관리자용: 상태 무관 조회. DRAFT도 봐야 편집할 수 있다 (CLAUDE.md §3.9).
+    @EntityGraph(attributePaths = {"production", "production.translations"})
+    Optional<Showing> findWithProductionById(Long id);
+
+    @EntityGraph(attributePaths = {"production", "production.translations"})
+    List<Showing> findAllByOrderByStartsAtAsc();
 }

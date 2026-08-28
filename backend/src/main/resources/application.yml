@@ -28,6 +28,10 @@ app:
     refresh-token-validity-days: 14
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  booking:
+    # 예약 URL은 저장 시 호스트 화이트리스트로 검증한다 — 오타 하나로 예약이 통째로 죽는다
+    # (CLAUDE.md §4). 네이버 예약 도메인만 기본 허용한다.
+    allowed-hosts: ${BOOKING_ALLOWED_HOSTS:booking.naver.com,m.booking.naver.com}
   media:
     s3:
       # 로컬은 MinIO, dev/prod는 환경변수로 실제 AWS S3 엔드포인트를 비운다(엔드포인트 오버라이드
