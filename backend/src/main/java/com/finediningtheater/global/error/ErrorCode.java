@@ -13,7 +13,8 @@ public enum ErrorCode {
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "입력값을 확인해 주세요."),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "ENTITY_NOT_FOUND", "요청한 대상을 찾을 수 없습니다."),
     DUPLICATE_SLUG(HttpStatus.CONFLICT, "DUPLICATE_SLUG", "이미 사용 중인 슬러그입니다."),
-    INVALID_STATE_TRANSITION(HttpStatus.CONFLICT, "INVALID_STATE_TRANSITION", "이미 처리된 제안입니다."),
+    INVALID_STATE_TRANSITION(
+            HttpStatus.CONFLICT, "INVALID_STATE_TRANSITION", "지금 상태에서는 처리할 수 없습니다."),
     RATE_LIMITED(HttpStatus.TOO_MANY_REQUESTS, "RATE_LIMITED", "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "인증이 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "권한이 없습니다."),
