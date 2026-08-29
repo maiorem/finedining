@@ -30,6 +30,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    // 일반 회원(카카오) 로그인. 관리자는 이 클라이언트와 무관한 자체 아이디·비밀번호 흐름이다
+    // (CLAUDE.md §3.1·§7.4).
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.flywaydb:flyway-mysql")
 

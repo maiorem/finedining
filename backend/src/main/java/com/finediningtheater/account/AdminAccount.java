@@ -12,9 +12,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 
 /**
- * 관리자 계정. 카카오로 가입하는 일반 회원 계정(아직 구현 전 — 카카오 로그인은 우선순위 마지막)과
- * 완전히 별개인 엔티티다. 회원가입 절차가 없고 SUPER_ADMIN이 직접 발급한다 (CLAUDE.md §3.1,
- * 2026-08-27 결정).
+ * 관리자 계정. 카카오로 가입하는 일반 회원 계정({@link Account})과 완전히 별개인 엔티티다.
+ * 회원가입 절차가 없고 SUPER_ADMIN이 직접 발급한다 (CLAUDE.md §3.1, 2026-08-27 결정).
  */
 @Entity
 @Getter

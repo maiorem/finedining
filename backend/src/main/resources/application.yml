@@ -18,8 +18,43 @@ spring:
     locations: classpath:db/migration
   cache:
     type: caffeine
+  security:
+    oauth2:
+      client:
+        registration:
+          # 일반 회원(카카오) 로그인 (CLAUDE.md §3.1·§7.4). client-id/secret 기본값은 JWT_SECRET과
+          # 같은 방식의 로컬 전용 placeholder다 — Spring의 ClientRegistration은 clientId가
+          # 비어 있으면 부팅 자체를 거부하므로 빈 문자열을 기본값으로 두면 안 된다. placeholder로
+          # 뜨는 건 문제 없지만, 실제 카카오 앱을 등록하기 전까지는 로그인 시도 자체가
+          # invalid_client로 실패한다 — 그건 정상이다. redirect-uri를 /api/oauth2/** 아래로
+          # 몰아서 프론트 라우트("/login")와 겹치지 않게 한다(SecurityConfig 참고).
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID:local-dev-placeholder-kakao-client-id}
+            client-secret: ${KAKAO_CLIENT_SECRET:local-dev-placeholder-kakao-client-secret}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/api/oauth2/callback/{registrationId}"
+            # account_email은 카카오 콘솔에서 별도 동의를 받아야 하고, 사용자가 거부하면 어차피
+            # null로 온다(§7.4) — 실패로 취급하지 않는다.
+            scope: profile_nickname, account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 
 app:
+  # 카카오 로그인 성공/실패 리다이렉트 대상. 로컬 dev는 vite 프록시 포트(§14) — 이 값을 통해서만
+  # 프론트로 되돌아가야 refresh 쿠키가 admin 로그인과 같은 원점(5173)에 남는다.
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  signup:
+    # 가입 정책은 코드가 아니라 설정이다(§3.2) — SignupPolicy 한 곳만 이 값을 읽는다.
+    policy: ${SIGNUP_POLICY:OPEN}
+    # local-login(§13.9, dev 전용 이메일·비밀번호 로그인 대체 경로)은 아직 구현 전이다 — 이
+    # 플래그는 다음 단계를 위해 자리만 잡아둔다.
+    local-login: ${SIGNUP_LOCAL_LOGIN:false}
   jwt:
     # prod/dev는 SSM Parameter Store에서 환경변수로 주입한다 (CLAUDE.md §13.7). 여기 기본값은
     # 로컬 개발 전용 placeholder다 — 절대 이 값 그대로 배포하지 않는다.

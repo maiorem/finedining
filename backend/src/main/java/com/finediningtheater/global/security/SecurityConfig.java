@@ -47,14 +47,20 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final ObjectMapper objectMapper;
     private final List<String> corsAllowedOrigins;
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter,
+            OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
+            OAuth2LoginFailureHandler oAuth2LoginFailureHandler,
             ObjectMapper objectMapper,
             @Value("${app.cors.allowed-origins}") String corsAllowedOrigins) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
+        this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
         this.objectMapper = objectMapper;
         this.corsAllowedOrigins = Arrays.stream(corsAllowedOrigins.split(",")).map(String::trim).toList();
     }
@@ -96,6 +102,14 @@ public class SecurityConfig {
                                                 "/api/auth/admin/refresh",
                                                 "/api/auth/admin/logout")
                                         .permitAll()
+                                        // 카카오 로그인 리다이렉트 흐름 전체 — 로그인 전이라 인증이 없다(§7.4).
+                                        .requestMatchers("/api/oauth2/**")
+                                        .permitAll()
+                                        .requestMatchers(
+                                                HttpMethod.POST,
+                                                "/api/auth/member/refresh",
+                                                "/api/auth/member/logout")
+                                        .permitAll()
                                         .requestMatchers(
                                                 HttpMethod.GET,
                                                 "/api/productions/**",
@@ -120,6 +134,14 @@ public class SecurityConfig {
                                         .authenticated()
                                         .anyRequest()
                                         .permitAll())
+                // 카카오 로그인(§7.4). 인가·리다이렉트 엔드포인트를 /api/oauth2/** 아래로 몰아서
+                // 프론트 라우트("/login")와 겹치지 않고, 기존 /api/** 프록시 규칙을 그대로 탄다.
+                .oauth2Login(
+                        oauth2 ->
+                                oauth2.authorizationEndpoint(a -> a.baseUri("/api/oauth2/authorization"))
+                                        .redirectionEndpoint(r -> r.baseUri("/api/oauth2/callback/*"))
+                                        .successHandler(oAuth2LoginSuccessHandler)
+                                        .failureHandler(oAuth2LoginFailureHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(
                         ex ->

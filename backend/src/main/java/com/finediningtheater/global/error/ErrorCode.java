@@ -34,6 +34,8 @@ public enum ErrorCode {
             HttpStatus.BAD_REQUEST,
             "WEAK_PIN",
             "너무 단순한 번호입니다. 000000·123456이나 연속·동일 숫자는 피해 주세요."),
+    SIGNUP_NOT_ALLOWED(
+            HttpStatus.FORBIDDEN, "SIGNUP_NOT_ALLOWED", "지금은 초대받은 사용자만 가입할 수 있습니다."),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", "일시적인 오류가 발생했습니다.");
 
     private final HttpStatus status;
