@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../api/http";
 import { useAdminAuth } from "../contexts/AdminAuthContext";
+import { useMemberAuth } from "../contexts/MemberAuthContext";
 import { useNoIndex } from "../hooks/useNoIndex";
 import styles from "./LoginPage.module.css";
 
@@ -18,9 +20,24 @@ function errorMessageKey(code: string): string {
     : "login.error.generic";
 }
 
+const KAKAO_ERROR_CODES = ["SIGNUP_NOT_ALLOWED", "OAUTH_FAILED"] as const;
+
+function kakaoErrorMessageKey(code: string): string {
+  return (KAKAO_ERROR_CODES as readonly string[]).includes(code)
+    ? `login.kakaoError.${code}`
+    : "login.kakaoError.generic";
+}
+
 export default function LoginPage() {
   const { t } = useTranslation();
   const { session, isInitializing, login, logout } = useAdminAuth();
+  const {
+    session: memberSession,
+    isInitializing: memberInitializing,
+    logout: memberLogout,
+  } = useMemberAuth();
+  const [searchParams] = useSearchParams();
+  const kakaoError = searchParams.get("error");
   const [adminFormOpen, setAdminFormOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -50,6 +67,26 @@ export default function LoginPage() {
         <p className={styles.eyebrow}>{t("login.eyebrow")}</p>
         <h1 className={styles.heading}>{t("login.heading")}</h1>
 
+        {kakaoError && (
+          <p className={styles.error} role="alert">
+            {t(kakaoErrorMessageKey(kakaoError))}
+          </p>
+        )}
+
+        {!memberInitializing &&
+          (memberSession ? (
+            <div className={styles.sessionCard}>
+              <p className={styles.sessionText}>{t("login.memberLoggedInAs", { nickname: memberSession.nickname })}</p>
+              <button type="button" className={styles.logoutButton} onClick={() => void memberLogout()}>
+                {t("login.logout")}
+              </button>
+            </div>
+          ) : (
+            <a className={styles.kakaoButtonActive} href="/api/oauth2/authorization/kakao">
+              {t("login.kakao")}
+            </a>
+          ))}
+
         {isInitializing ? null : session ? (
           <div className={styles.sessionCard}>
             <p className={styles.sessionText}>
@@ -61,17 +98,6 @@ export default function LoginPage() {
           </div>
         ) : (
           <>
-            <button
-              type="button"
-              className={styles.kakaoButton}
-              disabled
-              aria-disabled="true"
-              title={t("login.kakaoComingSoon")}
-            >
-              {t("login.kakao")}
-            </button>
-            <p className={styles.kakaoNote}>{t("login.kakaoComingSoon")}</p>
-
             <button
               type="button"
               className={styles.adminToggle}

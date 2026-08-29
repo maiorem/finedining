@@ -40,13 +40,16 @@
   "login.eyebrow": "Login",
   "login.heading": "Log in",
   "login.kakao": "Log in with Kakao",
-  "login.kakaoComingSoon": "Kakao login is coming soon.",
   "login.adminToggle": "ADMIN",
   "login.adminUsername": "Username",
   "login.adminPassword": "Password",
   "login.adminSubmit": "Log in",
   "login.loggedInAs": "Logged in as {{username}} ({{role}})",
+  "login.memberLoggedInAs": "Logged in as {{nickname}}.",
   "login.logout": "Log out",
+  "login.kakaoError.SIGNUP_NOT_ALLOWED": "Sign-ups are invite-only right now.",
+  "login.kakaoError.OAUTH_FAILED": "Kakao login failed. Please try again.",
+  "login.kakaoError.generic": "Login failed.",
   "login.error.INVALID_CREDENTIALS": "Incorrect username or password.",
   "login.error.ACCOUNT_LOCKED": "Too many attempts. Please try again later.",
   "login.error.RATE_LIMITED": "Too many requests. Please try again later.",
@@ -167,5 +170,6 @@
   "showings.form.save": "Save",
   "showings.form.cancel": "Cancel",
   "showings.form.error.noProduction": "Please choose a production first.",
-  "showings.form.error.generic": "Couldn't save."
+  "showings.form.error.generic": "Couldn't save.",
+  "oauthCallback.processing": "Signing you in…"
 }

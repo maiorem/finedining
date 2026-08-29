@@ -8,6 +8,7 @@ import "./styles/fonts.css";
 import "./styles/global.css";
 import { App } from "./App";
 import { AdminAuthProvider } from "./contexts/AdminAuthContext";
+import { MemberAuthProvider } from "./contexts/MemberAuthContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,9 +21,11 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AdminAuthProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <MemberAuthProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </MemberAuthProvider>
       </AdminAuthProvider>
     </QueryClientProvider>
   </StrictMode>,

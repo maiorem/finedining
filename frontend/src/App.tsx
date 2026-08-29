@@ -12,6 +12,7 @@ import ReviewDetailPage from "./pages/ReviewDetailPage";
 import ArtistsPage from "./pages/ArtistsPage";
 import ArtistDetailPage from "./pages/ArtistDetailPage";
 import LoginPage from "./pages/LoginPage";
+import OAuthCallbackPage from "./pages/OAuthCallbackPage";
 
 export function App() {
   return (
@@ -30,6 +31,7 @@ export function App() {
         <Route path="/artists/:slug" element={<ArtistDetailPage />} />
         {/* 내비게이션엔 노출하지 않는다 — 진입점은 Footer의 작은 링크뿐이다 (CLAUDE.md §3.5). */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
       </Routes>
       <Footer />
     </>

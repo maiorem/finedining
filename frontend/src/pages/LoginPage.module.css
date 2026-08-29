@@ -27,22 +27,29 @@
   margin: 0 0 2rem;
 }
 
-.kakaoButton {
+.kakaoButtonActive {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   min-height: 48px;
-  border: 1px solid var(--c-line);
+  border: 1px solid var(--c-ink);
   background: transparent;
-  color: var(--c-ink-35);
+  color: var(--c-ink);
   font-family: var(--f-body);
   font-size: var(--t-body);
-  cursor: not-allowed;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-.kakaoNote {
-  margin: 0.5rem 0 0;
-  font-size: var(--t-caption);
-  color: var(--c-ink-35);
-  text-align: center;
+.kakaoButtonActive:hover,
+.kakaoButtonActive:focus-visible {
+  border-color: var(--c-spot);
+}
+
+.kakaoButtonActive:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
 }
 
 .adminToggle {
