@@ -15,18 +15,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * 관리자 세션 전용 JWT 발급·검증. 일반 회원(카카오)의 OAuth2 흐름과는 별개다 (CLAUDE.md §7.4).
- * OAuth2 리소스서버 전체를 끌어오지 않고 최소한만 직접 구현한다 — 운영자가 소수라 JWK 회전 같은
- * 인프라가 필요 없다.
+ * 관리자·일반 회원 세션 공용 JWT 발급·검증. 로그인 수단(관리자는 아이디·비밀번호, 회원은
+ * 카카오 OAuth2)은 서로 다르지만 발급하는 토큰의 모양과 이후 처리는 하나로 수렴한다(CLAUDE.md
+ * §7.4). {@code principalType} 클레임으로 관리자용 토큰과 회원용 토큰을 서로 다른 자격으로
+ * 쓸 수 없게 분리한다 — 관리자 refresh 토큰으로 회원 세션을 재발급받을 수 없다.
+ *
+ * <p>OAuth2 리소스서버 전체를 끌어오지 않고 최소한만 직접 구현한다 — 운영자·회원 규모가 작아
+ * JWK 회전 같은 인프라가 필요 없다.
  */
 @Component
 public class JwtProvider {
 
     private static final String CLAIM_TYPE = "type";
+    private static final String CLAIM_PRINCIPAL_TYPE = "principalType";
     private static final String CLAIM_ROLE = "role";
     private static final String CLAIM_USERNAME = "username";
+    private static final String CLAIM_NICKNAME = "nickname";
     private static final String TYPE_ACCESS = "access";
     private static final String TYPE_REFRESH = "refresh";
+    private static final String PRINCIPAL_ADMIN = "ADMIN";
+    private static final String PRINCIPAL_MEMBER = "MEMBER";
 
     private final SecretKey key;
     private final Duration accessTokenValidity;
@@ -41,21 +49,73 @@ public class JwtProvider {
         this.refreshTokenValidity = Duration.ofDays(refreshTokenValidityDays);
     }
 
-    public String createAccessToken(Long adminId, String username, AdminRole role) {
+    // ── 관리자 ──────────────────────────────────────────────────────────
+
+    public String createAdminAccessToken(Long adminId, String username, AdminRole role) {
         return buildToken(
                 adminId,
                 accessTokenValidity,
-                Map.of(CLAIM_TYPE, TYPE_ACCESS, CLAIM_USERNAME, username, CLAIM_ROLE, role.name()));
+                Map.of(
+                        CLAIM_TYPE, TYPE_ACCESS,
+                        CLAIM_PRINCIPAL_TYPE, PRINCIPAL_ADMIN,
+                        CLAIM_USERNAME, username,
+                        CLAIM_ROLE, role.name()));
     }
 
-    public String createRefreshToken(Long adminId) {
-        return buildToken(adminId, refreshTokenValidity, Map.of(CLAIM_TYPE, TYPE_REFRESH));
+    public String createAdminRefreshToken(Long adminId) {
+        return buildToken(
+                adminId, refreshTokenValidity, Map.of(CLAIM_TYPE, TYPE_REFRESH, CLAIM_PRINCIPAL_TYPE, PRINCIPAL_ADMIN));
     }
 
-    private String buildToken(Long adminId, Duration validity, Map<String, Object> claims) {
+    /** 서명·만료·타입·principalType이 전부 유효한 관리자 access 토큰만 통과시킨다. */
+    public AdminAccessTokenClaims parseAdminAccessToken(String token) {
+        Claims claims = parseTypedClaims(token, TYPE_ACCESS, PRINCIPAL_ADMIN);
+        return new AdminAccessTokenClaims(
+                Long.valueOf(claims.getSubject()),
+                claims.get(CLAIM_USERNAME, String.class),
+                AdminRole.valueOf(claims.get(CLAIM_ROLE, String.class)));
+    }
+
+    public Long parseAdminRefreshToken(String token) {
+        Claims claims = parseTypedClaims(token, TYPE_REFRESH, PRINCIPAL_ADMIN);
+        return Long.valueOf(claims.getSubject());
+    }
+
+    // ── 일반 회원(카카오) ────────────────────────────────────────────────
+
+    public String createMemberAccessToken(Long accountId, String nickname) {
+        return buildToken(
+                accountId,
+                accessTokenValidity,
+                Map.of(
+                        CLAIM_TYPE, TYPE_ACCESS,
+                        CLAIM_PRINCIPAL_TYPE, PRINCIPAL_MEMBER,
+                        CLAIM_NICKNAME, nickname));
+    }
+
+    public String createMemberRefreshToken(Long accountId) {
+        return buildToken(
+                accountId,
+                refreshTokenValidity,
+                Map.of(CLAIM_TYPE, TYPE_REFRESH, CLAIM_PRINCIPAL_TYPE, PRINCIPAL_MEMBER));
+    }
+
+    public MemberAccessTokenClaims parseMemberAccessToken(String token) {
+        Claims claims = parseTypedClaims(token, TYPE_ACCESS, PRINCIPAL_MEMBER);
+        return new MemberAccessTokenClaims(Long.valueOf(claims.getSubject()), claims.get(CLAIM_NICKNAME, String.class));
+    }
+
+    public Long parseMemberRefreshToken(String token) {
+        Claims claims = parseTypedClaims(token, TYPE_REFRESH, PRINCIPAL_MEMBER);
+        return Long.valueOf(claims.getSubject());
+    }
+
+    // ── 공통 ────────────────────────────────────────────────────────────
+
+    private String buildToken(Long subjectId, Duration validity, Map<String, Object> claims) {
         Instant now = Instant.now();
         return Jwts.builder()
-                .subject(String.valueOf(adminId))
+                .subject(String.valueOf(subjectId))
                 .claims(claims)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(validity)))
@@ -63,30 +123,22 @@ public class JwtProvider {
                 .compact();
     }
 
-    /** 서명·만료·타입이 전부 유효한 access 토큰만 통과시킨다. 실패하면 예외를 던진다. */
-    public AccessTokenClaims parseAccessToken(String token) {
+    private Claims parseTypedClaims(String token, String expectedType, String expectedPrincipalType) {
         Claims claims = parseClaims(token);
-        if (!TYPE_ACCESS.equals(claims.get(CLAIM_TYPE, String.class))) {
-            throw new JwtException("access 토큰이 아닙니다.");
+        if (!expectedType.equals(claims.get(CLAIM_TYPE, String.class))) {
+            throw new JwtException("토큰 타입이 올바르지 않습니다.");
         }
-        return new AccessTokenClaims(
-                Long.valueOf(claims.getSubject()),
-                claims.get(CLAIM_USERNAME, String.class),
-                AdminRole.valueOf(claims.get(CLAIM_ROLE, String.class)));
-    }
-
-    /** refresh 토큰에서 관리자 id만 뽑아낸다. 실패하면 예외를 던진다. */
-    public Long parseRefreshToken(String token) {
-        Claims claims = parseClaims(token);
-        if (!TYPE_REFRESH.equals(claims.get(CLAIM_TYPE, String.class))) {
-            throw new JwtException("refresh 토큰이 아닙니다.");
+        if (!expectedPrincipalType.equals(claims.get(CLAIM_PRINCIPAL_TYPE, String.class))) {
+            throw new JwtException("이 토큰으로는 이 세션에 접근할 수 없습니다.");
         }
-        return Long.valueOf(claims.getSubject());
+        return claims;
     }
 
     private Claims parseClaims(String token) {
         return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
     }
 
-    public record AccessTokenClaims(Long adminId, String username, AdminRole role) {}
+    public record AdminAccessTokenClaims(Long adminId, String username, AdminRole role) {}
+
+    public record MemberAccessTokenClaims(Long accountId, String nickname) {}
 }

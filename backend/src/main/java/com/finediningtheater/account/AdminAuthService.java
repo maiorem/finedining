@@ -79,7 +79,7 @@ public class AdminAuthService {
     public AdminSession refresh(String refreshToken) {
         Long adminId;
         try {
-            adminId = jwtProvider.parseRefreshToken(refreshToken);
+            adminId = jwtProvider.parseAdminRefreshToken(refreshToken);
         } catch (RuntimeException e) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
@@ -95,8 +95,8 @@ public class AdminAuthService {
 
     private AdminSession issueSession(AdminAccount account) {
         String accessToken =
-                jwtProvider.createAccessToken(account.getId(), account.getUsername(), account.getRole());
-        String refreshToken = jwtProvider.createRefreshToken(account.getId());
+                jwtProvider.createAdminAccessToken(account.getId(), account.getUsername(), account.getRole());
+        String refreshToken = jwtProvider.createAdminRefreshToken(account.getId());
         return new AdminSession(accessToken, refreshToken, account.getUsername(), account.getRole());
     }
 }

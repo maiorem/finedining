@@ -30,7 +30,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void 유효한_토큰이면_SecurityContext에_관리자_주체를_채운다() throws Exception {
-        String token = jwtProvider.createAccessToken(1L, "admin", AdminRole.SUPER_ADMIN);
+        String token = jwtProvider.createAdminAccessToken(1L, "admin", AdminRole.SUPER_ADMIN);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
 
@@ -57,7 +57,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void Bearer_접두사가_없으면_무시한다() throws Exception {
-        String token = jwtProvider.createAccessToken(1L, "admin", AdminRole.EDITOR);
+        String token = jwtProvider.createAdminAccessToken(1L, "admin", AdminRole.EDITOR);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", token);
 
@@ -78,12 +78,48 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void refresh_토큰을_Authorization_헤더에_넣으면_거부한다() throws Exception {
-        String refreshToken = jwtProvider.createRefreshToken(1L);
+        String refreshToken = jwtProvider.createAdminRefreshToken(1L);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + refreshToken);
 
         filter(request);
 
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    }
+
+    @Test
+    void 유효한_회원_토큰이면_SecurityContext에_회원_주체를_채운다() throws Exception {
+        String token = jwtProvider.createMemberAccessToken(42L, "김아무개");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Authorization", "Bearer " + token);
+
+        filter(request);
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        assertThat(authentication).isNotNull();
+        MemberPrincipal principal = (MemberPrincipal) authentication.getPrincipal();
+        assertThat(principal.id()).isEqualTo(42L);
+        assertThat(principal.nickname()).isEqualTo("김아무개");
+        // Account에는 role이 없다(CLAUDE.md §3.1) — 부여하는 권한도 없다.
+        assertThat(authentication.getAuthorities()).isEmpty();
+    }
+
+    @Test
+    void 관리자_토큰과_회원_토큰이_서로의_주체를_대신할_수_없다() throws Exception {
+        String adminToken = jwtProvider.createAdminAccessToken(1L, "admin", AdminRole.EDITOR);
+        MockHttpServletRequest adminRequest = new MockHttpServletRequest();
+        adminRequest.addHeader("Authorization", "Bearer " + adminToken);
+        filter(adminRequest);
+        assertThat(SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .isInstanceOf(AdminPrincipal.class);
+
+        SecurityContextHolder.clearContext();
+
+        String memberToken = jwtProvider.createMemberAccessToken(42L, "김아무개");
+        MockHttpServletRequest memberRequest = new MockHttpServletRequest();
+        memberRequest.addHeader("Authorization", "Bearer " + memberToken);
+        filter(memberRequest);
+        assertThat(SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .isInstanceOf(MemberPrincipal.class);
     }
 }

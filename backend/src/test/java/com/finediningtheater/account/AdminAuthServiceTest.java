@@ -108,7 +108,7 @@ class AdminAuthServiceTest {
     @Test
     void 유효한_refresh_토큰이면_새_세션을_발급한다() {
         when(adminAccountRepository.findById(1L)).thenReturn(Optional.of(account));
-        String refreshToken = jwtProvider.createRefreshToken(1L);
+        String refreshToken = jwtProvider.createAdminRefreshToken(1L);
 
         AdminSession session = service().refresh(refreshToken);
 
@@ -119,14 +119,14 @@ class AdminAuthServiceTest {
     void 비활성_계정의_refresh_토큰은_거부한다() {
         account.disable();
         when(adminAccountRepository.findById(1L)).thenReturn(Optional.of(account));
-        String refreshToken = jwtProvider.createRefreshToken(1L);
+        String refreshToken = jwtProvider.createAdminRefreshToken(1L);
 
         assertThatThrownBy(() -> service().refresh(refreshToken)).isInstanceOf(BusinessException.class);
     }
 
     @Test
     void access_토큰을_refresh_엔드포인트에_쓰면_거부한다() {
-        String accessToken = jwtProvider.createAccessToken(1L, "admin", AdminRole.EDITOR);
+        String accessToken = jwtProvider.createAdminAccessToken(1L, "admin", AdminRole.EDITOR);
 
         assertThatThrownBy(() -> service().refresh(accessToken)).isInstanceOf(BusinessException.class);
     }
