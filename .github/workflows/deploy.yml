@@ -40,6 +40,11 @@ jobs:
           tar -czf infra.tar.gz docker-compose.yml docker-compose.local.yml deploy
           aws s3 cp infra.tar.gz "s3://${{ vars.S3_ARTIFACT_BUCKET }}/infra/${{ github.sha }}.tar.gz"
 
+      # tar -xzf는 기존 파일을 그 자리에서 덮어쓰지 않고 unlink 후 새 inode로 만든다.
+      # nginx.conf는 docker-compose.yml에서 파일 단위로 바인드 마운트되는데, 컨테이너는
+      # 마운트 시점의 inode를 그대로 붙들고 있어서 파일 내용이 바뀌어도 reload로는 절대
+      # 반영되지 않는다(고아 inode를 계속 읽음) — 반드시 컨테이너를 재생성해야 새 바인드가
+      # 맺어진다.
       - name: Sync to server and reload nginx via SSM Run Command
         env:
           S3_KEY: infra/${{ github.sha }}.tar.gz
@@ -54,6 +59,6 @@ jobs:
               \"aws s3 cp s3://${{ vars.S3_ARTIFACT_BUCKET }}/$S3_KEY infra.tar.gz\",
               \"tar -xzf infra.tar.gz\",
               \"docker compose config --quiet\",
-              \"docker compose up -d nginx\"
+              \"docker compose up -d --force-recreate nginx\"
             ]}" \
             --output text
