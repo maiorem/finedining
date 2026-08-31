@@ -94,6 +94,7 @@ jobs:
             --parameters "{\"commands\":[
               \"cd /opt/finedining\",
               \"export BACKEND_IMAGE=$IMAGE\",
+              \"aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ steps.ecr.outputs.registry }}\",
               \"docker compose pull backend\",
               \"docker compose up -d backend\"
             ]}" \
