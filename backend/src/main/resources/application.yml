@@ -89,6 +89,9 @@ app:
 
 server:
   port: 8080
+  # nginx가 X-Forwarded-Proto: https를 넣어준다(오리진 HTTP·CloudFront HTTPS 종단, §13.3).
+  # 이게 없으면 OAuth2 redirect_uri·절대 URL 생성이 http://로 나가 카카오가 거부한다.
+  forward-headers-strategy: framework
 
 management:
   server:
