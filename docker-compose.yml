@@ -27,6 +27,10 @@ services:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+    # nginx와 같은 web-dist를 읽기 전용으로 공유한다 — IndexHtmlFilter가 여기서
+    # index.html을 읽어 서빙한다(§10).
+    volumes:
+      - web-dist:/web-dist:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health/readiness"]
       interval: 10s
