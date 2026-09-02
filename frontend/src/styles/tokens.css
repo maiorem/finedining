@@ -16,10 +16,13 @@
      회차 캘린더 OPEN 배지 세 곳에만 쓴다 (§8.3). 흰 배경 위 본문 텍스트 색으로 쓰지 않는다(§8.8). */
   --c-spot: #b98a3c;
 
-  /* --- 타이포그래피 --- */
-  --f-display: "Hahmlet", serif;
+  /* --- 타이포그래피 ---
+     Display/Body/Utility 세 갈래(Hahmlet+Pretendard+IBM Plex Mono)에서 Pretendard
+     하나로 통일했다 — 세 토큰을 그대로 남겨 두는 이유는 컴포넌트마다 var(--f-display) 등을
+     이미 역할별로 쓰고 있어서, 나중에 다시 갈라도 값만 바꾸면 되게 하기 위해서다. */
+  --f-display: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
   --f-body: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
-  --f-util: "IBM Plex Mono", monospace;
+  --f-util: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
 
   --t-hero: clamp(2.25rem, 6vw, 4.75rem);
   --t-h1: clamp(1.75rem, 4vw, 3rem);
