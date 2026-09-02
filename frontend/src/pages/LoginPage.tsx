@@ -66,7 +66,8 @@ export default function LoginPage() {
     <main className={styles.page}>
       <div className={styles.card}>
         <p className={styles.eyebrow}>{t("login.eyebrow")}</p>
-        <h1 className={styles.heading}>{t("login.heading")}</h1>
+        {/* 큰 "로그인" 글씨는 화면에서 뺀다 — 접근성·SEO용 h1은 화면에서만 숨긴다. */}
+        <h1 className={styles.srOnly}>{t("login.heading")}</h1>
 
         {kakaoError && (
           <p className={styles.error} role="alert">

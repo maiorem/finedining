@@ -17,14 +17,16 @@
   letter-spacing: var(--ls-wide);
   text-transform: uppercase;
   color: var(--c-ink-60);
-  margin: 0 0 0.5rem;
+  margin: 0 0 2rem;
 }
 
-.heading {
-  font-family: var(--f-display);
-  font-size: var(--t-h1);
-  font-weight: 400;
-  margin: 0 0 2rem;
+/* 접근성·SEO용 h1 — 화면에는 안 보이지만 스크린리더·검색엔진은 읽는다. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }
 
 /* 카카오 로그인 버튼 리소스 — 브랜드 가이드상 원본 크기 그대로 쓴다(리사이즈·재채색 금지).
