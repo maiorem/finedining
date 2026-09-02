@@ -65,8 +65,8 @@ app:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
   booking:
     # 예약 URL은 저장 시 호스트 화이트리스트로 검증한다 — 오타 하나로 예약이 통째로 죽는다
-    # (CLAUDE.md §4). 네이버 예약 도메인만 기본 허용한다.
-    allowed-hosts: ${BOOKING_ALLOWED_HOSTS:booking.naver.com,m.booking.naver.com}
+    # (CLAUDE.md §4). 예매 플랫폼이 아직 확정되지 않아 네이버 예약 + NOL(인터파크)을 함께 허용한다.
+    allowed-hosts: ${BOOKING_ALLOWED_HOSTS:booking.naver.com,m.booking.naver.com,nol.interpark.com}
   web:
     # nginx와 공유하는 web-dist 볼륨 안의 index.html 경로(§10, docker-compose.yml 참고).
     # 로컬 개발(pnpm dev)은 이 파일이 없어도 된다 — IndexHtmlFilter가 조용히 통과시킨다.

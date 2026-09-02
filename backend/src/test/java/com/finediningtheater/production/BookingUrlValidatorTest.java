@@ -9,12 +9,14 @@ import org.junit.jupiter.api.Test;
 
 class BookingUrlValidatorTest {
 
-    private final BookingUrlValidator validator = new BookingUrlValidator("booking.naver.com,m.booking.naver.com");
+    private final BookingUrlValidator validator =
+            new BookingUrlValidator("booking.naver.com,m.booking.naver.com,nol.interpark.com");
 
     @Test
     void 허용된_호스트는_통과한다() {
         validator.validate("https://booking.naver.com/bizes/1/items/1");
         validator.validate("https://m.booking.naver.com/bizes/1/items/1");
+        validator.validate("https://nol.interpark.com/goods/12345");
     }
 
     @Test
