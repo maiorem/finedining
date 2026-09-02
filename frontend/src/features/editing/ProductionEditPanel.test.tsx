@@ -113,7 +113,7 @@ describe("ProductionEditPanel", () => {
     );
 
     await user.type(
-      await screen.findByPlaceholderText("https://booking.naver.com/..."),
+      await screen.findByPlaceholderText("https://..."),
       "https://booking.naver.com/bizes/1",
     );
     await user.type(screen.getByPlaceholderText("https://map.naver.com/..."), "https://map.naver.com/p/somewhere");
@@ -158,7 +158,7 @@ describe("ProductionEditPanel", () => {
     );
 
     await user.type(
-      await screen.findByPlaceholderText("https://booking.naver.com/..."),
+      await screen.findByPlaceholderText("https://..."),
       "https://booking.naver.com/bizes/1",
     );
     await user.type(screen.getByPlaceholderText("https://map.naver.com/..."), "https://map.naver.com/p/somewhere");

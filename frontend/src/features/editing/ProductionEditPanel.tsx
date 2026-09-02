@@ -259,7 +259,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
           type="url"
           value={bookingUrlDraft}
           onChange={(e) => setBookingUrlDraft(e.target.value)}
-          placeholder="https://booking.naver.com/..."
+          placeholder="https://..."
         />
       </label>
 

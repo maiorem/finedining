@@ -86,7 +86,7 @@ describe("ProductionsPage", () => {
 
     renderPage();
 
-    const bookingLink = await screen.findByRole("link", { name: /네이버 예약으로 이동/ });
+    const bookingLink = await screen.findByRole("link", { name: /예매하기/ });
     expect(bookingLink).toHaveAttribute("href", "https://booking.naver.com/bizes/1");
     expect(bookingLink).toHaveAttribute("target", "_blank");
     expect(bookingLink).toHaveAttribute("rel", "noopener noreferrer");
