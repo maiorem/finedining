@@ -23,7 +23,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * mtime을 확인하고 바뀐 경우에만 다시 읽는다(§10).
  *
  * <p>라우트별 메타 태그 주입(제목·설명·OG 이미지·hreflang)은 여기 없다 — 경로별로 어떤
- * Production/Showing을 참조하는지 DB에서 조회해야 하는 별도 기능이라 MetaInjectionFilter로
+ * Production/Program을 참조하는지 DB에서 조회해야 하는 별도 기능이라 MetaInjectionFilter로
  * 이어서 만든다(§10). 지금은 정적 서빙 + 캐시 무효화까지만 한다.
  */
 @Component

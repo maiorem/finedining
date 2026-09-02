@@ -1,4 +1,4 @@
-package com.finediningtheater.showing;
+package com.finediningtheater.production;
 
 import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 /**
  * 예약 URL은 저장 시 호스트 화이트리스트로 검증한다 — 오타 하나로 예약이 통째로 죽는다
  * (CLAUDE.md §4). 생성자 주입만 쓴다는 원칙(§11)을 지키려고 {@code @Value}를 생성자
- * 파라미터로 받는 별도 컴포넌트로 뺐다 — ShowingService에 필드 주입을 두지 않는다.
+ * 파라미터로 받는 별도 컴포넌트로 뺐다 — ProductionService에 필드 주입을 두지 않는다.
  */
 @Component
 public class BookingUrlValidator {

@@ -8,6 +8,8 @@ public record ProductionAdminResponse(
         Long id,
         String slug,
         String status,
+        String bookingUrl,
+        String locationUrl,
         List<TranslationView> translations,
         List<MediaAssetResponse> images) {
 
@@ -37,6 +39,12 @@ public record ProductionAdminResponse(
                                                 t.getDraftTitle() != null))
                         .toList();
         return new ProductionAdminResponse(
-                production.getId(), production.getSlug(), production.getStatus().name(), views, images);
+                production.getId(),
+                production.getSlug(),
+                production.getStatus().name(),
+                production.getBookingUrl(),
+                production.getLocationUrl(),
+                views,
+                images);
     }
 }

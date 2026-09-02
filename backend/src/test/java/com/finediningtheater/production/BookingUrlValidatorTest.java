@@ -1,4 +1,4 @@
-package com.finediningtheater.showing;
+package com.finediningtheater.production;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

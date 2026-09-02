@@ -21,6 +21,7 @@ public class ProductionService {
 
     private final ProductionRepository productionRepository;
     private final MediaService mediaService;
+    private final BookingUrlValidator bookingUrlValidator;
 
     @Cacheable("productions")
     public List<Production> listPublished() {
@@ -91,6 +92,26 @@ public class ProductionService {
     public Production unpublish(Long id) {
         Production production = getForAdmin(id);
         production.unpublish();
+        return production;
+    }
+
+    /** 예약 URL은 즉시 공개본에 반영된다(draft 없음) — 호출부(EditController)가 §3.4의 sudo 모드를 강제한다. */
+    @Transactional
+    @CacheEvict(value = {"productions", "productionDetail"}, allEntries = true)
+    public Production changeBookingUrl(Long id, String bookingUrl) {
+        if (bookingUrl != null && !bookingUrl.isBlank()) {
+            bookingUrlValidator.validate(bookingUrl);
+        }
+        Production production = getForAdmin(id);
+        production.changeBookingUrl(bookingUrl);
+        return production;
+    }
+
+    @Transactional
+    @CacheEvict(value = {"productions", "productionDetail"}, allEntries = true)
+    public Production changeLocationUrl(Long id, String locationUrl) {
+        Production production = getForAdmin(id);
+        production.changeLocationUrl(locationUrl);
         return production;
     }
 }

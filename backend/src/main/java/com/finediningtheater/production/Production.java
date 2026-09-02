@@ -28,6 +28,14 @@ public class Production extends Publishable {
     @Column(nullable = false, unique = true, length = 191)
     private String slug;
 
+    /** 네이버 예약 URL. 캘린더는 만들지 않는다 — 네이버 예약이 이미 제공한다. 저장 시 호스트 화이트리스트로 검증한다(§4). */
+    @Column(length = 500)
+    private String bookingUrl;
+
+    /** 공연장 위치 링크(지도 등). 화이트리스트 검증 없음 — Artist.linkUrl과 같은 취급이다. */
+    @Column(length = 500)
+    private String locationUrl;
+
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProductionTranslation> translations = new ArrayList<>();
 
@@ -35,6 +43,15 @@ public class Production extends Publishable {
 
     public Production(String slug) {
         this.slug = slug;
+    }
+
+    /** 예약 URL 변경은 §3.4의 PIN 필수 목록에 있다 — 호출부(EditController)가 sudo 모드를 강제한다. */
+    public void changeBookingUrl(String bookingUrl) {
+        this.bookingUrl = bookingUrl;
+    }
+
+    public void changeLocationUrl(String locationUrl) {
+        this.locationUrl = locationUrl;
     }
 
     /**

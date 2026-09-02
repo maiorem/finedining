@@ -23,9 +23,10 @@ class ProductionServiceTest {
 
     @Mock private ProductionRepository productionRepository;
     @Mock private MediaService mediaService;
+    private final BookingUrlValidator bookingUrlValidator = new BookingUrlValidator("booking.naver.com");
 
     private ProductionService productionService() {
-        return new ProductionService(productionRepository, mediaService);
+        return new ProductionService(productionRepository, mediaService, bookingUrlValidator);
     }
 
     @Test
@@ -124,5 +125,35 @@ class ProductionServiceTest {
 
         assertThat(result.isPublished()).isFalse();
         assertThat(result.getTranslations().get(0).getTitle()).isEqualTo("쇼케이스");
+    }
+
+    @Test
+    void 허용되지_않은_호스트의_예약_URL은_거부한다() {
+        assertThatThrownBy(() -> productionService().changeBookingUrl(1L, "https://evil.example.com"))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(
+                        e ->
+                                assertThat(((BusinessException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.VALIDATION_ERROR));
+    }
+
+    @Test
+    void 네이버_예약_호스트의_URL은_즉시_반영된다() {
+        Production production = new Production("showcase");
+        when(productionRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(production));
+
+        Production result = productionService().changeBookingUrl(1L, "https://booking.naver.com/bizes/1");
+
+        assertThat(result.getBookingUrl()).isEqualTo("https://booking.naver.com/bizes/1");
+    }
+
+    @Test
+    void 위치_URL은_화이트리스트_검증_없이_즉시_반영된다() {
+        Production production = new Production("showcase");
+        when(productionRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(production));
+
+        Production result = productionService().changeLocationUrl(1L, "https://map.naver.com/p/somewhere");
+
+        assertThat(result.getLocationUrl()).isEqualTo("https://map.naver.com/p/somewhere");
     }
 }

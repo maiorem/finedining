@@ -7,7 +7,14 @@ import com.finediningtheater.production.ProductionTranslation;
 import java.util.List;
 
 public record ProductionDetailResponse(
-        Long id, String slug, String title, String subtitle, String description, List<MediaAssetResponse> images) {
+        Long id,
+        String slug,
+        String title,
+        String subtitle,
+        String description,
+        String bookingUrl,
+        String locationUrl,
+        List<MediaAssetResponse> images) {
 
     public static ProductionDetailResponse from(
             Production production, SiteLocale locale, List<MediaAssetResponse> images) {
@@ -18,6 +25,8 @@ public record ProductionDetailResponse(
                 translation == null ? null : translation.getTitle(),
                 translation == null ? null : translation.getSubtitle(),
                 translation == null ? null : translation.getDescription(),
+                production.getBookingUrl(),
+                production.getLocationUrl(),
                 images);
     }
 }

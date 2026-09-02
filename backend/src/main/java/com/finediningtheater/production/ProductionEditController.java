@@ -9,6 +9,8 @@ import com.finediningtheater.global.support.SiteLocale;
 import com.finediningtheater.media.MediaOwnerType;
 import com.finediningtheater.media.MediaService;
 import com.finediningtheater.media.dto.MediaAssetResponse;
+import com.finediningtheater.production.dto.ChangeProductionBookingUrlRequest;
+import com.finediningtheater.production.dto.ChangeProductionLocationUrlRequest;
 import com.finediningtheater.production.dto.CreateProductionRequest;
 import com.finediningtheater.production.dto.ProductionAdminResponse;
 import com.finediningtheater.production.dto.UpsertTranslationRequest;
@@ -148,6 +150,52 @@ public class ProductionEditController {
                 id,
                 Map.of("status", beforeStatus),
                 Map.of("status", after.getStatus().name()),
+                ClientIp.resolve(httpRequest));
+
+        return ApiResponse.success(toAdminResponse(after));
+    }
+
+    /** 예약 URL 변경 — 파괴적·공개적 동작이라 PIN sudo 모드가 열려 있어야 한다(§3.4). 캘린더 없이 작품에 바로 붙는 예매 링크다. */
+    @PutMapping("/{id}/booking-url")
+    public ApiResponse<ProductionAdminResponse> changeBookingUrl(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangeProductionBookingUrlRequest request,
+            @AuthenticationPrincipal AdminPrincipal principal,
+            HttpServletRequest httpRequest) {
+        sudoMode.requireActive(principal.id());
+
+        String beforeUrl = String.valueOf(productionService.getForAdmin(id).getBookingUrl());
+        Production after = productionService.changeBookingUrl(id, request.bookingUrl());
+
+        auditLogger.record(
+                principal.id(),
+                "PRODUCTION_BOOKING_URL_CHANGE",
+                "Production",
+                id,
+                Map.of("bookingUrl", beforeUrl),
+                Map.of("bookingUrl", String.valueOf(after.getBookingUrl())),
+                ClientIp.resolve(httpRequest));
+
+        return ApiResponse.success(toAdminResponse(after));
+    }
+
+    /** 위치 링크 변경 — Artist.linkUrl과 같은 취급이다. 화이트리스트 검증·PIN 모두 없다. */
+    @PutMapping("/{id}/location-url")
+    public ApiResponse<ProductionAdminResponse> changeLocationUrl(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangeProductionLocationUrlRequest request,
+            @AuthenticationPrincipal AdminPrincipal principal,
+            HttpServletRequest httpRequest) {
+        String beforeUrl = String.valueOf(productionService.getForAdmin(id).getLocationUrl());
+        Production after = productionService.changeLocationUrl(id, request.locationUrl());
+
+        auditLogger.record(
+                principal.id(),
+                "PRODUCTION_LOCATION_URL_CHANGE",
+                "Production",
+                id,
+                Map.of("locationUrl", beforeUrl),
+                Map.of("locationUrl", String.valueOf(after.getLocationUrl())),
                 ClientIp.resolve(httpRequest));
 
         return ApiResponse.success(toAdminResponse(after));
