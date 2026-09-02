@@ -1,4 +1,5 @@
 import { apiAdminGet, apiAdminPost, apiAdminPut } from "./adminHttp";
+import type { MediaAsset } from "./media";
 
 export type ProgramTranslationView = {
   locale: "KO" | "EN";
@@ -11,10 +12,12 @@ export type ProgramTranslationView = {
 
 export type ProgramAdmin = {
   id: number;
+  slug: string;
   status: "DRAFT" | "PUBLISHED";
   applyUrl: string | null;
   locationUrl: string | null;
   translations: ProgramTranslationView[];
+  images: MediaAsset[];
 };
 
 export function listProgramsForAdmin(accessToken: string): Promise<ProgramAdmin[]> {
@@ -25,9 +28,9 @@ export function getProgramForAdmin(accessToken: string, id: number): Promise<Pro
   return apiAdminGet<ProgramAdmin>(`/api/programs/manage/${id}`, accessToken);
 }
 
-/** 목록에서 "새 프로그램 추가"로 호출한다. 본문 없이 DRAFT로 만든다(CLAUDE.md §3.9). */
-export function createProgram(accessToken: string): Promise<ProgramAdmin> {
-  return apiAdminPost<ProgramAdmin>("/api/programs", accessToken);
+/** 목록에서 "새 프로그램 추가"로 호출한다. 슬러그만 받아 DRAFT로 만든다(CLAUDE.md §3.9). */
+export function createProgram(accessToken: string, slug: string): Promise<ProgramAdmin> {
+  return apiAdminPost<ProgramAdmin>("/api/programs", accessToken, { slug });
 }
 
 /** "임시저장" — 공개본에는 영향이 없다(CLAUDE.md §3.9). */

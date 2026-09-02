@@ -1,0 +1,236 @@
+.layout {
+  display: block;
+}
+
+.layoutWithPanel {
+  display: flex;
+  align-items: flex-start;
+}
+
+.page {
+  flex: 1;
+  min-width: 0;
+  padding: var(--section-y-mobile) var(--gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--section-y-desktop) var(--gutter-desktop);
+  }
+}
+
+.status {
+  color: var(--c-ink-60);
+}
+
+/* 풀블리드 히어로 — .page의 패딩을 정확히 상쇄해 뷰포트 끝까지 이미지를 채운다. 히어로가
+   맨 처음 자식이어야 이 트릭이 성립한다(§8.2 "풀블리드 이미지 위 최소 텍스트"). */
+.hero {
+  position: relative;
+  margin: calc(-1 * var(--section-y-mobile)) calc(-1 * var(--gutter-mobile)) var(--section-y-mobile);
+  height: 70svh;
+  min-height: 420px;
+  overflow: hidden;
+  background: var(--c-black);
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    margin: calc(-1 * var(--section-y-desktop)) calc(-1 * var(--gutter-desktop)) var(--section-y-desktop);
+    height: 80svh;
+  }
+}
+
+.heroImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroScrim {
+  position: absolute;
+  inset: 0;
+  /* 무채색 팔레트 안의 불투명도 그라디언트다 — 색상 그라디언트가 아니다(§8.2). */
+  background: linear-gradient(to top, rgba(11, 11, 12, 0.65), rgba(11, 11, 12, 0) 55%);
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--gutter-mobile);
+  color: var(--c-white);
+}
+
+@media (min-width: 1024px) {
+  .heroOverlay {
+    padding: var(--gutter-desktop);
+  }
+}
+
+.heroTitle {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: var(--t-h1);
+  line-height: var(--lh-tight);
+  margin: 0;
+}
+
+/* 이미지가 없는 프로그램(드물다)만 쓰는 기본 헤더 — 히어로 없이 텍스트만 있다. */
+.title {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: var(--t-h1);
+  margin: 0 0 2rem;
+}
+
+.editToggle {
+  margin-bottom: 1.5rem;
+  min-height: 40px;
+  padding: 0 1em;
+  border: 1px dashed var(--c-spot);
+  background: transparent;
+  color: var(--c-spot);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  cursor: pointer;
+}
+
+.editToggle:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.desktopOnlyNotice {
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--c-line);
+  padding: 0.75em 1em;
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
+}
+
+.lead {
+  max-width: 38em;
+  color: var(--c-ink);
+  font-size: var(--t-lead);
+  line-height: var(--lh-body);
+  white-space: pre-wrap;
+  margin: 0 0 var(--section-y-mobile);
+}
+
+@media (min-width: 1024px) {
+  .lead {
+    margin: 0 0 var(--section-y-desktop);
+  }
+}
+
+/* 참가/위치 — 1px 아웃라인 CTA(§8.1). 채운 버튼이 아니다. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0 0 var(--section-y-mobile);
+}
+
+@media (min-width: 1024px) {
+  .actions {
+    margin: 0 0 var(--section-y-desktop);
+  }
+}
+
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.5em;
+  border: 1px solid var(--c-ink);
+  color: var(--c-ink);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.actionLink:hover,
+.actionLink:focus-visible {
+  border-color: var(--c-spot);
+  color: var(--c-spot);
+  outline: none;
+}
+
+.actionLink:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+/* 블로그처럼 본문 이미지를 하나씩, 좌우로 번갈아 큼직하게 배치하고 캡션을 붙인다(§8.2 응용). */
+.editorial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-y-mobile);
+}
+
+@media (min-width: 1024px) {
+  .editorial {
+    gap: var(--section-y-desktop);
+  }
+}
+
+.editorialRow {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .editorialRow {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+  }
+
+  .editorialRow > .editorialImage {
+    grid-column: 1 / 8;
+  }
+
+  .editorialRowReverse > .editorialImage {
+    grid-column: 6 / 13;
+  }
+}
+
+.editorialImage {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.editorialCaption {
+  margin-top: 0.75rem;
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
+  line-height: var(--lh-body);
+}
+
+@media (min-width: 1024px) {
+  .editorialRow > .editorialCaption {
+    grid-column: 1 / 8;
+  }
+
+  .editorialRowReverse > .editorialCaption {
+    grid-column: 6 / 13;
+  }
+}
+
+.panelLoading {
+  width: 360px;
+  flex-shrink: 0;
+  padding: 1.5rem;
+  border-left: 1px solid var(--c-line);
+  color: var(--c-ink-60);
+  font-size: var(--t-caption);
+}

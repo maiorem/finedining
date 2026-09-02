@@ -48,10 +48,12 @@ describe("ProgramsPage", () => {
           data: [
             {
               id: 1,
+              slug: "summer-tasting",
               title: "여름 시식회",
               description: "참가는 구글폼으로 접수합니다.",
               applyUrl: "https://forms.gle/abcd",
               locationUrl: "https://map.naver.com/p/somewhere",
+              thumbnail: null,
             },
           ],
           error: null,
@@ -61,7 +63,8 @@ describe("ProgramsPage", () => {
 
     renderPage();
 
-    expect(await screen.findByRole("heading", { name: "여름 시식회" })).toBeInTheDocument();
+    const titleLink = await screen.findByRole("link", { name: /여름 시식회/ });
+    expect(titleLink).toHaveAttribute("href", "/programs/summer-tasting");
     expect(screen.getByText("참가는 구글폼으로 접수합니다.")).toBeInTheDocument();
 
     const applyLink = screen.getByRole("link", { name: /참가하기/ });
@@ -71,7 +74,7 @@ describe("ProgramsPage", () => {
     const locationLink = screen.getByRole("link", { name: /위치보기/ });
     expect(locationLink).toHaveAttribute("href", "https://map.naver.com/p/somewhere");
 
-    expect(screen.queryByRole("button", { name: "프로그램 관리" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "새 프로그램 추가" })).not.toBeInTheDocument();
   });
 
   it("프로그램이 없으면 빈 상태 문구를 보여준다", async () => {
@@ -89,7 +92,7 @@ describe("ProgramsPage", () => {
     expect(await screen.findByText("등록된 프로그램이 없습니다.")).toBeInTheDocument();
   });
 
-  it("관리자로 로그인했으면 프로그램 관리 버튼이 보인다", async () => {
+  it("관리자로 로그인했으면 새 프로그램 추가 버튼이 보인다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
         return Promise.resolve(
@@ -105,6 +108,6 @@ describe("ProgramsPage", () => {
 
     renderPage();
 
-    expect(await screen.findByRole("button", { name: "프로그램 관리" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "새 프로그램 추가" })).toBeInTheDocument();
   });
 });

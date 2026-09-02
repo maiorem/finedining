@@ -6,6 +6,7 @@ import ProductionsPage from "./pages/ProductionsPage";
 import ProductionDetailPage from "./pages/ProductionDetailPage";
 import AboutPage from "./pages/AboutPage";
 import ProgramsPage from "./pages/ProgramsPage";
+import ProgramDetailPage from "./pages/ProgramDetailPage";
 import ProposalPage from "./pages/ProposalPage";
 import ReviewsPage from "./pages/ReviewsPage";
 import ReviewDetailPage from "./pages/ReviewDetailPage";
@@ -24,6 +25,7 @@ export function App() {
         <Route path="/productions/:slug" element={<ProductionDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/programs" element={<ProgramsPage />} />
+        <Route path="/programs/:slug" element={<ProgramDetailPage />} />
         <Route path="/proposal" element={<ProposalPage />} />
         <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/reviews/:id" element={<ReviewDetailPage />} />

@@ -13,6 +13,7 @@ export const queryKeys = {
   programs: {
     all: ["programs"] as const,
     list: (lang: string) => ["programs", "list", lang] as const,
+    detail: (slug: string, lang: string) => ["programs", "detail", slug, lang] as const,
     adminList: ["programs", "admin", "list"] as const,
     adminDetail: (id: number) => ["programs", "admin", id] as const,
   },

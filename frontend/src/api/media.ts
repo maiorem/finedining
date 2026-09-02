@@ -1,6 +1,6 @@
 import { apiAdminDelete, apiAdminPost, apiAdminPut } from "./adminHttp";
 
-export type MediaOwnerType = "PRODUCTION" | "ARTIST";
+export type MediaOwnerType = "PRODUCTION" | "ARTIST" | "PROGRAM";
 
 // 뷰어 무관 데이터라 공개·관리자 응답 모두 이 모양을 공유한다 (CLAUDE.md §7.2 — 백엔드
 // MediaAssetResponse와 1:1로 대응).
