@@ -32,7 +32,7 @@ describe("HomePage", () => {
     vi.unstubAllGlobals();
   });
 
-  it("사이트 이름과 히어로 한가운데 예매하기 버튼, 협업하기 버튼을 렌더한다", async () => {
+  it("사이트 이름과 히어로 한가운데 예매하기 버튼, 협업 제안하기 버튼을 렌더한다", async () => {
     fetchMock.mockResolvedValue(jsonResponse({ success: true, data: [], error: null }));
 
     renderHome();
@@ -42,7 +42,7 @@ describe("HomePage", () => {
     const bookingLink = screen.getByRole("link", { name: "예매하기" });
     expect(bookingLink).toHaveAttribute("href", "/productions");
 
-    const collaborateLink = screen.getByRole("link", { name: "협업하기" });
+    const collaborateLink = screen.getByRole("link", { name: "협업 제안하기" });
     expect(collaborateLink).toHaveAttribute("href", "/proposal");
   });
 
