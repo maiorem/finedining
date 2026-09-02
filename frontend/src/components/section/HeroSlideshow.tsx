@@ -19,7 +19,6 @@ type HeroSlideshowProps = {
 
 export function HeroSlideshow({ children }: HeroSlideshowProps) {
   const [index, setIndex] = useState(0);
-  const [manualPause, setManualPause] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [prefersReducedMotion] = useState(
@@ -29,7 +28,9 @@ export function HeroSlideshow({ children }: HeroSlideshowProps) {
   );
 
   const hasMultiple = slides.length > 1;
-  const playing = hasMultiple && !manualPause && !hovered && !focused && !prefersReducedMotion;
+  // 화살표·재생 버튼은 뺐지만 자동재생은 계속 돈다 — hover/focus 정지와
+  // prefers-reduced-motion은 버튼과 무관하게 그대로 유지한다.
+  const playing = hasMultiple && !hovered && !focused && !prefersReducedMotion;
 
   useEffect(() => {
     if (!playing) return;
@@ -82,48 +83,19 @@ export function HeroSlideshow({ children }: HeroSlideshowProps) {
       <div className={styles.overlay}>{children}</div>
 
       {hasMultiple && (
-        <>
-          <div className={styles.controls}>
+        <div className={styles.dots} role="tablist" aria-label="이미지 선택">
+          {slides.map((src, i) => (
             <button
+              key={src}
               type="button"
-              className={styles.arrowButton}
-              aria-label="이전 이미지"
-              onClick={() => goTo(index - 1)}
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              className={styles.playButton}
-              aria-label={playing ? "슬라이드 일시정지" : "슬라이드 재생"}
-              onClick={() => setManualPause((p) => !p)}
-            >
-              {playing ? "❚❚" : "▶"}
-            </button>
-            <button
-              type="button"
-              className={styles.arrowButton}
-              aria-label="다음 이미지"
-              onClick={() => goTo(index + 1)}
-            >
-              ›
-            </button>
-          </div>
-
-          <div className={styles.dots} role="tablist" aria-label="이미지 선택">
-            {slides.map((src, i) => (
-              <button
-                key={src}
-                type="button"
-                role="tab"
-                aria-selected={i === index}
-                aria-label={`${i + 1}번째 이미지로 이동`}
-                className={i === index ? `${styles.dot} ${styles.dotActive}` : styles.dot}
-                onClick={() => goTo(i)}
-              />
-            ))}
-          </div>
-        </>
+              role="tab"
+              aria-selected={i === index}
+              aria-label={`${i + 1}번째 이미지로 이동`}
+              className={i === index ? `${styles.dot} ${styles.dotActive}` : styles.dot}
+              onClick={() => goTo(i)}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

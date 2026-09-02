@@ -40,35 +40,6 @@
   }
 }
 
-.controls {
-  position: absolute;
-  right: var(--gutter-mobile);
-  bottom: var(--gutter-mobile);
-  display: flex;
-  gap: 0.5rem;
-}
-
-@media (min-width: 1024px) {
-  .controls {
-    right: var(--gutter-desktop);
-    bottom: var(--gutter-desktop);
-  }
-}
-
-.arrowButton,
-.playButton {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(11, 11, 12, 0.4);
-  color: var(--c-white);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  font-size: 1rem;
-}
-
 .dots {
   position: absolute;
   left: 50%;
