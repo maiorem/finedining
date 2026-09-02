@@ -1,5 +1,8 @@
 {
   "app.name": "Fine Dining Theater",
+  "home.collaborateCta": "Collaborate",
+  "home.productionsHeading": "Productions",
+  "home.programsHeading": "Programs",
   "nav.main": "Main navigation",
   "nav.productions": "Productions & Booking",
   "nav.about": "About",

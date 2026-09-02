@@ -1,5 +1,8 @@
 {
   "app.name": "파인다이닝 씨어터",
+  "home.collaborateCta": "협업하기",
+  "home.productionsHeading": "작품",
+  "home.programsHeading": "프로그램",
   "nav.main": "주 메뉴",
   "nav.productions": "작품 예매하기",
   "nav.about": "소개",
