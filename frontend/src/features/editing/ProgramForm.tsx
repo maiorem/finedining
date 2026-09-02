@@ -203,21 +203,8 @@ export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
         />
       </label>
 
-      <button
-        type="button"
-        className={styles.saveButton}
-        disabled={saveDraftMutation.isPending}
-        onClick={() => {
-          setSaveNotice(null);
-          setActionError(null);
-          saveDraftMutation.mutate();
-        }}
-      >
-        {t("editing.panel.saveDraft")}
-      </button>
-
-      <hr className={styles.divider} />
-
+      {/* 제목·설명과 별개 저장 버튼으로 나눠뒀더니 운영자가 링크 저장 버튼을 놓치고 값이 비는
+          사고가 실제로 있었다 — 아래 저장 버튼 하나로 전부 같이 저장한다. */}
       <label className={styles.field}>
         <span>{t("programs.form.applyUrlLabel")}</span>
         <input
@@ -227,18 +214,6 @@ export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
           placeholder="https://forms.gle/..."
         />
       </label>
-      <button
-        type="button"
-        className={styles.saveButton}
-        disabled={applyUrlMutation.isPending}
-        onClick={() => {
-          setSaveNotice(null);
-          setActionError(null);
-          applyUrlMutation.mutate();
-        }}
-      >
-        {t("editing.image.save")}
-      </button>
 
       <label className={styles.field}>
         <span>{t("programs.form.locationUrlLabel")}</span>
@@ -249,18 +224,6 @@ export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
           placeholder="https://map.naver.com/..."
         />
       </label>
-      <button
-        type="button"
-        className={styles.saveButton}
-        disabled={locationUrlMutation.isPending}
-        onClick={() => {
-          setSaveNotice(null);
-          setActionError(null);
-          locationUrlMutation.mutate();
-        }}
-      >
-        {t("editing.image.save")}
-      </button>
 
       {saveNotice && <p className={styles.notice}>{saveNotice}</p>}
       {actionError && (
@@ -268,6 +231,21 @@ export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
           {actionError}
         </p>
       )}
+
+      <button
+        type="button"
+        className={styles.saveButton}
+        disabled={saveDraftMutation.isPending || applyUrlMutation.isPending || locationUrlMutation.isPending}
+        onClick={() => {
+          setSaveNotice(null);
+          setActionError(null);
+          saveDraftMutation.mutate();
+          if (applyUrlDraft !== (data.applyUrl ?? "")) applyUrlMutation.mutate();
+          if (locationUrlDraft !== (data.locationUrl ?? "")) locationUrlMutation.mutate();
+        }}
+      >
+        {t("editing.panel.saveDraft")}
+      </button>
 
       <hr className={styles.divider} />
 

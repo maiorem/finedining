@@ -220,34 +220,9 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
         />
       </label>
 
-      {saveNotice && <p className={styles.notice}>{saveNotice}</p>}
-      {actionError && (
-        <p className={styles.error} role="alert">
-          {actionError}
-        </p>
-      )}
-
-      <button
-        type="button"
-        className={styles.saveButton}
-        disabled={saveDraftMutation.isPending}
-        onClick={() => {
-          setSaveNotice(null);
-          setActionError(null);
-          saveDraftMutation.mutate();
-        }}
-      >
-        {t("editing.panel.saveDraft")}
-      </button>
-
-      <hr className={styles.divider} />
-
-      <h3 className={styles.imagesHeading}>{t("editing.panel.imagesHeading")}</h3>
-      <ImageDropzone ownerType="PRODUCTION" ownerId={productionId} images={data.images} onChanged={invalidate} />
-
-      <hr className={styles.divider} />
-
-      {/* 캘린더는 만들지 않는다 — 네이버 예약이 이미 제공한다(CLAUDE.md §4). 예매/위치 링크만 붙인다. */}
+      {/* 캘린더는 만들지 않는다 — 네이버 예약이 이미 제공한다(CLAUDE.md §4). 예매/위치 링크만 붙인다.
+          제목·설명과 별개 저장 버튼으로 나눠뒀더니 운영자가 URL 저장 버튼을 놓치고 값이 비는
+          사고가 실제로 있었다 — 아래 저장 버튼 하나로 전부 같이 저장한다. */}
       <label className={styles.field}>
         <span>{t("editing.panel.productionBookingUrlLabel")}</span>
         <input
@@ -257,18 +232,6 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
           placeholder="https://booking.naver.com/..."
         />
       </label>
-      <button
-        type="button"
-        className={styles.saveButton}
-        disabled={bookingUrlMutation.isPending}
-        onClick={() => {
-          setSaveNotice(null);
-          setActionError(null);
-          bookingUrlMutation.mutate();
-        }}
-      >
-        {t("editing.image.save")}
-      </button>
 
       <label className={styles.field}>
         <span>{t("editing.panel.productionLocationUrlLabel")}</span>
@@ -279,18 +242,35 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
           placeholder="https://map.naver.com/..."
         />
       </label>
+
+      {saveNotice && <p className={styles.notice}>{saveNotice}</p>}
+      {actionError && (
+        <p className={styles.error} role="alert">
+          {actionError}
+        </p>
+      )}
+
       <button
         type="button"
         className={styles.saveButton}
-        disabled={locationUrlMutation.isPending}
+        disabled={saveDraftMutation.isPending || bookingUrlMutation.isPending || locationUrlMutation.isPending}
         onClick={() => {
           setSaveNotice(null);
           setActionError(null);
-          locationUrlMutation.mutate();
+          saveDraftMutation.mutate();
+          // 값이 바뀌지 않았으면 보내지 않는다 — bookingUrl은 매번 sudo(PIN)를 요구하므로(§3.4),
+          // 건드리지 않은 예매 링크 때문에 제목만 고치려는 저장에도 PIN이 뜨면 안 된다.
+          if (locationUrlDraft !== (data.locationUrl ?? "")) locationUrlMutation.mutate();
+          if (bookingUrlDraft !== (data.bookingUrl ?? "")) bookingUrlMutation.mutate();
         }}
       >
-        {t("editing.image.save")}
+        {t("editing.panel.saveDraft")}
       </button>
+
+      <hr className={styles.divider} />
+
+      <h3 className={styles.imagesHeading}>{t("editing.panel.imagesHeading")}</h3>
+      <ImageDropzone ownerType="PRODUCTION" ownerId={productionId} images={data.images} onChanged={invalidate} />
 
       <hr className={styles.divider} />
 
