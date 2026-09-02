@@ -27,24 +27,19 @@
   margin: 0 0 2rem;
 }
 
+/* 카카오 로그인 버튼 리소스 — 브랜드 가이드상 원본 크기 그대로 쓴다(리사이즈·재채색 금지).
+   좁은 화면에서만 비율 유지한 채 줄어든다. */
 .kakaoButtonActive {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 48px;
-  border: 1px solid var(--c-ink);
-  background: transparent;
-  color: var(--c-ink);
-  font-family: var(--f-body);
-  font-size: var(--t-body);
-  text-decoration: none;
-  cursor: pointer;
+  display: block;
+  width: 300px;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
-.kakaoButtonActive:hover,
-.kakaoButtonActive:focus-visible {
-  border-color: var(--c-spot);
+.kakaoButtonActive img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .kakaoButtonActive:focus-visible {

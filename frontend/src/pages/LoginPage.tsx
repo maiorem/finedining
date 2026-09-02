@@ -5,6 +5,7 @@ import { ApiError } from "../api/http";
 import { useAdminAuth } from "../contexts/AdminAuthContext";
 import { useMemberAuth } from "../contexts/MemberAuthContext";
 import { useNoIndex } from "../hooks/useNoIndex";
+import kakaoLoginImage from "../assets/kakao-login.png";
 import styles from "./LoginPage.module.css";
 
 const KNOWN_ERROR_CODES = [
@@ -83,7 +84,8 @@ export default function LoginPage() {
             </div>
           ) : (
             <a className={styles.kakaoButtonActive} href="/api/oauth2/authorization/kakao">
-              {t("login.kakao")}
+              {/* 카카오 로그인 버튼 리소스 — 브랜드 가이드상 리사이즈·재채색하지 않고 원본 그대로 쓴다. */}
+              <img src={kakaoLoginImage} alt={t("login.kakao")} width={300} height={45} />
             </a>
           ))}
 
