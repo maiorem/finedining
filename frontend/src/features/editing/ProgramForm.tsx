@@ -55,6 +55,7 @@ export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
   const [pinAction, setPinAction] = useState<"publish" | "unpublish" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
     if (!data) return;
@@ -124,20 +125,46 @@ export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
     },
   });
 
-  const publishMutation = useMutation({
-    mutationFn: () => publishProgram(session!.accessToken, programId),
-    onSuccess: () => {
-      setActionError(null);
+  /**
+   * "발행하기" 한 번으로 제목·설명(양쪽 로케일)·참가/위치 링크를 전부 저장한 뒤 발행까지
+   * 마친다 — ProductionEditPanel과 같은 이유로 합쳤다(따로 "임시저장"을 눌러야 했던 게 귀찮다는
+   * 피드백). 발행만 PIN sudo를 요구하므로(§3.4) PIN 모달은 최대 한 번만 뜬다.
+   */
+  async function handlePublish() {
+    if (!session || !data) return;
+    setSaveNotice(null);
+    setActionError(null);
+    setPublishing(true);
+    try {
+      for (const locale of LOCALES) {
+        // 제목이 비어있는 로케일(대개 EN)은 보내지 않는다 — title은 서버에서 NotBlank 검증한다.
+        if (drafts[locale].title.trim() === "") continue;
+        await saveProgramDraftTranslation(
+          session.accessToken,
+          programId,
+          locale,
+          drafts[locale].title,
+          drafts[locale].description || null,
+        );
+      }
+      if (applyUrlDraft !== (data.applyUrl ?? "")) {
+        await changeProgramApplyUrl(session.accessToken, programId, applyUrlDraft || null);
+      }
+      if (locationUrlDraft !== (data.locationUrl ?? "")) {
+        await changeProgramLocationUrl(session.accessToken, programId, locationUrlDraft || null);
+      }
+      await publishProgram(session.accessToken, programId);
       invalidate();
-    },
-    onError: (err: unknown) => {
+    } catch (err) {
       if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
         setPinAction("publish");
         return;
       }
       setActionError(err instanceof ApiError ? err.message : t("editing.panel.publishFailed"));
-    },
-  });
+    } finally {
+      setPublishing(false);
+    }
+  }
 
   const unpublishMutation = useMutation({
     mutationFn: () => unpublishProgram(session!.accessToken, programId),
@@ -158,8 +185,9 @@ export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
     return <div className={styles.form}>{t("editing.panel.loading")}</div>;
   }
 
-  const koTranslation = data.translations.find((tr) => tr.locale === "KO");
-  const hasKoTitle = Boolean(koTranslation?.title ?? koTranslation?.draftTitle);
+  // "발행하기"가 저장까지 함께 하므로(handlePublish) 서버 상태가 아니라 지금 입력 중인
+  // draft를 기준으로 발행 가능 여부를 본다.
+  const hasKoTitle = drafts.KO.title.trim() !== "";
 
   return (
     <div className={styles.form}>
@@ -255,8 +283,8 @@ export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
           <button
             type="button"
             className={styles.publishButton}
-            disabled={publishMutation.isPending || !hasKoTitle}
-            onClick={() => publishMutation.mutate()}
+            disabled={publishing || !hasKoTitle}
+            onClick={() => void handlePublish()}
           >
             {t("editing.panel.publish")}
           </button>
@@ -282,7 +310,7 @@ export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
           onVerified={() => {
             const action = pinAction;
             setPinAction(null);
-            if (action === "publish") publishMutation.mutate();
+            if (action === "publish") void handlePublish();
             if (action === "unpublish") unpublishMutation.mutate();
           }}
         />

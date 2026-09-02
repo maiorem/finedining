@@ -129,4 +129,51 @@ describe("ProductionEditPanel", () => {
       );
     });
   });
+
+  // "임시저장"을 따로 눌러야만 발행이 최신 값을 반영하던 게 귀찮다는 피드백 — 이제 "발행하기"
+  // 한 번으로 제목·링크 저장과 발행이 함께 일어나야 한다.
+  it("임시저장 없이 발행하기만 눌러도 제목·링크 저장과 발행이 함께 일어난다", async () => {
+    const user = userEvent.setup();
+    const calls: Array<{ url: string; method: string }> = [];
+    const fetchMock = vi.fn((input: string, init?: RequestInit) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: true, data: { accessToken: "t", username: "admin", role: "EDITOR" }, error: null }),
+        );
+      }
+      if (init?.method === "PUT" || init?.method === "POST") {
+        calls.push({ url: input, method: init.method });
+      }
+      return Promise.resolve(jsonResponse({ success: true, data: adminData("DRAFT"), error: null }));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AdminAuthProvider>
+          <ProductionEditPanel productionId={1} />
+        </AdminAuthProvider>
+      </QueryClientProvider>,
+    );
+
+    await user.type(
+      await screen.findByPlaceholderText("https://booking.naver.com/..."),
+      "https://booking.naver.com/bizes/1",
+    );
+    await user.type(screen.getByPlaceholderText("https://map.naver.com/..."), "https://map.naver.com/p/somewhere");
+    // "임시저장"은 누르지 않는다 — 발행하기 한 번이 전부 처리해야 한다.
+    await user.click(screen.getByRole("button", { name: "발행하기" }));
+
+    await waitFor(() => {
+      expect(calls).toEqual(
+        expect.arrayContaining([
+          { url: "/api/productions/1/translations/KO", method: "PUT" },
+          { url: "/api/productions/1/booking-url", method: "PUT" },
+          { url: "/api/productions/1/location-url", method: "PUT" },
+          { url: "/api/productions/1/publish", method: "POST" },
+        ]),
+      );
+    });
+  });
 });

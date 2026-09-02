@@ -51,9 +51,10 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
   const [drafts, setDrafts] = useState<DraftState>(EMPTY_DRAFTS);
   const [bookingUrlDraft, setBookingUrlDraft] = useState("");
   const [locationUrlDraft, setLocationUrlDraft] = useState("");
-  const [pinAction, setPinAction] = useState<"publish" | "unpublish" | "booking-url" | null>(null);
+  const [pinAction, setPinAction] = useState<"publish" | "unpublish" | "save-links" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
     if (!data) return;
@@ -108,7 +109,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
     onError: (err: unknown) => {
       setSaveNotice(null);
       if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
-        setPinAction("booking-url");
+        setPinAction("save-links");
         return;
       }
       setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
@@ -128,20 +129,49 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
     },
   });
 
-  const publishMutation = useMutation({
-    mutationFn: () => publishProduction(session!.accessToken, productionId),
-    onSuccess: () => {
-      setActionError(null);
+  /**
+   * "발행하기" 한 번으로 제목·설명(양쪽 로케일)·예매/위치 링크를 전부 저장한 뒤 발행까지
+   * 마친다 — 따로 "임시저장"을 눌러야 했던 게 귀찮다는 피드백으로 합쳤다. bookingUrl 변경과
+   * 발행 둘 다 PIN sudo 모드를 요구하지만(§3.4), sudo는 서버에서 15분간 유지되므로 순서대로
+   * await하면 PIN 모달은 최대 한 번만 뜬다 — 뜬 뒤 같은 함수를 처음부터 다시 실행하면(이미
+   * 끝난 단계는 값이 그대로라 다시 보내도 무해하다) 나머지가 그대로 이어진다.
+   */
+  async function handlePublish() {
+    if (!session || !data) return;
+    setSaveNotice(null);
+    setActionError(null);
+    setPublishing(true);
+    try {
+      for (const locale of LOCALES) {
+        // 제목이 비어있는 로케일(대개 EN)은 보내지 않는다 — title은 서버에서 NotBlank 검증한다.
+        if (drafts[locale].title.trim() === "") continue;
+        await saveDraftTranslation(
+          session.accessToken,
+          productionId,
+          locale,
+          drafts[locale].title,
+          drafts[locale].subtitle || null,
+          drafts[locale].description || null,
+        );
+      }
+      if (locationUrlDraft !== (data.locationUrl ?? "")) {
+        await changeProductionLocationUrl(session.accessToken, productionId, locationUrlDraft || null);
+      }
+      if (bookingUrlDraft !== (data.bookingUrl ?? "")) {
+        await changeProductionBookingUrl(session.accessToken, productionId, bookingUrlDraft || null);
+      }
+      await publishProduction(session.accessToken, productionId);
       invalidate();
-    },
-    onError: (err: unknown) => {
+    } catch (err) {
       if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
         setPinAction("publish");
         return;
       }
       setActionError(err instanceof ApiError ? err.message : t("editing.panel.publishFailed"));
-    },
-  });
+    } finally {
+      setPublishing(false);
+    }
+  }
 
   const unpublishMutation = useMutation({
     mutationFn: () => unpublishProduction(session!.accessToken, productionId),
@@ -162,10 +192,10 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
     return <aside className={styles.panel}>{t("editing.panel.loading")}</aside>;
   }
 
-  const koTranslation = data.translations.find((tr) => tr.locale === "KO");
-  const enTranslation = data.translations.find((tr) => tr.locale === "EN");
-  const hasKoTitle = Boolean(koTranslation?.title ?? koTranslation?.draftTitle);
-  const hasEnTitle = Boolean(enTranslation?.title ?? enTranslation?.draftTitle);
+  // 서버에 아직 저장되지 않은 방금 입력한 제목으로도 발행 버튼이 바로 켜져야 한다 — "발행하기"가
+  // 저장까지 함께 하므로(handlePublish) 서버 상태가 아니라 지금 입력 중인 draft를 기준으로 본다.
+  const hasKoTitle = drafts.KO.title.trim() !== "";
+  const hasEnTitle = drafts.EN.title.trim() !== "";
 
   return (
     <aside className={styles.panel} aria-label={t("editing.panel.heading")}>
@@ -284,8 +314,8 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
           <button
             type="button"
             className={styles.publishButton}
-            disabled={publishMutation.isPending || !hasKoTitle}
-            onClick={() => publishMutation.mutate()}
+            disabled={publishing || !hasKoTitle}
+            onClick={() => void handlePublish()}
           >
             {t("editing.panel.publish")}
           </button>
@@ -308,9 +338,9 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
           onVerified={() => {
             const action = pinAction;
             setPinAction(null);
-            if (action === "publish") publishMutation.mutate();
+            if (action === "publish") void handlePublish();
             if (action === "unpublish") unpublishMutation.mutate();
-            if (action === "booking-url") bookingUrlMutation.mutate();
+            if (action === "save-links") bookingUrlMutation.mutate();
           }}
         />
       )}
