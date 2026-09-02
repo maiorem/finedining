@@ -3,55 +3,56 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
 import {
-  changeProductionBookingUrl,
-  changeProductionLocationUrl,
-  getProductionForAdmin,
-  publishProduction,
-  saveDraftTranslation,
-  unpublishProduction,
-} from "../../api/productionAdmin";
+  changeProgramApplyUrl,
+  changeProgramLocationUrl,
+  getProgramForAdmin,
+  publishProgram,
+  saveProgramDraftTranslation,
+  unpublishProgram,
+} from "../../api/programAdmin";
 import { ApiError } from "../../api/http";
 import { queryKeys } from "../../api/queryKeys";
-import { ImageDropzone } from "./ImageDropzone";
 import { PinModal } from "./PinModal";
-import styles from "./ProductionEditPanel.module.css";
+import styles from "./ProgramForm.module.css";
 
 type Locale = "KO" | "EN";
 const LOCALES: Locale[] = ["KO", "EN"];
 
-type DraftState = Record<Locale, { title: string; subtitle: string; description: string }>;
-
-type ProductionEditPanelProps = {
-  productionId: number;
-};
+type DraftState = Record<Locale, { title: string; description: string }>;
 
 const EMPTY_DRAFTS: DraftState = {
-  KO: { title: "", subtitle: "", description: "" },
-  EN: { title: "", subtitle: "", description: "" },
+  KO: { title: "", description: "" },
+  EN: { title: "", description: "" },
+};
+
+type ProgramFormProps = {
+  programId: number;
+  onClose: () => void;
 };
 
 /**
- * §3.9의 "같은 페이지, 편집 패널" 그 자체. 이 모듈은 `features/editing/`에 있으므로
- * React.lazy로만 import된다 — 익명 방문자 번들에 섞이지 않는다(§3.5·§9).
+ * 프로그램 하나의 인라인 편집 폼. KO/EN 탭으로 제목·설명을 임시저장하고(§3.9), 참가/위치
+ * 링크는 즉시 반영된다(Artist.linkUrl과 같은 취급). ProgramsPage에서 React.lazy로만 import되는
+ * ProgramManagementPanel 안에서만 쓰인다 — 관리자 전용 쓰기 경로다(CLAUDE.md §3.5·§9).
  */
-export default function ProductionEditPanel({ productionId }: ProductionEditPanelProps) {
+export default function ProgramForm({ programId, onClose }: ProgramFormProps) {
   const { t } = useTranslation();
   const { session } = useAdminAuth();
   const queryClient = useQueryClient();
-  const queryKey = queryKeys.productions.adminDetail(productionId);
+  const queryKey = queryKeys.programs.adminDetail(programId);
 
   const { data } = useQuery({
     queryKey,
-    queryFn: () => getProductionForAdmin(session!.accessToken, productionId),
+    queryFn: () => getProgramForAdmin(session!.accessToken, programId),
     enabled: Boolean(session),
-    staleTime: 0, // 편집 모드는 방금 저장한 값이 바로 보여야 한다 (CLAUDE.md §9).
+    staleTime: 0, // 편집 모드는 방금 저장한 값이 바로 보여야 한다(CLAUDE.md §9).
   });
 
   const [activeLocale, setActiveLocale] = useState<Locale>("KO");
   const [drafts, setDrafts] = useState<DraftState>(EMPTY_DRAFTS);
-  const [bookingUrlDraft, setBookingUrlDraft] = useState("");
+  const [applyUrlDraft, setApplyUrlDraft] = useState("");
   const [locationUrlDraft, setLocationUrlDraft] = useState("");
-  const [pinAction, setPinAction] = useState<"publish" | "unpublish" | "booking-url" | null>(null);
+  const [pinAction, setPinAction] = useState<"publish" | "unpublish" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
 
@@ -62,29 +63,28 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
       for (const translation of data.translations) {
         next[translation.locale] = {
           title: translation.draftTitle ?? translation.title ?? "",
-          subtitle: translation.draftSubtitle ?? translation.subtitle ?? "",
           description: translation.draftDescription ?? translation.description ?? "",
         };
       }
       return next;
     });
-    setBookingUrlDraft(data.bookingUrl ?? "");
+    setApplyUrlDraft(data.applyUrl ?? "");
     setLocationUrlDraft(data.locationUrl ?? "");
   }, [data]);
 
   function invalidate() {
     void queryClient.invalidateQueries({ queryKey });
-    void queryClient.invalidateQueries({ queryKey: queryKeys.productions.all });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.programs.all });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.programs.adminList });
   }
 
   const saveDraftMutation = useMutation({
     mutationFn: () =>
-      saveDraftTranslation(
+      saveProgramDraftTranslation(
         session!.accessToken,
-        productionId,
+        programId,
         activeLocale,
         drafts[activeLocale].title,
-        drafts[activeLocale].subtitle || null,
         drafts[activeLocale].description || null,
       ),
     onSuccess: () => {
@@ -98,8 +98,8 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
     },
   });
 
-  const bookingUrlMutation = useMutation({
-    mutationFn: () => changeProductionBookingUrl(session!.accessToken, productionId, bookingUrlDraft || null),
+  const applyUrlMutation = useMutation({
+    mutationFn: () => changeProgramApplyUrl(session!.accessToken, programId, applyUrlDraft || null),
     onSuccess: () => {
       setActionError(null);
       setSaveNotice(t("editing.panel.saved"));
@@ -107,16 +107,12 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
     },
     onError: (err: unknown) => {
       setSaveNotice(null);
-      if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
-        setPinAction("booking-url");
-        return;
-      }
       setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
     },
   });
 
   const locationUrlMutation = useMutation({
-    mutationFn: () => changeProductionLocationUrl(session!.accessToken, productionId, locationUrlDraft || null),
+    mutationFn: () => changeProgramLocationUrl(session!.accessToken, programId, locationUrlDraft || null),
     onSuccess: () => {
       setActionError(null);
       setSaveNotice(t("editing.panel.saved"));
@@ -129,7 +125,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
   });
 
   const publishMutation = useMutation({
-    mutationFn: () => publishProduction(session!.accessToken, productionId),
+    mutationFn: () => publishProgram(session!.accessToken, programId),
     onSuccess: () => {
       setActionError(null);
       invalidate();
@@ -144,7 +140,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
   });
 
   const unpublishMutation = useMutation({
-    mutationFn: () => unpublishProduction(session!.accessToken, productionId),
+    mutationFn: () => unpublishProgram(session!.accessToken, programId),
     onSuccess: () => {
       setActionError(null);
       invalidate();
@@ -159,16 +155,14 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
   });
 
   if (!data) {
-    return <aside className={styles.panel}>{t("editing.panel.loading")}</aside>;
+    return <div className={styles.form}>{t("editing.panel.loading")}</div>;
   }
 
   const koTranslation = data.translations.find((tr) => tr.locale === "KO");
-  const enTranslation = data.translations.find((tr) => tr.locale === "EN");
   const hasKoTitle = Boolean(koTranslation?.title ?? koTranslation?.draftTitle);
-  const hasEnTitle = Boolean(enTranslation?.title ?? enTranslation?.draftTitle);
 
   return (
-    <aside className={styles.panel} aria-label={t("editing.panel.heading")}>
+    <div className={styles.form}>
       <div className={styles.tabs} role="tablist">
         {LOCALES.map((locale) => (
           <button
@@ -185,7 +179,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
       </div>
 
       <label className={styles.field}>
-        <span>{t("editing.panel.titleLabel")}</span>
+        <span>{t("programs.form.titleLabel")}</span>
         <input
           type="text"
           value={drafts[activeLocale].title}
@@ -196,20 +190,9 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
       </label>
 
       <label className={styles.field}>
-        <span>{t("editing.panel.subtitleLabel")}</span>
-        <input
-          type="text"
-          value={drafts[activeLocale].subtitle}
-          onChange={(e) =>
-            setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], subtitle: e.target.value } }))
-          }
-        />
-      </label>
-
-      <label className={styles.field}>
-        <span>{t("editing.panel.descriptionLabel")}</span>
+        <span>{t("programs.form.descriptionLabel")}</span>
         <textarea
-          rows={6}
+          rows={4}
           value={drafts[activeLocale].description}
           onChange={(e) =>
             setDrafts((prev) => ({
@@ -219,13 +202,6 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
           }
         />
       </label>
-
-      {saveNotice && <p className={styles.notice}>{saveNotice}</p>}
-      {actionError && (
-        <p className={styles.error} role="alert">
-          {actionError}
-        </p>
-      )}
 
       <button
         type="button"
@@ -242,36 +218,30 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
 
       <hr className={styles.divider} />
 
-      <h3 className={styles.imagesHeading}>{t("editing.panel.imagesHeading")}</h3>
-      <ImageDropzone ownerType="PRODUCTION" ownerId={productionId} images={data.images} onChanged={invalidate} />
-
-      <hr className={styles.divider} />
-
-      {/* 캘린더는 만들지 않는다 — 네이버 예약이 이미 제공한다(CLAUDE.md §4). 예매/위치 링크만 붙인다. */}
       <label className={styles.field}>
-        <span>{t("editing.panel.productionBookingUrlLabel")}</span>
+        <span>{t("programs.form.applyUrlLabel")}</span>
         <input
           type="url"
-          value={bookingUrlDraft}
-          onChange={(e) => setBookingUrlDraft(e.target.value)}
-          placeholder="https://booking.naver.com/..."
+          value={applyUrlDraft}
+          onChange={(e) => setApplyUrlDraft(e.target.value)}
+          placeholder="https://forms.gle/..."
         />
       </label>
       <button
         type="button"
         className={styles.saveButton}
-        disabled={bookingUrlMutation.isPending}
+        disabled={applyUrlMutation.isPending}
         onClick={() => {
           setSaveNotice(null);
           setActionError(null);
-          bookingUrlMutation.mutate();
+          applyUrlMutation.mutate();
         }}
       >
         {t("editing.image.save")}
       </button>
 
       <label className={styles.field}>
-        <span>{t("editing.panel.productionLocationUrlLabel")}</span>
+        <span>{t("programs.form.locationUrlLabel")}</span>
         <input
           type="url"
           value={locationUrlDraft}
@@ -292,15 +262,18 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
         {t("editing.image.save")}
       </button>
 
-      <hr className={styles.divider} />
+      {saveNotice && <p className={styles.notice}>{saveNotice}</p>}
+      {actionError && (
+        <p className={styles.error} role="alert">
+          {actionError}
+        </p>
+      )}
 
-      {!hasEnTitle && <p className={styles.warning}>{t("editing.panel.enMissing")}</p>}
+      <hr className={styles.divider} />
 
       <div className={styles.publishRow}>
         <span className={styles.statusBadge}>{data.status}</span>
         <div className={styles.publishActions}>
-          {/* 발행은 이미 공개된 페이지에서도 항상 눌러야 한다 — 새로 임시저장한 draft를
-              공개본으로 밀어 올리는 동작이라 발행취소와 배타적이지 않다. */}
           <button
             type="button"
             className={styles.publishButton}
@@ -319,6 +292,9 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
               {t("editing.panel.unpublish")}
             </button>
           )}
+          <button type="button" className={styles.closeButton} onClick={onClose}>
+            {t("programs.form.cancel")}
+          </button>
         </div>
       </div>
 
@@ -330,10 +306,9 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
             setPinAction(null);
             if (action === "publish") publishMutation.mutate();
             if (action === "unpublish") unpublishMutation.mutate();
-            if (action === "booking-url") bookingUrlMutation.mutate();
           }}
         />
       )}
-    </aside>
+    </div>
   );
 }

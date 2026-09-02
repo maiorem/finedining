@@ -14,23 +14,25 @@ function renderHeader() {
 }
 
 describe("Header", () => {
-  it("작품·소개·예약·협업제안·리뷰·아티스트 내비게이션 링크를 렌더한다", () => {
+  it("작품 예매하기·프로그램·아티스트·리뷰·협업제안 내비게이션 링크를 렌더한다", () => {
     renderHeader();
 
-    expect(screen.getAllByRole("link", { name: "작품" })[0]).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "작품 예매하기" })[0]).toHaveAttribute(
       "href",
       "/productions",
     );
-    expect(screen.getAllByRole("link", { name: "소개" })[0]).toHaveAttribute("href", "/about");
-    expect(screen.getAllByRole("link", { name: "예약" })[0]).toHaveAttribute("href", "/booking");
-    expect(screen.getAllByRole("link", { name: "협업제안" })[0]).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "프로그램" })[0]).toHaveAttribute(
       "href",
-      "/proposal",
+      "/programs",
     );
-    expect(screen.getAllByRole("link", { name: "리뷰" })[0]).toHaveAttribute("href", "/reviews");
     expect(screen.getAllByRole("link", { name: "아티스트" })[0]).toHaveAttribute(
       "href",
       "/artists",
+    );
+    expect(screen.getAllByRole("link", { name: "리뷰" })[0]).toHaveAttribute("href", "/reviews");
+    expect(screen.getAllByRole("link", { name: "협업제안" })[0]).toHaveAttribute(
+      "href",
+      "/proposal",
     );
   });
 
@@ -39,10 +41,10 @@ describe("Header", () => {
     renderHeader();
 
     const menuButton = screen.getByRole("button", { name: "메뉴 열기" });
-    expect(screen.getAllByRole("link", { name: "작품" })).toHaveLength(1);
+    expect(screen.getAllByRole("link", { name: "작품 예매하기" })).toHaveLength(1);
 
     await user.click(menuButton);
-    expect(screen.getAllByRole("link", { name: "작품" })).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: "작품 예매하기" })).toHaveLength(2);
     expect(screen.getByRole("button", { name: "메뉴 닫기" })).toBeInTheDocument();
   });
 });

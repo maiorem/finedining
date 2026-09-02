@@ -6,11 +6,10 @@ import styles from "./Header.module.css";
 
 const NAV_ITEMS = [
   { to: "/productions", labelKey: "nav.productions" },
-  { to: "/about", labelKey: "nav.about" },
-  { to: "/booking", labelKey: "nav.booking" },
-  { to: "/proposal", labelKey: "nav.proposal" },
-  { to: "/reviews", labelKey: "nav.reviews" },
+  { to: "/programs", labelKey: "nav.programs" },
   { to: "/artists", labelKey: "nav.artists" },
+  { to: "/reviews", labelKey: "nav.reviews" },
+  { to: "/proposal", labelKey: "nav.proposal" },
 ] as const;
 
 export function Header() {

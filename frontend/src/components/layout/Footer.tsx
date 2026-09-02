@@ -11,6 +11,10 @@ export function Footer() {
   return (
     <footer className={styles.footer}>
       <p className={styles.copyright}>{t("footer.copyright")}</p>
+      {/* 내비게이션에서 뺀 소개는 우선순위가 낮은 항목을 푸터로 옮기는 패턴을 따른다(CLAUDE.md §8.5). */}
+      <Link to="/about" className={styles.loginLink}>
+        {t("nav.about")}
+      </Link>
       {session ? (
         <button type="button" className={styles.adminLogout} onClick={() => void logout()}>
           {t("footer.adminLogout")}

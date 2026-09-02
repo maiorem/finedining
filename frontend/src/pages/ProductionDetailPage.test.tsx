@@ -117,6 +117,42 @@ describe("ProductionDetailPage", () => {
     expect(screen.getByText("세번째 사진")).toBeInTheDocument();
   });
 
+  it("예매·위치 링크가 있으면 새 창으로 여는 외부 링크 버튼을 보여준다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: {
+            id: 1,
+            slug: "showcase",
+            title: "쇼케이스",
+            subtitle: null,
+            description: null,
+            bookingUrl: "https://booking.naver.com/bizes/1",
+            locationUrl: "https://map.naver.com/p/somewhere",
+            images: [],
+          },
+          error: null,
+        }),
+      );
+    });
+
+    renderAt("/productions/showcase");
+
+    const bookingLink = await screen.findByRole("link", { name: /네이버 예약으로 이동/ });
+    expect(bookingLink).toHaveAttribute("href", "https://booking.naver.com/bizes/1");
+    expect(bookingLink).toHaveAttribute("target", "_blank");
+    expect(bookingLink).toHaveAttribute("rel", "noopener noreferrer");
+
+    const locationLink = screen.getByRole("link", { name: /위치보기/ });
+    expect(locationLink).toHaveAttribute("href", "https://map.naver.com/p/somewhere");
+  });
+
   it("존재하지 않는 작품이면 안내 문구를 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {

@@ -1,0 +1,52 @@
+.card {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--c-line);
+}
+
+.title {
+  font-family: var(--f-display);
+  font-size: var(--t-h2);
+  font-weight: 400;
+  margin: 0 0 0.5em;
+}
+
+.description {
+  max-width: 38em;
+  color: var(--c-ink-60);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  white-space: pre-wrap;
+  margin: 0 0 1.25rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.5em;
+  border: 1px solid var(--c-ink);
+  color: var(--c-ink);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.actionLink:hover,
+.actionLink:focus-visible {
+  border-color: var(--c-spot);
+  color: var(--c-spot);
+  outline: none;
+}
+
+.actionLink:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}

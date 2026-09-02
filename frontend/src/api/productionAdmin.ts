@@ -16,6 +16,8 @@ export type ProductionAdmin = {
   id: number;
   slug: string;
   status: "DRAFT" | "PUBLISHED";
+  bookingUrl: string | null;
+  locationUrl: string | null;
   translations: ProductionTranslationView[];
   images: MediaAsset[];
 };
@@ -56,4 +58,21 @@ export function publishProduction(accessToken: string, id: number): Promise<Prod
 
 export function unpublishProduction(accessToken: string, id: number): Promise<ProductionAdmin> {
   return apiAdminPost<ProductionAdmin>(`/api/productions/${id}/unpublish`, accessToken);
+}
+
+/** 예약 URL 변경 — 파괴적·공개적 동작이라 PIN sudo 모드가 필요하다(CLAUDE.md §3.4). */
+export function changeProductionBookingUrl(
+  accessToken: string,
+  id: number,
+  bookingUrl: string | null,
+): Promise<ProductionAdmin> {
+  return apiAdminPut<ProductionAdmin>(`/api/productions/${id}/booking-url`, accessToken, { bookingUrl });
+}
+
+export function changeProductionLocationUrl(
+  accessToken: string,
+  id: number,
+  locationUrl: string | null,
+): Promise<ProductionAdmin> {
+  return apiAdminPut<ProductionAdmin>(`/api/productions/${id}/location-url`, accessToken, { locationUrl });
 }

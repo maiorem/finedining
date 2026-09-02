@@ -147,6 +147,46 @@
   }
 }
 
+/* 예매/위치 — 1px 아웃라인 CTA(§8.1). 채운 버튼이 아니다. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0 0 var(--section-y-mobile);
+}
+
+@media (min-width: 1024px) {
+  .actions {
+    margin: 0 0 var(--section-y-desktop);
+  }
+}
+
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.5em;
+  border: 1px solid var(--c-ink);
+  color: var(--c-ink);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.actionLink:hover,
+.actionLink:focus-visible {
+  border-color: var(--c-spot);
+  color: var(--c-spot);
+  outline: none;
+}
+
+.actionLink:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
 /* 편집형 세로 스토리텔링 — 남은 이미지를 하나씩, 좌우로 번갈아 큼직하게 배치한다(§8.2).
    텍스트 짝을 인위로 만들지 않고, 이미지 자체의 캡션(alt)과 여백만으로 리듬을 준다. */
 .editorial {

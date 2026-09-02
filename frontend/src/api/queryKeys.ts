@@ -10,11 +10,11 @@ export const queryKeys = {
     adminDetail: (id: number) => ["productions", "admin", id] as const,
     adminList: ["productions", "admin", "list"] as const,
   },
-  showings: {
-    all: ["showings"] as const,
-    list: (params: { productionSlug?: string; from?: string; to?: string; lang: string }) =>
-      ["showings", "list", params] as const,
-    adminList: ["showings", "admin", "list"] as const,
+  programs: {
+    all: ["programs"] as const,
+    list: (lang: string) => ["programs", "list", lang] as const,
+    adminList: ["programs", "admin", "list"] as const,
+    adminDetail: (id: number) => ["programs", "admin", id] as const,
   },
   artists: {
     all: ["artists"] as const,

@@ -4,7 +4,7 @@ import type { AdminRole } from "../api/auth";
 export type Capability =
   | "production:edit"
   | "review:moderate"
-  | "showing:edit"
+  | "program:edit"
   | "proposal:review"
   | "artist:edit"
   | "about:edit";
@@ -15,7 +15,7 @@ export type Capability =
 const CAPABILITY_ROLES: Record<Capability, readonly AdminRole[]> = {
   "production:edit": ["EDITOR", "SUPER_ADMIN"],
   "review:moderate": ["EDITOR", "SUPER_ADMIN"],
-  "showing:edit": ["EDITOR", "SUPER_ADMIN"],
+  "program:edit": ["EDITOR", "SUPER_ADMIN"],
   "proposal:review": ["EDITOR", "SUPER_ADMIN"],
   "artist:edit": ["EDITOR", "SUPER_ADMIN"],
   "about:edit": ["EDITOR", "SUPER_ADMIN"],

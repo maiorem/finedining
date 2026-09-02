@@ -93,6 +93,35 @@ export default function ProductionDetailPage() {
           </EditableSection>
         )}
 
+        {(production.bookingUrl || production.locationUrl) && (
+          <EditableSection active={showPanel}>
+            <div className={styles.actions}>
+              {production.bookingUrl && (
+                <a
+                  className={styles.actionLink}
+                  href={production.bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${t("booking.reserve")} (${t("booking.opensNewWindow")})`}
+                >
+                  {t("booking.reserve")}
+                </a>
+              )}
+              {production.locationUrl && (
+                <a
+                  className={styles.actionLink}
+                  href={production.locationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${t("booking.location")} (${t("booking.opensNewWindow")})`}
+                >
+                  {t("booking.location")}
+                </a>
+              )}
+            </div>
+          </EditableSection>
+        )}
+
         {editorialImages.length > 0 && (
           <EditableSection active={showPanel}>
             <div className={styles.editorial}>
