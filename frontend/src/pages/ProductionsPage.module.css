@@ -10,7 +10,7 @@
 
 .heading {
   font-family: var(--f-display);
-  font-size: var(--t-h1);
+  font-size: var(--t-h1-sm);
   font-weight: 400;
   margin: 0 0 2rem;
 }
