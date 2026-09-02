@@ -5,6 +5,7 @@ import { useScrolled } from "../../hooks/useScrolled";
 import styles from "./Header.module.css";
 
 const NAV_ITEMS = [
+  { to: "/about", labelKey: "nav.about" },
   { to: "/productions", labelKey: "nav.productions" },
   { to: "/programs", labelKey: "nav.programs" },
   { to: "/artists", labelKey: "nav.artists" },

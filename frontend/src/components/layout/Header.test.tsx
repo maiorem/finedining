@@ -14,9 +14,10 @@ function renderHeader() {
 }
 
 describe("Header", () => {
-  it("작품 예매하기·프로그램·아티스트·리뷰·협업제안 내비게이션 링크를 렌더한다", () => {
+  it("소개·작품 예매하기·프로그램·아티스트·리뷰·협업제안 내비게이션 링크를 렌더한다", () => {
     renderHeader();
 
+    expect(screen.getAllByRole("link", { name: "소개" })[0]).toHaveAttribute("href", "/about");
     expect(screen.getAllByRole("link", { name: "작품 예매하기" })[0]).toHaveAttribute(
       "href",
       "/productions",
