@@ -120,6 +120,31 @@
   }
 }
 
+/* 로그인/로그아웃 진입점 — 스크롤이나 메뉴를 열지 않아도 항상 보이는 자리에 둔다
+   (푸터에 숨어 있던 걸 옮겨왔다). 로그인 상태면 채워진 아이콘으로 구분한다. */
+.accountButton {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--c-ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.accountButton:hover {
+  color: var(--c-spot);
+}
+
+.accountButton:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
 .menuButton {
   width: 44px;
   height: 44px;
