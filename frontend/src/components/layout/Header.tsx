@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useScrolled } from "../../hooks/useScrolled";
+import logo from "../../assets/logo.png";
 import styles from "./Header.module.css";
 
 const NAV_ITEMS = [
@@ -69,6 +70,8 @@ export function Header() {
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.inner}>
         <Link to="/" className={styles.logo} onClick={() => setMenuOpen(false)}>
+          {/* 바로 옆 텍스트가 같은 이름을 전달하므로 이미지는 장식용이다(CLAUDE.md §8.8 alt="") */}
+          <img src={logo} alt="" className={styles.logoImage} width={28} height={28} />
           {t("app.name")}
         </Link>
 
