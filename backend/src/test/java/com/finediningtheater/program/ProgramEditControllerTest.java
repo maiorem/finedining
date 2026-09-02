@@ -14,12 +14,14 @@ import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.security.AdminPrincipal;
 import com.finediningtheater.global.security.JwtProvider;
 import com.finediningtheater.global.security.SudoMode;
+import com.finediningtheater.media.MediaService;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,6 +36,7 @@ class ProgramEditControllerTest {
     @Autowired private MockMvc mockMvc;
 
     @MockitoBean private ProgramService programService;
+    @MockitoBean private MediaService mediaService;
     @MockitoBean private AuditLogger auditLogger;
     @MockitoBean private SudoMode sudoMode;
     @MockitoBean private JwtProvider jwtProvider;
@@ -54,15 +57,20 @@ class ProgramEditControllerTest {
     @Test
     void 생성에_성공한다() throws Exception {
         loginAs(1L);
-        when(programService.create()).thenReturn(new Program());
+        when(programService.create("summer-tasting")).thenReturn(new Program("summer-tasting"));
 
-        mockMvc.perform(post("/api/programs")).andExpect(status().isOk());
+        mockMvc.perform(
+                        post("/api/programs")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"slug\":\"summer-tasting\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.slug").value("summer-tasting"));
     }
 
     @Test
     void 관리자_목록을_반환한다() throws Exception {
         loginAs(1L);
-        when(programService.listForAdmin()).thenReturn(List.of(new Program()));
+        when(programService.listForAdmin()).thenReturn(List.of(new Program("summer-tasting")));
 
         mockMvc.perform(get("/api/programs/manage")).andExpect(status().isOk());
     }

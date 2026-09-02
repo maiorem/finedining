@@ -12,8 +12,17 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
     List<Program> findAllByStatusOrderByCreatedAtDesc(ContentStatus status);
 
     @EntityGraph(attributePaths = "translations")
+    Optional<Program> findBySlugAndStatus(String slug, ContentStatus status);
+
+    @EntityGraph(attributePaths = "translations")
     Optional<Program> findWithTranslationsById(Long id);
 
     @EntityGraph(attributePaths = "translations")
     List<Program> findAllByOrderByCreatedAtDesc();
+
+    // 관리자 미리보기 전용(§3.9 ?preview=true) — 상태 무관으로 슬러그만으로 찾는다.
+    @EntityGraph(attributePaths = "translations")
+    Optional<Program> findBySlug(String slug);
+
+    boolean existsBySlug(String slug);
 }

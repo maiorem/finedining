@@ -17,8 +17,8 @@ import lombok.Getter;
 
 /**
  * 프로그램(이벤트 공지). 네이버 예약 캘린더처럼 회차별 일정을 자체 구축하지 않는 콘텐츠와 같은
- * 이유로, 참가 신청은 구글폼(applyUrl) 외부 링크로 받는다. 슬러그 없이 목록으로만 노출된다 —
- * Casting과 같은 패턴이다.
+ * 이유로, 참가 신청은 구글폼(applyUrl) 외부 링크로 받는다. 대표 이미지 + 캡션 있는 본문
+ * 이미지들을 블로그처럼 보여줘야 해서 Production과 같은 슬러그 기반 상세 페이지 패턴을 쓴다.
  */
 @Entity
 @Getter
@@ -28,6 +28,9 @@ public class Program extends Publishable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true, length = 191)
+    private String slug;
 
     /** 참가하기 — 구글폼 등 외부 신청 링크. 화이트리스트 검증 없음(Artist.linkUrl과 같은 취급). */
     @Column(length = 500)
@@ -41,6 +44,10 @@ public class Program extends Publishable {
     private Set<ProgramTranslation> translations = new HashSet<>();
 
     protected Program() {}
+
+    public Program(String slug) {
+        this.slug = slug;
+    }
 
     /** 공개 조회 전용 — 공개본 제목이 없는(초안뿐인) 로케일은 한국어로 폴백한다(§7.6). */
     public ProgramTranslation translationFor(SiteLocale locale) {
