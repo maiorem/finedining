@@ -53,6 +53,8 @@ describe("ProductionsPage", () => {
           id: 1,
           slug: "showcase",
           title: "쇼케이스",
+          bookingUrl: null,
+          locationUrl: null,
           thumbnail: { id: 2, status: "READY", url640: "http://example.com/640.jpg", lqipBase64: null },
         },
       ]),
@@ -66,6 +68,31 @@ describe("ProductionsPage", () => {
     // DOM에서 직접 확인한다.
     expect(link.querySelector("img")).toHaveAttribute("src", "http://example.com/640.jpg");
     expect(screen.queryByRole("button", { name: "새 작품 추가" })).not.toBeInTheDocument();
+  });
+
+  it("작품마다 예매하기·위치보기 링크가 있으면 목록에 바로 보여준다", async () => {
+    fetchMock.mockImplementation(
+      mockUnauthenticatedThen([
+        {
+          id: 1,
+          slug: "showcase",
+          title: "쇼케이스",
+          bookingUrl: "https://booking.naver.com/bizes/1",
+          locationUrl: "https://map.naver.com/p/somewhere",
+          thumbnail: null,
+        },
+      ]),
+    );
+
+    renderPage();
+
+    const bookingLink = await screen.findByRole("link", { name: /네이버 예약으로 이동/ });
+    expect(bookingLink).toHaveAttribute("href", "https://booking.naver.com/bizes/1");
+    expect(bookingLink).toHaveAttribute("target", "_blank");
+    expect(bookingLink).toHaveAttribute("rel", "noopener noreferrer");
+
+    const locationLink = screen.getByRole("link", { name: /위치보기/ });
+    expect(locationLink).toHaveAttribute("href", "https://map.naver.com/p/somewhere");
   });
 
   it("작품이 없으면 빈 상태 문구를 보여준다", async () => {

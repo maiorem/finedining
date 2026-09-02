@@ -1,10 +1,14 @@
 .card {
   display: block;
+}
+
+.link {
+  display: block;
   text-decoration: none;
   color: inherit;
 }
 
-.card:focus-visible {
+.link:focus-visible {
   outline: 2px solid var(--c-spot);
   outline-offset: 3px;
 }
@@ -32,7 +36,41 @@
   transition: color var(--d-fast) var(--e-out);
 }
 
-.card:hover .title,
-.card:focus-visible .title {
+.link:hover .title,
+.link:focus-visible .title {
   color: var(--c-spot);
+}
+
+/* 예매/위치 — 1px 아웃라인 CTA(§8.1). ProductionDetailPage의 actionLink와 같은 스타일이다. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.25em;
+  border: 1px solid var(--c-ink);
+  color: var(--c-ink);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.actionLink:hover,
+.actionLink:focus-visible {
+  border-color: var(--c-spot);
+  color: var(--c-spot);
+  outline: none;
+}
+
+.actionLink:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
 }
