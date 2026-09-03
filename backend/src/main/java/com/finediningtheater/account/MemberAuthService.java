@@ -22,7 +22,7 @@ public class MemberAuthService {
     public MemberSession issueSession(Account account) {
         String accessToken = jwtProvider.createMemberAccessToken(account.getId(), account.getNickname());
         String refreshToken = jwtProvider.createMemberRefreshToken(account.getId());
-        return new MemberSession(accessToken, refreshToken, account.getNickname());
+        return new MemberSession(account.getId(), accessToken, refreshToken, account.getNickname());
     }
 
     public MemberSession refresh(String refreshToken) {

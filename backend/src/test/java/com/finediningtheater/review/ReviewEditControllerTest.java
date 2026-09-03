@@ -17,6 +17,7 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.security.AdminPrincipal;
 import com.finediningtheater.global.security.JwtProvider;
+import com.finediningtheater.global.security.MemberPrincipal;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,13 @@ class ReviewEditControllerTest {
         Authentication auth =
                 new UsernamePasswordAuthenticationToken(
                         principal, null, List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+    // 회원은 role이 없다 — 로그인 자체가 곧 자격이다(§3.1). 권한 목록이 비어 있다.
+    private void loginAsMember(long accountId) {
+        MemberPrincipal principal = new MemberPrincipal(accountId, "닉네임");
+        Authentication auth = new UsernamePasswordAuthenticationToken(principal, null, List.of());
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
@@ -136,5 +144,82 @@ class ReviewEditControllerTest {
         verify(reviewService).softDeleteComment(5L);
         verify(auditLogger)
                 .record(eq(1L), eq("REVIEW_COMMENT_DELETE"), eq("ReviewComment"), eq(5L), any(), any(), any());
+    }
+
+    @Test
+    void 회원이_리뷰를_작성하면_감사로그를_남긴다() throws Exception {
+        loginAsMember(4L);
+        Review created = new Review(4L, "제목", "본문");
+        when(reviewService.create(4L, "제목", "본문")).thenReturn(created);
+
+        mockMvc.perform(
+                        post("/api/reviews")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"title\":\"제목\",\"body\":\"본문\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.title").value("제목"))
+                .andExpect(jsonPath("$.data.accountId").value(4));
+
+        verify(auditLogger).record(eq(4L), eq("REVIEW_CREATE"), eq("Review"), any(), any(), any(), any());
+    }
+
+    @Test
+    void 회원이_본인_리뷰를_수정하면_감사로그를_남긴다() throws Exception {
+        loginAsMember(4L);
+        Review before = new Review(4L, "원래 제목", "원래 본문");
+        Review after = new Review(4L, "새 제목", "새 본문");
+        when(reviewService.getForAdmin(1L)).thenReturn(before);
+        when(reviewService.editOwnContent(1L, 4L, "새 제목", "새 본문")).thenReturn(after);
+
+        mockMvc.perform(
+                        put("/api/reviews/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"title\":\"새 제목\",\"body\":\"새 본문\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.title").value("새 제목"));
+
+        verify(auditLogger).record(eq(4L), eq("REVIEW_SELF_EDIT"), eq("Review"), eq(1L), any(), any(), any());
+    }
+
+    @Test
+    void 다른_회원의_리뷰를_수정하려_하면_403이다() throws Exception {
+        loginAsMember(999L);
+        when(reviewService.getForAdmin(1L)).thenReturn(new Review(4L, "제목", "본문"));
+        when(reviewService.editOwnContent(1L, 999L, "새 제목", "새 본문"))
+                .thenThrow(new BusinessException(ErrorCode.POST_NOT_OWNED));
+
+        mockMvc.perform(
+                        put("/api/reviews/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"title\":\"새 제목\",\"body\":\"새 본문\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error.code").value("POST_NOT_OWNED"));
+    }
+
+    @Test
+    void 회원이_본인_리뷰를_삭제하면_감사로그를_남긴다() throws Exception {
+        loginAsMember(4L);
+        Review before = new Review(4L, "제목", "본문");
+        Review after = new Review(4L, "제목", "본문");
+        after.softDelete();
+        when(reviewService.getForAdmin(1L)).thenReturn(before);
+        when(reviewService.softDeleteOwn(1L, 4L)).thenReturn(after);
+
+        mockMvc.perform(delete("/api/reviews/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("DELETED"));
+
+        verify(auditLogger).record(eq(4L), eq("REVIEW_SELF_DELETE"), eq("Review"), eq(1L), any(), any(), any());
+    }
+
+    @Test
+    void 다른_회원의_리뷰를_삭제하려_하면_403이다() throws Exception {
+        loginAsMember(999L);
+        when(reviewService.getForAdmin(1L)).thenReturn(new Review(4L, "제목", "본문"));
+        when(reviewService.softDeleteOwn(1L, 999L)).thenThrow(new BusinessException(ErrorCode.POST_NOT_OWNED));
+
+        mockMvc.perform(delete("/api/reviews/1"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error.code").value("POST_NOT_OWNED"));
     }
 }

@@ -33,7 +33,8 @@ public class MemberAuthController {
 
         MemberSession session = memberAuthService.refresh(refreshToken);
         MemberRefreshCookie.set(httpResponse, session.refreshToken());
-        return ApiResponse.success(new MemberSessionResponse(session.accessToken(), session.nickname()));
+        return ApiResponse.success(
+                new MemberSessionResponse(session.accountId(), session.accessToken(), session.nickname()));
     }
 
     @PostMapping("/logout")

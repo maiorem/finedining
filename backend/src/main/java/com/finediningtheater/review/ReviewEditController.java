@@ -1,12 +1,15 @@
 package com.finediningtheater.review;
 
 import com.finediningtheater.global.audit.AuditLogger;
+import com.finediningtheater.global.error.BusinessException;
+import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.response.ApiResponse;
 import com.finediningtheater.global.security.AdminPrincipal;
+import com.finediningtheater.global.security.MemberPrincipal;
 import com.finediningtheater.global.support.ClientIp;
-import com.finediningtheater.review.dto.AdminEditReviewRequest;
 import com.finediningtheater.review.dto.ReviewAdminResponse;
 import com.finediningtheater.review.dto.ReviewCommentResponse;
+import com.finediningtheater.review.dto.ReviewContentRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -24,8 +27,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 리뷰 모더레이션(2026-08-28, 우선순위 5단계). 본인 글 수정·삭제(소유권 검사)는 아직 없다 —
- * 로그인 회원 신원이 없어 "내 글인가"를 확인할 방법이 없기 때문이다. 숨김·복구·삭제·원문수정은
+ * 리뷰 모더레이션(관리자) + 작성·본인 수정·삭제(회원, 2026-09-03 — 카카오 로그인이 붙은 뒤 연
+ * 경로, §3.6). 작성자 본인과 관리자가 같은 컨트롤러를 쓴다(§6 패키지 설계) — 글 작성·수정·삭제는
+ * {@code @PreAuthorize("isAuthenticated()")}로 클래스 레벨의 {@code hasRole('EDITOR')}를
+ * 메서드에서 덮어써 회원도 통과시키고, "누구의 글을 건드릴 수 있는가"는 관리자 여부에 따라
+ * 서비스 계층에서 갈린다(소유권 검사, §3.3) — 관리자는 그 검사를 우회하는 유일한 경로다. 숨김·
+ * 복구·댓글삭제는 여전히 관리자 전용이라 클래스 레벨 hasRole('EDITOR')를 그대로 받는다. 전부
  * §3.4의 PIN 필수 목록에 없으므로 sudo 모드를 요구하지 않는다(ProposalEditController와 동일한
  * 판단). 모든 쓰기에 감사 로그를 남긴다(§7.7).
  */
@@ -37,6 +44,30 @@ public class ReviewEditController {
 
     private final ReviewService reviewService;
     private final AuditLogger auditLogger;
+
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public ApiResponse<ReviewAdminResponse> create(
+            @Valid @RequestBody ReviewContentRequest request,
+            @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+            HttpServletRequest httpRequest) {
+        if (memberPrincipal == null) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        Review review = reviewService.create(memberPrincipal.id(), request.title(), request.body());
+
+        auditLogger.record(
+                memberPrincipal.id(),
+                "REVIEW_CREATE",
+                "Review",
+                review.getId(),
+                null,
+                Map.of("title", review.getTitle(), "body", review.getBody()),
+                ClientIp.resolve(httpRequest));
+
+        return ApiResponse.success(toAdminResponse(review));
+    }
 
     @GetMapping("/manage")
     public ApiResponse<List<ReviewAdminResponse>> listForAdmin() {
@@ -54,26 +85,43 @@ public class ReviewEditController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<ReviewAdminResponse> updateContent(
             @PathVariable Long id,
-            @Valid @RequestBody AdminEditReviewRequest request,
-            @AuthenticationPrincipal AdminPrincipal principal,
+            @Valid @RequestBody ReviewContentRequest request,
+            @AuthenticationPrincipal AdminPrincipal adminPrincipal,
+            @AuthenticationPrincipal MemberPrincipal memberPrincipal,
             HttpServletRequest httpRequest) {
         Review before = reviewService.getForAdmin(id);
         Map<String, String> beforeSnapshot = Map.of("title", before.getTitle(), "body", before.getBody());
 
-        Review after = reviewService.adminEditContent(id, request.title(), request.body());
+        if (adminPrincipal != null) {
+            Review after = reviewService.adminEditContent(id, request.title(), request.body());
+            auditLogger.record(
+                    adminPrincipal.id(),
+                    "REVIEW_ADMIN_EDIT",
+                    "Review",
+                    id,
+                    beforeSnapshot,
+                    Map.of("title", after.getTitle(), "body", after.getBody()),
+                    ClientIp.resolve(httpRequest));
+            return ApiResponse.success(toAdminResponse(after));
+        }
 
-        auditLogger.record(
-                principal.id(),
-                "REVIEW_ADMIN_EDIT",
-                "Review",
-                id,
-                beforeSnapshot,
-                Map.of("title", after.getTitle(), "body", after.getBody()),
-                ClientIp.resolve(httpRequest));
+        if (memberPrincipal != null) {
+            Review after = reviewService.editOwnContent(id, memberPrincipal.id(), request.title(), request.body());
+            auditLogger.record(
+                    memberPrincipal.id(),
+                    "REVIEW_SELF_EDIT",
+                    "Review",
+                    id,
+                    beforeSnapshot,
+                    Map.of("title", after.getTitle(), "body", after.getBody()),
+                    ClientIp.resolve(httpRequest));
+            return ApiResponse.success(toAdminResponse(after));
+        }
 
-        return ApiResponse.success(toAdminResponse(after));
+        throw new BusinessException(ErrorCode.UNAUTHORIZED);
     }
 
     @PostMapping("/{id}/hide")
@@ -117,23 +165,41 @@ public class ReviewEditController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<ReviewAdminResponse> delete(
             @PathVariable Long id,
-            @AuthenticationPrincipal AdminPrincipal principal,
+            @AuthenticationPrincipal AdminPrincipal adminPrincipal,
+            @AuthenticationPrincipal MemberPrincipal memberPrincipal,
             HttpServletRequest httpRequest) {
         String beforeStatus = reviewService.getForAdmin(id).getStatus().name();
-        Review after = reviewService.softDelete(id);
 
-        auditLogger.record(
-                principal.id(),
-                "REVIEW_DELETE",
-                "Review",
-                id,
-                Map.of("status", beforeStatus),
-                Map.of("status", after.getStatus().name()),
-                ClientIp.resolve(httpRequest));
+        if (adminPrincipal != null) {
+            Review after = reviewService.softDelete(id);
+            auditLogger.record(
+                    adminPrincipal.id(),
+                    "REVIEW_DELETE",
+                    "Review",
+                    id,
+                    Map.of("status", beforeStatus),
+                    Map.of("status", after.getStatus().name()),
+                    ClientIp.resolve(httpRequest));
+            return ApiResponse.success(toAdminResponse(after));
+        }
 
-        return ApiResponse.success(toAdminResponse(after));
+        if (memberPrincipal != null) {
+            Review after = reviewService.softDeleteOwn(id, memberPrincipal.id());
+            auditLogger.record(
+                    memberPrincipal.id(),
+                    "REVIEW_SELF_DELETE",
+                    "Review",
+                    id,
+                    Map.of("status", beforeStatus),
+                    Map.of("status", after.getStatus().name()),
+                    ClientIp.resolve(httpRequest));
+            return ApiResponse.success(toAdminResponse(after));
+        }
+
+        throw new BusinessException(ErrorCode.UNAUTHORIZED);
     }
 
     @DeleteMapping("/comments/{commentId}")

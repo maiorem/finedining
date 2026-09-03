@@ -37,7 +37,7 @@ class MemberAuthControllerTest {
     @Test
     void 유효한_refresh_쿠키면_새_토큰을_돌려준다() throws Exception {
         when(memberAuthService.refresh("valid-refresh-token"))
-                .thenReturn(new MemberSession("new-access-token", "new-refresh-token", "김아무개"));
+                .thenReturn(new MemberSession(7L, "new-access-token", "new-refresh-token", "김아무개"));
 
         mockMvc.perform(
                         post("/api/auth/member/refresh")
@@ -45,6 +45,7 @@ class MemberAuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.accessToken").value("new-access-token"))
                 .andExpect(jsonPath("$.data.nickname").value("김아무개"))
+                .andExpect(jsonPath("$.data.accountId").value(7))
                 .andExpect(cookie().value("member_refresh_token", "new-refresh-token"));
     }
 

@@ -18,6 +18,8 @@ public enum ErrorCode {
     RATE_LIMITED(HttpStatus.TOO_MANY_REQUESTS, "RATE_LIMITED", "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "인증이 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "권한이 없습니다."),
+    POST_NOT_OWNED(
+            HttpStatus.FORBIDDEN, "POST_NOT_OWNED", "본인이 작성한 글만 수정·삭제할 수 있습니다."),
     INVALID_CREDENTIALS(
             HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "아이디 또는 비밀번호가 올바르지 않습니다."),
     ACCOUNT_LOCKED(

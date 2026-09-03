@@ -64,7 +64,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                             + "/oauth/callback#accessToken="
                             + encode(session.accessToken())
                             + "&nickname="
-                            + encode(session.nickname()));
+                            + encode(session.nickname())
+                            + "&accountId="
+                            + session.accountId());
         } catch (BusinessException e) {
             response.sendRedirect(frontendUrl + "/login?error=" + encode(e.getErrorCode().getCode()));
         }
