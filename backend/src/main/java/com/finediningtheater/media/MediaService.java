@@ -112,7 +112,15 @@ public class MediaService {
     /** 이미 완료된 이미지의 대체 텍스트만 고친다 — 다시 업로드하지 않아도 되게 한다. */
     @Transactional
     @CacheEvict(
-            value = {"productions", "productionDetail", "artists", "artistDetail", "programs", "programDetail"},
+            value = {
+                "productions",
+                "productionDetail",
+                "artists",
+                "artistDetail",
+                "programs",
+                "programDetail",
+                "pressClippings"
+            },
             allEntries = true)
     public MediaAsset updateAltText(Long id, String altText) {
         MediaAsset asset =
@@ -124,7 +132,15 @@ public class MediaService {
     /** 방문자에게 보이는 설명 문단을 고친다 — altText와 별개 필드다(2026-09-04, §8.2 블로그형 레이아웃). */
     @Transactional
     @CacheEvict(
-            value = {"productions", "productionDetail", "artists", "artistDetail", "programs", "programDetail"},
+            value = {
+                "productions",
+                "productionDetail",
+                "artists",
+                "artistDetail",
+                "programs",
+                "programDetail",
+                "pressClippings"
+            },
             allEntries = true)
     public MediaAsset updateCaption(Long id, String caption) {
         MediaAsset asset =

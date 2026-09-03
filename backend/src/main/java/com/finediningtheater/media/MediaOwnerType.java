@@ -4,5 +4,6 @@ package com.finediningtheater.media;
 public enum MediaOwnerType {
     PRODUCTION,
     ARTIST,
-    PROGRAM
+    PROGRAM,
+    PRESS_CLIPPING
 }
