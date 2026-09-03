@@ -55,3 +55,19 @@ export async function verifySudoPin(accessToken: string, pin: string): Promise<v
     throw new ApiError(envelope.error?.code ?? "UNKNOWN", envelope.error?.message ?? "요청이 실패했습니다.");
   }
 }
+
+/**
+ * 새 PIN을 지정한다 (CLAUDE.md §3.4). 옛 PIN은 몰라도 된다 — 현재 로그인 비밀번호만 확인하고
+ * 덮어쓰는 방식이라, 최초 설정과 변경이 같은 요청 하나다.
+ */
+export async function setAdminPin(accessToken: string, currentPassword: string, newPin: string): Promise<void> {
+  const response = await fetch("/api/auth/admin/pin", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ currentPassword, newPin }),
+  });
+  const envelope = (await response.json()) as ApiEnvelope<null>;
+  if (!envelope.success) {
+    throw new ApiError(envelope.error?.code ?? "UNKNOWN", envelope.error?.message ?? "요청이 실패했습니다.");
+  }
+}

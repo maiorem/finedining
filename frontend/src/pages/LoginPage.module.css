@@ -141,6 +141,36 @@
   padding: 0.6em 0.8em;
 }
 
+.success {
+  margin: 0;
+  color: var(--c-ink);
+  font-size: var(--t-caption);
+  border: 1px solid var(--c-line);
+  padding: 0.6em 0.8em;
+}
+
+.pinToggle {
+  align-self: flex-start;
+  padding: 0.25rem 0;
+  background: none;
+  border: none;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  color: var(--c-ink-35);
+  cursor: pointer;
+}
+
+.pinToggle:hover,
+.pinToggle:focus-visible {
+  color: var(--c-ink-60);
+}
+
+.pinToggle:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
 .sessionCard {
   border: 1px solid var(--c-line);
   padding: 1.25rem;

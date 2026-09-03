@@ -130,4 +130,83 @@ describe("LoginPage", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("지금은 초대받은 사용자만 가입할 수 있습니다.");
   });
+
+  async function loginAsAdmin(user: ReturnType<typeof userEvent.setup>) {
+    renderLoginPage();
+    await screen.findByRole("link", { name: "카카오로 로그인" });
+    await user.click(screen.getByRole("button", { name: "ADMIN" }));
+    await user.type(screen.getByLabelText("아이디"), "admin");
+    await user.type(screen.getByLabelText("비밀번호"), "ChangeMe!2026");
+    await user.click(screen.getByRole("button", { name: "로그인" }));
+    await screen.findByText("admin님으로 로그인했습니다 (SUPER_ADMIN)");
+  }
+
+  it("PIN 변경 버튼을 눌러 새 PIN을 제출하면 성공 메시지를 보여준다", async () => {
+    const user = userEvent.setup();
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/login")) {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: { accessToken: "token", username: "admin", role: "SUPER_ADMIN" },
+            error: null,
+          }),
+        );
+      }
+      if (input.includes("/api/auth/admin/pin")) {
+        return Promise.resolve(jsonResponse({ success: true, data: null, error: null }));
+      }
+      return Promise.resolve(unauthenticated());
+    });
+
+    await loginAsAdmin(user);
+
+    await user.click(screen.getByRole("button", { name: "PIN 변경" }));
+    await user.type(screen.getByLabelText("현재 비밀번호"), "ChangeMe!2026");
+    await user.type(screen.getByLabelText("새 PIN (6자리 숫자)"), "482915");
+    await user.click(screen.getByRole("button", { name: "변경하기" }));
+
+    expect(await screen.findByText("PIN이 변경되었습니다.")).toBeInTheDocument();
+
+    const pinCall = fetchMock.mock.calls.find(([input]) => (input as string).includes("/api/auth/admin/pin"));
+    expect(pinCall).toBeDefined();
+    const [, init] = pinCall!;
+    expect(JSON.parse((init as RequestInit).body as string)).toEqual({
+      currentPassword: "ChangeMe!2026",
+      newPin: "482915",
+    });
+    expect((init as RequestInit).headers).toMatchObject({ Authorization: "Bearer token" });
+  });
+
+  it("너무 단순한 PIN을 제출하면 서버 거부 메시지를 보여준다", async () => {
+    const user = userEvent.setup();
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/login")) {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: { accessToken: "token", username: "admin", role: "SUPER_ADMIN" },
+            error: null,
+          }),
+        );
+      }
+      if (input.includes("/api/auth/admin/pin")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "WEAK_PIN", message: "x" } }),
+        );
+      }
+      return Promise.resolve(unauthenticated());
+    });
+
+    await loginAsAdmin(user);
+
+    await user.click(screen.getByRole("button", { name: "PIN 변경" }));
+    await user.type(screen.getByLabelText("현재 비밀번호"), "ChangeMe!2026");
+    await user.type(screen.getByLabelText("새 PIN (6자리 숫자)"), "123456");
+    await user.click(screen.getByRole("button", { name: "변경하기" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "너무 단순한 번호예요. 000000·123456이나 연속·동일 숫자는 피해 주세요.",
+    );
+  });
 });
