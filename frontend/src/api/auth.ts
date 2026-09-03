@@ -71,3 +71,20 @@ export async function setAdminPin(accessToken: string, currentPassword: string, 
     throw new ApiError(envelope.error?.code ?? "UNKNOWN", envelope.error?.message ?? "요청이 실패했습니다.");
   }
 }
+
+/** 로그인 비밀번호를 바꾼다. 시드 비밀번호를 영구히 쓰지 않게 하는 통로다(CLAUDE.md §3.1). */
+export async function changeAdminPassword(
+  accessToken: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  const response = await fetch("/api/auth/admin/password", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  const envelope = (await response.json()) as ApiEnvelope<null>;
+  if (!envelope.success) {
+    throw new ApiError(envelope.error?.code ?? "UNKNOWN", envelope.error?.message ?? "요청이 실패했습니다.");
+  }
+}

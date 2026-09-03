@@ -2,11 +2,11 @@ import { useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../api/http";
-import { setAdminPin } from "../api/auth";
 import { useAdminAuth } from "../contexts/AdminAuthContext";
 import { useMemberAuth } from "../contexts/MemberAuthContext";
 import { useNoIndex } from "../hooks/useNoIndex";
 import kakaoLoginImage from "../assets/kakao-login.png";
+import { AdminSessionPanel } from "./AdminSessionPanel";
 import styles from "./LoginPage.module.css";
 
 const KNOWN_ERROR_CODES = [
@@ -30,14 +30,6 @@ function kakaoErrorMessageKey(code: string): string {
     : "login.kakaoError.generic";
 }
 
-const PIN_ERROR_CODES = ["INVALID_CREDENTIALS", "WEAK_PIN", "VALIDATION_ERROR"] as const;
-
-function pinErrorMessageKey(code: string): string {
-  return (PIN_ERROR_CODES as readonly string[]).includes(code)
-    ? `login.pin.error.${code}`
-    : "login.pin.error.generic";
-}
-
 export default function LoginPage() {
   const { t } = useTranslation();
   const { session, isInitializing, login, logout } = useAdminAuth();
@@ -54,13 +46,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const [pinFormOpen, setPinFormOpen] = useState(false);
-  const [currentPasswordForPin, setCurrentPasswordForPin] = useState("");
-  const [newPin, setNewPin] = useState("");
-  const [pinError, setPinError] = useState<string | null>(null);
-  const [pinSuccess, setPinSuccess] = useState(false);
-  const [pinSubmitting, setPinSubmitting] = useState(false);
-
   useNoIndex();
 
   async function handleSubmit(e: FormEvent) {
@@ -75,25 +60,6 @@ export default function LoginPage() {
       setError(t(errorMessageKey(code)));
     } finally {
       setSubmitting(false);
-    }
-  }
-
-  async function handleSetPin(e: FormEvent) {
-    e.preventDefault();
-    if (!session) return;
-    setPinError(null);
-    setPinSuccess(false);
-    setPinSubmitting(true);
-    try {
-      await setAdminPin(session.accessToken, currentPasswordForPin, newPin);
-      setCurrentPasswordForPin("");
-      setNewPin("");
-      setPinSuccess(true);
-    } catch (err) {
-      const code = err instanceof ApiError ? err.code : "UNKNOWN";
-      setPinError(t(pinErrorMessageKey(code)));
-    } finally {
-      setPinSubmitting(false);
     }
   }
 
@@ -126,76 +92,7 @@ export default function LoginPage() {
           ))}
 
         {isInitializing ? null : session ? (
-          <div className={styles.sessionCard}>
-            <p className={styles.sessionText}>
-              {t("login.loggedInAs", { username: session.username, role: session.role })}
-            </p>
-            <button type="button" className={styles.logoutButton} onClick={() => void logout()}>
-              {t("login.logout")}
-            </button>
-
-            <button
-              type="button"
-              className={styles.pinToggle}
-              aria-expanded={pinFormOpen}
-              onClick={() => {
-                setPinFormOpen((open) => !open);
-                setPinError(null);
-                setPinSuccess(false);
-              }}
-            >
-              {t("login.pin.toggle")}
-            </button>
-
-            {pinFormOpen && (
-              <form className={styles.adminForm} onSubmit={handleSetPin}>
-                <div className={styles.field}>
-                  <label htmlFor="pin-current-password">{t("login.pin.currentPasswordLabel")}</label>
-                  <input
-                    id="pin-current-password"
-                    type="password"
-                    autoComplete="current-password"
-                    value={currentPasswordForPin}
-                    onChange={(e) => setCurrentPasswordForPin(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="pin-new-value">{t("login.pin.newPinLabel")}</label>
-                  <input
-                    id="pin-new-value"
-                    type="password"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={6}
-                    autoComplete="off"
-                    value={newPin}
-                    onChange={(e) => setNewPin(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {pinError && (
-                  <p className={styles.error} role="alert">
-                    {pinError}
-                  </p>
-                )}
-                {pinSuccess && (
-                  <p className={styles.success} role="status">
-                    {t("login.pin.success")}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  className={styles.submit}
-                  disabled={pinSubmitting || newPin.length !== 6}
-                >
-                  {t("login.pin.submit")}
-                </button>
-              </form>
-            )}
-          </div>
+          <AdminSessionPanel session={session} onLogout={() => void logout()} />
         ) : (
           <>
             <button

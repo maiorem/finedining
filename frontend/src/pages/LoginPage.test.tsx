@@ -209,4 +209,76 @@ describe("LoginPage", () => {
       "너무 단순한 번호예요. 000000·123456이나 연속·동일 숫자는 피해 주세요.",
     );
   });
+
+  it("비밀번호 변경 버튼을 눌러 새 비밀번호를 제출하면 성공 메시지를 보여준다", async () => {
+    const user = userEvent.setup();
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/login")) {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: { accessToken: "token", username: "admin", role: "SUPER_ADMIN" },
+            error: null,
+          }),
+        );
+      }
+      if (input.includes("/api/auth/admin/password")) {
+        return Promise.resolve(jsonResponse({ success: true, data: null, error: null }));
+      }
+      return Promise.resolve(unauthenticated());
+    });
+
+    await loginAsAdmin(user);
+
+    await user.click(screen.getByRole("button", { name: "비밀번호 변경" }));
+    await user.type(screen.getByLabelText("현재 비밀번호"), "ChangeMe!2026");
+    await user.type(screen.getByLabelText("새 비밀번호 (10자 이상)"), "new-password-123");
+    await user.click(screen.getByRole("button", { name: "변경하기" }));
+
+    expect(await screen.findByText("비밀번호가 변경되었습니다.")).toBeInTheDocument();
+
+    const passwordCall = fetchMock.mock.calls.find(([input]) =>
+      (input as string).includes("/api/auth/admin/password"),
+    );
+    expect(passwordCall).toBeDefined();
+    const [, init] = passwordCall!;
+    expect(JSON.parse((init as RequestInit).body as string)).toEqual({
+      currentPassword: "ChangeMe!2026",
+      newPassword: "new-password-123",
+    });
+  });
+
+  it("현재 비밀번호가 틀리면 비밀번호 변경 에러 메시지를 보여준다", async () => {
+    const user = userEvent.setup();
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/login")) {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: { accessToken: "token", username: "admin", role: "SUPER_ADMIN" },
+            error: null,
+          }),
+        );
+      }
+      if (input.includes("/api/auth/admin/password")) {
+        return Promise.resolve(
+          jsonResponse({
+            success: false,
+            data: null,
+            error: { code: "INVALID_CREDENTIALS", message: "x" },
+          }),
+        );
+      }
+      return Promise.resolve(unauthenticated());
+    });
+
+    await loginAsAdmin(user);
+
+    await user.click(screen.getByRole("button", { name: "비밀번호 변경" }));
+    await user.type(screen.getByLabelText("현재 비밀번호"), "wrong");
+    await user.type(screen.getByLabelText("새 비밀번호 (10자 이상)"), "new-password-123");
+    await user.click(screen.getByRole("button", { name: "변경하기" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("현재 비밀번호가 올바르지 않습니다.");
+  });
 });
