@@ -105,6 +105,26 @@ class MediaEditControllerTest {
     }
 
     @Test
+    void 설명_문단_수정은_이전_값을_감사로그에_남기고_새_값을_반환한다() throws Exception {
+        loginAs(1L);
+        MediaAsset before = new MediaAsset(MediaOwnerType.PRODUCTION, 1L, 0, "originals/x.jpg");
+        MediaAsset after = new MediaAsset(MediaOwnerType.PRODUCTION, 1L, 0, "originals/x.jpg");
+        after.updateCaption("새 설명");
+        when(mediaService.get(10L)).thenReturn(before);
+        when(mediaService.updateCaption(10L, "새 설명")).thenReturn(after);
+
+        mockMvc.perform(
+                        put("/api/media/10/caption")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"caption\":\"새 설명\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.caption").value("새 설명"));
+
+        verify(auditLogger)
+                .record(eq(1L), eq("MEDIA_CAPTION_UPDATE"), eq("MediaAsset"), eq(10L), any(), eq("새 설명"), any());
+    }
+
+    @Test
     void 삭제는_감사로그를_남긴다() throws Exception {
         loginAs(1L);
 

@@ -103,20 +103,33 @@ public class MediaService {
         return asset;
     }
 
-    /**
-     * 이미 완료된 이미지의 캡션(대체 텍스트)만 고친다 — 다시 업로드하지 않아도 되게 한다.
-     * media 패키지는 소유자(Production/Artist)를 모르므로(§6), 이미지가 걸린 콘텐츠 캐시를
-     * 전부 비운다 — 이미 발행된 이미지라면 캐시 무효화가 없으면 공개 화면에 반영되지 않는다
-     * (ArtistService.changeLinkUrl과 같은 이유).
-     */
+    // media 패키지는 소유자(Production/Artist/Program)를 모르므로(§6), alt 텍스트·캡션을 고칠 때마다
+    // 이미지가 걸릴 수 있는 콘텐츠 캐시를 전부 비운다 — 안 그러면 이미 발행된 이미지의 변경이 캐시가
+    // 만료될 때까지 공개 화면에 반영되지 않는다(ArtistService.changeLinkUrl과 같은 이유). Program을
+    // 빠뜨렸던 이전 버전의 버그를 여기서 함께 고쳤다 — Program 이미지의 alt 텍스트를 고쳐도
+    // programDetail 캐시가 비워지지 않아 발행된 화면에 반영이 늦게 되는 문제가 있었다.
+
+    /** 이미 완료된 이미지의 대체 텍스트만 고친다 — 다시 업로드하지 않아도 되게 한다. */
     @Transactional
     @CacheEvict(
-            value = {"productions", "productionDetail", "artists", "artistDetail"},
+            value = {"productions", "productionDetail", "artists", "artistDetail", "programs", "programDetail"},
             allEntries = true)
     public MediaAsset updateAltText(Long id, String altText) {
         MediaAsset asset =
                 mediaAssetRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
         asset.updateAltText(altText);
+        return asset;
+    }
+
+    /** 방문자에게 보이는 설명 문단을 고친다 — altText와 별개 필드다(2026-09-04, §8.2 블로그형 레이아웃). */
+    @Transactional
+    @CacheEvict(
+            value = {"productions", "productionDetail", "artists", "artistDetail", "programs", "programDetail"},
+            allEntries = true)
+    public MediaAsset updateCaption(Long id, String caption) {
+        MediaAsset asset =
+                mediaAssetRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+        asset.updateCaption(caption);
         return asset;
     }
 

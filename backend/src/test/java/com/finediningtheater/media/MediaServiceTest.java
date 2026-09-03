@@ -138,6 +138,27 @@ class MediaServiceTest {
     }
 
     @Test
+    void 설명_문단을_수정하면_altText는_그대로다() {
+        MediaAsset asset = new MediaAsset(MediaOwnerType.PRODUCTION, 1L, 0, "originals/a.jpg");
+        asset.markReady(100, 100, "d640", "d960", "d1600", "lqip", "대체 텍스트");
+        when(mediaAssetRepository.findById(1L)).thenReturn(Optional.of(asset));
+
+        MediaAsset result = service().updateCaption(1L, "새 설명 문단");
+
+        assertThat(result.getCaption()).isEqualTo("새 설명 문단");
+        assertThat(result.getAltText()).isEqualTo("대체 텍스트");
+    }
+
+    @Test
+    void 존재하지_않는_이미지의_설명을_고치려_하면_ENTITY_NOT_FOUND를_던진다() {
+        when(mediaAssetRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service().updateCaption(99L, "새 설명"))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(ErrorCode.ENTITY_NOT_FOUND));
+    }
+
+    @Test
     void 삭제는_모든_오브젝트키를_지우고_행을_삭제한다() {
         MediaAsset asset = new MediaAsset(MediaOwnerType.PRODUCTION, 1L, 0, "originals/x.jpg");
         when(mediaAssetRepository.findById(1L)).thenReturn(Optional.of(asset));

@@ -9,6 +9,7 @@ import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.media.dto.PresignRequest;
 import com.finediningtheater.media.dto.PresignResponse;
 import com.finediningtheater.media.dto.UpdateAltTextRequest;
+import com.finediningtheater.media.dto.UpdateCaptionRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.Map;
@@ -88,6 +89,29 @@ public class MediaEditController {
                 id,
                 beforeAltText,
                 asset.getAltText(),
+                ClientIp.resolve(httpRequest));
+
+        return ApiResponse.success(MediaAssetResponse.from(asset, mediaService));
+    }
+
+    /** 방문자에게 보이는 설명 문단을 고친다 — altText와 별개 경로다(2026-09-04, §8.2). */
+    @PutMapping("/{id}/caption")
+    public ApiResponse<MediaAssetResponse> updateCaption(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateCaptionRequest request,
+            @AuthenticationPrincipal AdminPrincipal principal,
+            HttpServletRequest httpRequest) {
+        String beforeCaption = mediaService.get(id).getCaption();
+
+        MediaAsset asset = mediaService.updateCaption(id, request.caption());
+
+        auditLogger.record(
+                principal.id(),
+                "MEDIA_CAPTION_UPDATE",
+                "MediaAsset",
+                id,
+                beforeCaption,
+                asset.getCaption(),
                 ClientIp.resolve(httpRequest));
 
         return ApiResponse.success(MediaAssetResponse.from(asset, mediaService));

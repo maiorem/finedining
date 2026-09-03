@@ -72,6 +72,10 @@ public class MediaAsset extends BaseTimeEntity {
     @Column(length = 300)
     private String altText;
 
+    /** 방문자에게 실제로 보이는 설명 문단 — altText(접근성용 짧은 대체 텍스트)와는 별개다. */
+    @Column(length = 2000)
+    private String caption;
+
     @Column(nullable = false)
     private boolean published;
 
@@ -103,9 +107,14 @@ public class MediaAsset extends BaseTimeEntity {
         this.failureReason = null;
     }
 
-    /** 업로드 시점에만 입력받던 캡션(대체 텍스트)을 업로드 이후에도 고칠 수 있게 한다. */
+    /** 업로드 시점에만 입력받던 대체 텍스트를 업로드 이후에도 고칠 수 있게 한다. */
     public void updateAltText(String altText) {
         this.altText = altText;
+    }
+
+    /** 설명 문단은 alt 텍스트와 달리 선택 사항이다 — 비워서 지울 수도 있다. */
+    public void updateCaption(String caption) {
+        this.caption = caption;
     }
 
     public void markFailed(String reason) {
