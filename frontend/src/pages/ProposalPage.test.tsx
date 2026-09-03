@@ -31,6 +31,7 @@ function mockUnauthenticatedRefreshThen(response: unknown) {
 async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("이름"), "김철수");
   await user.type(screen.getByLabelText("회신 이메일"), "chulsoo@example.com");
+  await user.selectOptions(screen.getByLabelText("분류"), "CORPORATE_EVENT");
   await user.type(screen.getByLabelText("제목"), "콜라보 제안");
   await user.type(screen.getByLabelText("내용"), "같이 해보고 싶습니다.");
   await user.click(screen.getByRole("checkbox", { name: /개인정보 수집·이용에 동의합니다/ }));
@@ -63,6 +64,7 @@ describe("ProposalPage", () => {
     expect(sentBody).toMatchObject({
       name: "김철수",
       contactEmail: "chulsoo@example.com",
+      category: "CORPORATE_EVENT",
       title: "콜라보 제안",
       body: "같이 해보고 싶습니다.",
       privacyConsent: true,

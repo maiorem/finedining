@@ -1,13 +1,15 @@
 import { lazy, Suspense, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../api/http";
-import { submitProposal } from "../api/proposals";
+import { submitProposal, type ProposalCategory } from "../api/proposals";
 import { useCan } from "../hooks/useCan";
 import styles from "./ProposalPage.module.css";
 
 // 관리자 전용 API 경로가 익명 방문자 번들에 섞이면 안 되므로 React.lazy로만 import한다
 // (CLAUDE.md §3.5·§9).
 const ProposalReviewList = lazy(() => import("../features/editing/ProposalReviewList"));
+
+const PROPOSAL_CATEGORIES: ProposalCategory[] = ["CORPORATE_EVENT", "LOCAL_CULTURE", "CUSTOM_CONSULTING"];
 
 const KNOWN_ERROR_CODES = ["VALIDATION_ERROR", "RATE_LIMITED"] as const;
 
@@ -23,6 +25,7 @@ export default function ProposalPage() {
   const [reviewing, setReviewing] = useState(false);
   const [name, setName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [category, setCategory] = useState<ProposalCategory | "">("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [privacyConsent, setPrivacyConsent] = useState(false);
@@ -33,10 +36,11 @@ export default function ProposalPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (category === "") return;
     setError(null);
     setSubmitting(true);
     try {
-      await submitProposal({ name, contactEmail, title, body, privacyConsent, website });
+      await submitProposal({ name, contactEmail, category, title, body, privacyConsent, website });
       setSubmitted(true);
     } catch (err) {
       const code = err instanceof ApiError ? err.code : "UNKNOWN";
@@ -66,7 +70,7 @@ export default function ProposalPage() {
   if (submitted) {
     return (
       <main className={styles.page}>
-        <h1 className={styles.heading}>{t("nav.proposal")}</h1>
+        <h1 className={styles.srOnly}>{t("nav.proposal")}</h1>
         {reviewToggle}
         {reviewPanel}
         <div className={styles.success}>
@@ -78,9 +82,10 @@ export default function ProposalPage() {
 
   return (
     <main className={styles.page}>
-      <h1 className={styles.heading}>{t("nav.proposal")}</h1>
+      <h1 className={styles.srOnly}>{t("nav.proposal")}</h1>
       {reviewToggle}
       {reviewPanel}
+      <p className={styles.tagline}>{t("proposal.tagline")}</p>
       <p className={styles.lead}>{t("proposal.lead")}</p>
 
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -104,6 +109,25 @@ export default function ProposalPage() {
             onChange={(e) => setContactEmail(e.target.value)}
             required
           />
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="proposal-category">{t("proposal.category.label")}</label>
+          <select
+            id="proposal-category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value as ProposalCategory)}
+            required
+          >
+            <option value="" disabled>
+              {t("proposal.category.placeholder")}
+            </option>
+            {PROPOSAL_CATEGORIES.map((value) => (
+              <option key={value} value={value}>
+                {t(`proposal.category.${value}`)}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className={styles.field}>

@@ -37,42 +37,24 @@
   outline-offset: 3px;
 }
 
-.collaborateRow {
-  display: flex;
-  justify-content: center;
+/* 히어로 바로 아래의 한 줄 태그라인 — 수동 줄바꿈 헤드라인과 같은 문법(§8.9), CTA 없이 문장
+   하나로 여백을 채운다. */
+.tagline {
+  max-width: 32em;
+  margin: 0 auto;
   padding: var(--section-y-mobile) var(--gutter-mobile) 0;
+  text-align: center;
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: var(--t-h1-sm);
+  line-height: var(--lh-tight);
+  color: var(--c-ink);
 }
 
 @media (min-width: 1024px) {
-  .collaborateRow {
+  .tagline {
     padding: var(--section-y-desktop) var(--gutter-desktop) 0;
   }
-}
-
-.collaborateCta {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 1.75em;
-  border: 1px solid var(--c-ink);
-  color: var(--c-ink);
-  font-family: var(--f-util);
-  font-size: var(--t-caption);
-  letter-spacing: var(--ls-wide);
-  text-transform: uppercase;
-  text-decoration: none;
-}
-
-.collaborateCta:hover,
-.collaborateCta:focus-visible {
-  border-color: var(--c-spot);
-  color: var(--c-spot);
-  outline: none;
-}
-
-.collaborateCta:focus-visible {
-  outline: 2px solid var(--c-spot);
-  outline-offset: 3px;
 }
 
 .section {

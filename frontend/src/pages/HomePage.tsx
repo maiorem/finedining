@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { HeroSlideshow } from "../components/section/HeroSlideshow";
+import { GallerySlideshow } from "../components/section/GallerySlideshow";
 import { useProductions } from "../api/productions";
 import { usePrograms } from "../api/programs";
 import { ProductionCard } from "../components/section/ProductionCard";
@@ -26,11 +27,7 @@ export default function HomePage() {
         </Link>
       </HeroSlideshow>
 
-      <div className={styles.collaborateRow}>
-        <Link to="/proposal" className={styles.collaborateCta}>
-          {t("home.collaborateCta")}
-        </Link>
-      </div>
+      <p className={styles.tagline}>{t("home.tagline")}</p>
 
       {featuredProductions.length > 0 && (
         <section className={styles.section}>
@@ -57,6 +54,8 @@ export default function HomePage() {
           </ul>
         </section>
       )}
+
+      <GallerySlideshow />
     </main>
   );
 }

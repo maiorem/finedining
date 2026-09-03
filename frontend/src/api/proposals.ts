@@ -1,8 +1,11 @@
 import { ApiError } from "./http";
 
+export type ProposalCategory = "CORPORATE_EVENT" | "LOCAL_CULTURE" | "CUSTOM_CONSULTING";
+
 export type CreateProposalInput = {
   name: string;
   contactEmail: string;
+  category: ProposalCategory;
   title: string;
   body: string;
   privacyConsent: boolean;

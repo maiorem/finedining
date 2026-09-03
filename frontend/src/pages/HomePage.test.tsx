@@ -32,18 +32,18 @@ describe("HomePage", () => {
     vi.unstubAllGlobals();
   });
 
-  it("사이트 이름과 히어로 한가운데 예매하기 버튼, 협업 제안하기 버튼을 렌더한다", async () => {
+  it("사이트 이름과 히어로 한가운데 예약하기 버튼, 태그라인을 렌더하고 협업 제안하기 버튼은 없다", async () => {
     fetchMock.mockResolvedValue(jsonResponse({ success: true, data: [], error: null }));
 
     renderHome();
 
     expect(screen.getByRole("heading", { name: "파인다이닝 씨어터" })).toBeInTheDocument();
 
-    const bookingLink = screen.getByRole("link", { name: "예매하기" });
+    const bookingLink = screen.getByRole("link", { name: "예약하기" });
     expect(bookingLink).toHaveAttribute("href", "/productions");
 
-    const collaborateLink = screen.getByRole("link", { name: "협업 제안하기" });
-    expect(collaborateLink).toHaveAttribute("href", "/proposal");
+    expect(screen.getByText("당신의 식탁 위에 이야기를 올립니다")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "협업 제안하기" })).not.toBeInTheDocument();
   });
 
   it("작품·프로그램을 각각 최대 2개까지 보여주고 각 상세 페이지로 연결한다", async () => {

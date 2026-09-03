@@ -52,7 +52,9 @@ export default function ProposalReviewList() {
             <span className={styles.statusBadge}>{t(`proposal.admin.status.${proposal.status}`)}</span>
           </div>
           <p className={styles.meta}>
-            {proposal.name} · {proposal.contactEmail} · {formatAdminTime(proposal.createdAt)}
+            {proposal.name} · {proposal.contactEmail}
+            {proposal.category && <> · {t(`proposal.category.${proposal.category}`)}</>} ·{" "}
+            {formatAdminTime(proposal.createdAt)}
           </p>
           <p className={styles.body}>{proposal.body}</p>
         </li>
