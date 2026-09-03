@@ -37,4 +37,10 @@ export const queryKeys = {
   proposals: {
     adminList: ["proposals", "admin", "list"] as const,
   },
+  pressClippings: {
+    all: ["pressClippings"] as const,
+    list: ["pressClippings", "list"] as const,
+    adminList: ["pressClippings", "admin", "list"] as const,
+    adminDetail: (id: number) => ["pressClippings", "admin", id] as const,
+  },
 } as const;
