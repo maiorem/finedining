@@ -1,6 +1,7 @@
 import { ApiError } from "./http";
 
 export type MemberSession = {
+  accountId: number;
   accessToken: string;
   nickname: string;
 };

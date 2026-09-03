@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { logoutMember, refreshMemberSession, type MemberSession } from "../api/memberAuth";
+import { registerMemberSessionHandlers } from "../api/memberHttp";
 
 type MemberAuthContextValue = {
   session: MemberSession | null;
@@ -35,6 +36,15 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // memberHttp의 401 재시도 로직이 조용히 재발급한 토큰을 이 컨텍스트에도 반영한다 — 그래야
+  // 다음 호출부터 새 토큰을 쓴다(adminHttp와 동일한 이유, §7.4).
+  useEffect(() => {
+    registerMemberSessionHandlers({
+      onRefreshed: (refreshed) => setSessionState(refreshed),
+      onExpired: () => setSessionState(null),
+    });
   }, []);
 
   async function logout() {

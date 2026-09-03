@@ -107,7 +107,11 @@ describe("LoginPage", () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/member/refresh")) {
         return Promise.resolve(
-          jsonResponse({ success: true, data: { accessToken: "t", nickname: "김아무개" }, error: null }),
+          jsonResponse({
+            success: true,
+            data: { accountId: 4, accessToken: "t", nickname: "김아무개" },
+            error: null,
+          }),
         );
       }
       return Promise.resolve(unauthenticated());

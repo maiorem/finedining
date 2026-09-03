@@ -20,9 +20,10 @@ export default function OAuthCallbackPage() {
     const params = new URLSearchParams(location.hash.replace(/^#/, ""));
     const accessToken = params.get("accessToken");
     const nickname = params.get("nickname");
+    const accountId = params.get("accountId");
 
-    if (accessToken && nickname) {
-      setSession({ accessToken, nickname });
+    if (accessToken && nickname && accountId) {
+      setSession({ accessToken, nickname, accountId: Number(accountId) });
       navigate("/", { replace: true });
     } else {
       navigate("/login", { replace: true });

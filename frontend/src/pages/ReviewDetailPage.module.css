@@ -45,6 +45,95 @@
   margin: 0 0 2rem;
 }
 
+.selfActions {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0 0 2rem;
+}
+
+.selfActions button {
+  min-height: 40px;
+  padding: 0 1em;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-caption);
+  cursor: pointer;
+}
+
+.selfActions button:hover,
+.selfActions button:focus-visible {
+  border-color: var(--c-spot);
+  color: var(--c-spot);
+}
+
+.selfActions button:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
+.selfActions button:disabled {
+  color: var(--c-ink-35);
+  border-color: var(--c-line);
+  cursor: not-allowed;
+}
+
+.selfEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 0 0 2rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field label {
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+}
+
+.field input,
+.field textarea {
+  padding: 0.7em 0.9em;
+  border: 1px solid var(--c-line);
+  background: var(--c-white);
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+}
+
+.field input {
+  min-height: 44px;
+}
+
+.field textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
+.selfActions .submit {
+  border-color: var(--c-ink);
+}
+
+.error {
+  margin: 0;
+  border: 1px solid var(--c-line);
+  padding: 0.6em 0.8em;
+  font-size: var(--t-caption);
+  color: var(--c-ink);
+}
+
 .comments {
   border-top: 1px solid var(--c-line);
   padding-top: 1.5rem;
