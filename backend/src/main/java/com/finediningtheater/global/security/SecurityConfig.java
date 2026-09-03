@@ -116,8 +116,7 @@ public class SecurityConfig {
                                                 "/api/programs/**",
                                                 "/api/artists/**",
                                                 "/api/castings/**",
-                                                "/api/reviews/**",
-                                                "/api/about/**")
+                                                "/api/reviews/**")
                                         // /manage 하위 경로도 이 와일드카드에 걸리지만 안전하다 — 그쪽은
                                         // ArtistEditController/CastingEditController/ReviewEditController/
                                         // ProgramEditController의 클래스 레벨 @PreAuthorize가 별도 AOP
