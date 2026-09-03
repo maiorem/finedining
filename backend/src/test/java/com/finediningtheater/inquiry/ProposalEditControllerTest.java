@@ -53,7 +53,7 @@ class ProposalEditControllerTest {
     }
 
     private Proposal proposal() {
-        return new Proposal("김철수", "chulsoo@example.com", "제목", "본문");
+        return new Proposal("김철수", "chulsoo@example.com", ProposalCategory.CORPORATE_EVENT, "제목", "본문");
     }
 
     @Test

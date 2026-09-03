@@ -34,7 +34,7 @@ class ProposalControllerTest {
     @MockitoBean private JwtProvider jwtProvider;
 
     private static final String VALID_BODY =
-            "{\"name\":\"김철수\",\"contactEmail\":\"chulsoo@example.com\","
+            "{\"name\":\"김철수\",\"contactEmail\":\"chulsoo@example.com\",\"category\":\"CORPORATE_EVENT\","
                     + "\"title\":\"제목\",\"body\":\"본문\",\"privacyConsent\":true}";
 
     @Test
@@ -51,7 +51,7 @@ class ProposalControllerTest {
     @Test
     void 개인정보_동의가_없으면_검증_오류를_반환한다() throws Exception {
         String body =
-                "{\"name\":\"김철수\",\"contactEmail\":\"chulsoo@example.com\","
+                "{\"name\":\"김철수\",\"contactEmail\":\"chulsoo@example.com\",\"category\":\"CORPORATE_EVENT\","
                         + "\"title\":\"제목\",\"body\":\"본문\",\"privacyConsent\":false}";
 
         mockMvc.perform(post("/api/proposals").contentType(MediaType.APPLICATION_JSON).content(body))
@@ -64,12 +64,25 @@ class ProposalControllerTest {
     @Test
     void 이메일_형식이_틀리면_검증_오류를_반환한다() throws Exception {
         String body =
-                "{\"name\":\"김철수\",\"contactEmail\":\"not-an-email\","
+                "{\"name\":\"김철수\",\"contactEmail\":\"not-an-email\",\"category\":\"CORPORATE_EVENT\","
                         + "\"title\":\"제목\",\"body\":\"본문\",\"privacyConsent\":true}";
 
         mockMvc.perform(post("/api/proposals").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void 카테고리가_없으면_검증_오류를_반환한다() throws Exception {
+        String body =
+                "{\"name\":\"김철수\",\"contactEmail\":\"chulsoo@example.com\","
+                        + "\"title\":\"제목\",\"body\":\"본문\",\"privacyConsent\":true}";
+
+        mockMvc.perform(post("/api/proposals").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("VALIDATION_ERROR"));
+
+        verify(proposalService, never()).create(any(), any());
     }
 
     @Test
@@ -94,5 +107,6 @@ class ProposalControllerTest {
         verify(proposalService).create(captor.capture(), any());
         assertThat(captor.getValue().name()).isEqualTo("김철수");
         assertThat(captor.getValue().contactEmail()).isEqualTo("chulsoo@example.com");
+        assertThat(captor.getValue().category()).isEqualTo(ProposalCategory.CORPORATE_EVENT);
     }
 }

@@ -37,7 +37,8 @@ public class ProposalService {
         dailySubmissionLimiter.recordFailure(ip);
 
         proposalRepository.save(
-                new Proposal(request.name(), request.contactEmail(), request.title(), request.body()));
+                new Proposal(
+                        request.name(), request.contactEmail(), request.category(), request.title(), request.body()));
     }
 
     public List<Proposal> listForAdmin() {

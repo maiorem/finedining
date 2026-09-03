@@ -35,6 +35,11 @@ public class Proposal extends BaseTimeEntity {
     @Column(nullable = false, length = 100)
     private String contactEmail;
 
+    /** 과거 제안에는 값이 없어 nullable이다 — 새 제출은 요청 DTO의 @NotNull이 항상 채운다. */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private ProposalCategory category;
+
     @Column(nullable = false, length = 200)
     private String title;
 
@@ -51,9 +56,10 @@ public class Proposal extends BaseTimeEntity {
 
     protected Proposal() {}
 
-    public Proposal(String name, String contactEmail, String title, String body) {
+    public Proposal(String name, String contactEmail, ProposalCategory category, String title, String body) {
         this.name = name;
         this.contactEmail = contactEmail;
+        this.category = category;
         this.title = title;
         this.body = body;
         this.consentAgreedAt = Instant.now();

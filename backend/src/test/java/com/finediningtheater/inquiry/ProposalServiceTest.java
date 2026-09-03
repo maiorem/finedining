@@ -27,7 +27,8 @@ class ProposalServiceTest {
     }
 
     private CreateProposalRequest request(String website) {
-        return new CreateProposalRequest("김철수", "chulsoo@example.com", "제목", "본문", true, website);
+        return new CreateProposalRequest(
+                "김철수", "chulsoo@example.com", ProposalCategory.CORPORATE_EVENT, "제목", "본문", true, website);
     }
 
     @Test
@@ -72,7 +73,7 @@ class ProposalServiceTest {
 
     @Test
     void 상세_조회하면_SENT가_READ로_바뀐다() {
-        Proposal proposal = new Proposal("김철수", "chulsoo@example.com", "제목", "본문");
+        Proposal proposal = new Proposal("김철수", "chulsoo@example.com", ProposalCategory.CORPORATE_EVENT, "제목", "본문");
         when(proposalRepository.findById(1L)).thenReturn(Optional.of(proposal));
 
         Proposal result = service().getForAdmin(1L);
@@ -82,7 +83,7 @@ class ProposalServiceTest {
 
     @Test
     void 수락하면_ACCEPTED가_되고_이메일_알림을_호출한다() {
-        Proposal proposal = new Proposal("김철수", "chulsoo@example.com", "제목", "본문");
+        Proposal proposal = new Proposal("김철수", "chulsoo@example.com", ProposalCategory.CORPORATE_EVENT, "제목", "본문");
         when(proposalRepository.findById(1L)).thenReturn(Optional.of(proposal));
 
         Proposal result = service().accept(1L);
@@ -93,7 +94,7 @@ class ProposalServiceTest {
 
     @Test
     void 이미_처리된_제안은_다시_수락할_수_없다() {
-        Proposal proposal = new Proposal("김철수", "chulsoo@example.com", "제목", "본문");
+        Proposal proposal = new Proposal("김철수", "chulsoo@example.com", ProposalCategory.CORPORATE_EVENT, "제목", "본문");
         proposal.decline();
         when(proposalRepository.findById(1L)).thenReturn(Optional.of(proposal));
 

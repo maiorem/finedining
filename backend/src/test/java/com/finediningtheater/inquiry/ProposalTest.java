@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 class ProposalTest {
 
     private Proposal proposal() {
-        return new Proposal("김철수", "chulsoo@example.com", "협업 제안", "본문입니다.");
+        return new Proposal(
+                "김철수", "chulsoo@example.com", ProposalCategory.CORPORATE_EVENT, "협업 제안", "본문입니다.");
     }
 
     @Test
