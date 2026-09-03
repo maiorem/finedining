@@ -166,6 +166,44 @@ class AdminAuthControllerTest {
     }
 
     @Test
+    void 비밀번호_변경에_성공하면_200을_반환한다() throws Exception {
+        loginAs(1L, AdminRole.SUPER_ADMIN);
+
+        mockMvc.perform(
+                        post("/api/auth/admin/password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"currentPassword\":\"pw\",\"newPassword\":\"new-password-123\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void 새_비밀번호가_너무_짧으면_검증_오류를_반환한다() throws Exception {
+        loginAs(1L, AdminRole.SUPER_ADMIN);
+
+        mockMvc.perform(
+                        post("/api/auth/admin/password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"currentPassword\":\"pw\",\"newPassword\":\"short\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void 현재_비밀번호가_틀리면_비밀번호_변경은_401을_반환한다() throws Exception {
+        loginAs(1L, AdminRole.SUPER_ADMIN);
+        doThrow(new BusinessException(ErrorCode.INVALID_CREDENTIALS))
+                .when(adminAuthService)
+                .changePassword(eq(1L), anyString(), anyString());
+
+        mockMvc.perform(
+                        post("/api/auth/admin/password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"currentPassword\":\"wrong\",\"newPassword\":\"new-password-123\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code").value("INVALID_CREDENTIALS"));
+    }
+
+    @Test
     void sudo_확인에_성공하면_200을_반환한다() throws Exception {
         loginAs(1L, AdminRole.SUPER_ADMIN);
 

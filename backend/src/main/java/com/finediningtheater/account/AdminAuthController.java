@@ -2,6 +2,7 @@ package com.finediningtheater.account;
 
 import com.finediningtheater.account.dto.AdminLoginRequest;
 import com.finediningtheater.account.dto.AdminLoginResponse;
+import com.finediningtheater.account.dto.ChangePasswordRequest;
 import com.finediningtheater.account.dto.SetPinRequest;
 import com.finediningtheater.account.dto.VerifyPinRequest;
 import com.finediningtheater.global.error.BusinessException;
@@ -80,6 +81,15 @@ public class AdminAuthController {
     public ApiResponse<Void> setPin(
             @AuthenticationPrincipal AdminPrincipal principal, @Valid @RequestBody SetPinRequest request) {
         adminAuthService.setPin(principal.id(), request.currentPassword(), request.newPin());
+        return ApiResponse.ok();
+    }
+
+    /** 로그인 비밀번호 변경. 시드 비밀번호를 영구히 쓰지 않게 하는 통로다(§3.1). PIN 변경과
+     * 동일하게 sudo가 아니라 현재 비밀번호 재확인으로 본인을 증명한다. */
+    @PostMapping("/password")
+    public ApiResponse<Void> changePassword(
+            @AuthenticationPrincipal AdminPrincipal principal, @Valid @RequestBody ChangePasswordRequest request) {
+        adminAuthService.changePassword(principal.id(), request.currentPassword(), request.newPassword());
         return ApiResponse.ok();
     }
 

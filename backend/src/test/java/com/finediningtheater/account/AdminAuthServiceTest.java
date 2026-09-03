@@ -164,6 +164,29 @@ class AdminAuthServiceTest {
     }
 
     @Test
+    void 현재_비밀번호가_맞으면_비밀번호를_바꾼다() {
+        when(adminAccountRepository.findById(1L)).thenReturn(Optional.of(account));
+
+        service().changePassword(1L, "correct-password", "new-password-123");
+
+        assertThat(passwordEncoder.matches("new-password-123", account.getPasswordHash())).isTrue();
+    }
+
+    @Test
+    void 현재_비밀번호가_틀리면_비밀번호를_바꾸지_않는다() {
+        when(adminAccountRepository.findById(1L)).thenReturn(Optional.of(account));
+        String originalHash = account.getPasswordHash();
+
+        assertThatThrownBy(() -> service().changePassword(1L, "wrong-password", "new-password-123"))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(
+                        e ->
+                                assertThat(((BusinessException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.INVALID_CREDENTIALS));
+        assertThat(account.getPasswordHash()).isEqualTo(originalHash);
+    }
+
+    @Test
     void PIN이_맞으면_sudo_모드가_열린다() {
         account.changePin(passwordEncoder.encode("482913"));
         when(adminAccountRepository.findById(1L)).thenReturn(Optional.of(account));

@@ -67,6 +67,20 @@ public class AdminAuthService {
         account.changePin(pinAuth.hash(newPin));
     }
 
+    /** 로그인 비밀번호를 바꾼다. 시드로 심은 최초 비밀번호를 영구히 쓰지 않게 하는 통로다(§3.1).
+     * PIN 변경과 동일하게 sudo가 아니라 현재 비밀번호 재확인으로 본인을 증명한다. */
+    @Transactional
+    public void changePassword(Long adminId, String currentPassword, String newPassword) {
+        AdminAccount account =
+                adminAccountRepository.findById(adminId).orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED));
+
+        if (!passwordEncoder.matches(currentPassword, account.getPasswordHash())) {
+            throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
+        }
+
+        account.changePassword(passwordEncoder.encode(newPassword));
+    }
+
     /** PIN을 확인하고 통과하면 15분짜리 sudo 모드를 연다. */
     public void verifySudo(Long adminId, String pin) {
         AdminAccount account =
