@@ -337,6 +337,7 @@ backend/src/main/java/com/finediningtheater/
 ├── artist/              # 아티스트 프로필, 모집 공고(Casting). ArtistEditController는 관리자 전용(§3.8)
 ├── review/              # 리뷰(요구서상 커뮤니티, 기능7). 작성자 본인 + 관리자 모두 쓰는 ReviewEditController(§3.6)
 ├── inquiry/             # 협업 문의 (비로그인 폼)
+├── press/               # 보도자료(소개 페이지 탭). 열람전용·슬러그없음, 번역 없음(§17)
 └── media/               # 업로드 presign, 파생본 생성
 
 frontend/src/
@@ -1042,7 +1043,8 @@ cd frontend && pnpm build && pnpm lint && pnpm test
 - **메인 하단 갤러리 섹션 신설** (`components/section/GallerySlideshow.tsx`): 음식·무대 사진을 "클릭하면 옆으로 넘어가는" 방식으로 보여준다 — **자동재생이 아니다.** 히어로의 자동재생 예외(§8.2)를 다른 곳으로 확대하지 않기 위해, 화살표·점 클릭으로만 넘어가는 별개 컴포넌트로 새로 만들었다. 캡션 "삶의 이야기를 담은 좋은 식사" / "Finedining Theater" 포함. 사진은 `frontend/src/assets/gallery/`에 파일만 넣으면 파일명 순으로 자동 슬라이드가 된다(히어로와 동일한 패턴, §8.2) — 사진이 없으면 섹션 자체가 렌더되지 않는다.
 - **"예매하기" → "예약하기" 용어 통일**: 내비게이션 탭("작품 예매하기" → "작품 예약하기"), 예약 버튼 문구, 관리자 편집 패널의 필드 라벨까지 전부 바꿨다.
 - **협업제안 비즈니스 카테고리 추가**(§3.7 확장): `Proposal.category`(`CORPORATE_EVENT` / `LOCAL_CULTURE` / `CUSTOM_CONSULTING`) 신설 — 폼에 필수 선택 항목으로 추가했고 관리자 목록에도 노출한다. 과거 제안에는 값이 없어 DB 컬럼은 nullable이다(expand-contract, §13.4 원칙 그대로). 협업제안 페이지 상단에 태그라인 "당신의 식탁에 어떤 이야기가 필요하세요?"를 추가했다.
-- **소개(About) 페이지 본문**: 요청서 카피(미션 선언문 포함)를 반영했다. 다만 방식이 바뀌었다(2026-09-04 결정) — **About은 더 이상 편집 모드/DB로 관리하지 않는다.** 소개문은 거의 안 바뀌는 정적 카피라 PIN·발행 흐름까지 갖춘 CMS를 유지할 이유가 없다는 판단으로, `AboutContent`/`AboutTranslation` 엔티티·`AboutController`/`AboutEditController`·프론트 `AboutEditPanel`을 전부 제거하고 `frontend/src/locales/{ko,en}/common.json`의 `about.introText`에 직접 넣었다. `about_content`/`about_translation` 테이블은 드롭하지 않고 unused로 남겨뒀다(§13.4 expand-contract와 같은 이유 — 마이그레이션 히스토리를 건드리지 않는다). 나중에 자주 바뀌는 콘텐츠가 필요해지면 그때 다시 동적으로 만든다.
+- **소개(About) 페이지 본문**: 요청서 카피(미션 선언문 포함)를 반영했다. 다만 방식이 바뀌었다(2026-09-04 결정) — **소개 인트로 문단은 더 이상 편집 모드/DB로 관리하지 않는다.** 거의 안 바뀌는 정적 카피라 PIN·발행 흐름까지 갖춘 CMS를 유지할 이유가 없다는 판단으로, `AboutContent`/`AboutTranslation` 엔티티·`AboutController`/`AboutEditController`·프론트 `AboutEditPanel`을 전부 제거하고 `frontend/src/locales/{ko,en}/common.json`의 `about.introText`에 직접 넣었다. `about_content`/`about_translation` 테이블은 드롭하지 않고 unused로 남겨뒀다(§13.4 expand-contract와 같은 이유 — 마이그레이션 히스토리를 건드리지 않는다).
+- **소개 페이지에 "보도자료" 탭 추가**(2026-09-04 결정 — §2 핵심 기능 표에는 없는 신규 콘텐츠, 처음엔 "새 기능으로 보류"였다가 확정됨): 위 정적 결정과 상충하지 않는다 — 정적으로 굳힌 건 소개 인트로 문단뿐이고, 보도자료는 반대로 운영자가 계속 추가하는 콘텐츠라 실제 백엔드(`press` 패키지, `PressClipping` 엔티티)로 만들었다. Casting과 같은 열람전용·슬러그없음 패턴이지만 번역 테이블은 두지 않는다 — 언론사 기사 제목은 원문 그대로 노출한다. 이미지는 기존 media 파이프라인에 `MediaOwnerType.PRESS_CLIPPING`으로 붙는다(§6·§7.5). `/about` 페이지는 "소개"/"보도자료" 두 탭으로 나뉘며(URL 라우팅 없이 컴포넌트 로컬 state), 보도자료 탭만 부분적으로 동적이다. 관리자는 제목+링크+이미지 1장을 목록에서 바로 인라인으로 등록·수정하고(상세 페이지가 없으므로 Artist/Program처럼 별도 페이지로 이동하지 않는다), 발행/발행취소는 PIN sudo가 필요하다(§3.4). Artist/Program 목록과 달리 관리자 목록(`GET /manage`) 응답에 이미지를 항상 포함한다 — 상세 페이지가 없어 목록 하나로 편집을 끝내야 하고 항목 수 자체가 적어 N+1 비용이 무시할 만하다. **§2 핵심 기능 표·요구서 자체에 이 기능을 추가할지는 아직 미정이다** — 원 요구서에 없던 항목이므로 센터 보고 시 별도로 짚어야 한다(§2 "우선순위" 원칙 참고).
 
 ### 관리자가 편집 모드에서 입력해야 하는 것 (코드 아님)
 
@@ -1058,17 +1060,9 @@ cd frontend && pnpm build && pnpm lint && pnpm test
 
 - 메인 히어로 이미지 4장(`frontend/src/assets/hero/`, 1번째는 공연 이미지)
 - 메인 하단 갤러리 이미지(`frontend/src/assets/gallery/`, 이번에 신설)
-- 작품 페이지 포스터/이미지, 프로그램 3건 이미지 — 각 편집 패널에서 업로드
-- 소개 페이지 이미지 — About이 정적 페이지로 바뀌면서 편집 패널 자체가 없다. 필요해지면 히어로
-  이미지와 같은 방식(`frontend/src/assets/`에 파일 추가 + `AboutPage.tsx`에서 import)으로 넣는다.
-
-### 새 기능으로 판단해 보류함 (사전 협의 필요)
-
-- **소개 페이지에 "보도자료" 탭 신설**: 기사 이미지를 넣고 클릭하면 원문 기사로 이동하는 기능. 요구서의 8개 핵심 기능 표(§2)에 없는 새 콘텐츠 타입이라, 최소한 아래를 정해야 구현에 들어갈 수 있다 — 결정되면 별도 세션에서 진행한다.
-  - 도메인 이름(`PressClipping`? `NewsArticle`?), 목록 형태(그리드 vs 리스트)
-  - 관리자 등록 방식(이미지+외부 링크만? 발행일·매체명도 구조화할지)
-  - "탭"의 의미 — 소개(About) 페이지 내부 탭인지, 별도 라우트(`/press`)인지
-  - §2 핵심 기능 표·요구서 자체에 이 기능을 추가할지 — 원 요구서에 없던 항목이므로 센터 사전 협의 대상일 수 있다(§2 "우선순위" 원칙 참고)
+- 작품 페이지 포스터/이미지, 프로그램 3건 이미지, 보도자료 기사 이미지 — 각 편집 패널에서 업로드
+- 소개 인트로 문단의 이미지 — 정적 문단이라 편집 패널이 없다. 필요해지면 히어로 이미지와 같은
+  방식(`frontend/src/assets/`에 파일 추가 + `AboutPage.tsx`에서 import)으로 넣는다.
 
 ### 파비콘 / 로고
 
