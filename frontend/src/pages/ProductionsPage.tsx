@@ -20,7 +20,7 @@ export default function ProductionsPage() {
 
   return (
     <main className={styles.page}>
-      <h1 className={styles.heading}>{t("nav.productions")}</h1>
+      <h1 className={styles.srOnly}>{t("home.productionsHeading")}</h1>
 
       {canEdit && (
         <button

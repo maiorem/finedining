@@ -145,6 +145,16 @@
   outline-offset: 2px;
 }
 
+/* 모바일에서는 데스크톱 내비·언어 전환 버튼이 display:none으로 빠지면서 로고와 아이콘 둘만
+   남는데, .inner의 justify-content: space-between이 남은 공간을 둘로 똑같이 나눠 로그인
+   아이콘이 화면 가운데 어중간하게 떴다. margin-right: auto로 로그인 아이콘의 오른쪽 여백을
+   전부 가져가게 해서 로고 옆에 붙이고, 남는 공간은 전부 햄버거 메뉴 앞으로 보낸다. */
+@media (max-width: 1023px) {
+  .accountButton {
+    margin-right: auto;
+  }
+}
+
 .menuButton {
   width: 44px;
   height: 44px;

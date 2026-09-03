@@ -8,11 +8,14 @@
   }
 }
 
-.heading {
-  font-family: var(--f-display);
-  font-size: var(--t-h1-sm);
-  font-weight: 400;
-  margin: 0 0 2rem;
+/* 접근성·SEO용 h1 — 화면에는 안 보이지만 스크린리더·검색엔진은 읽는다. 메뉴를 눌러 이 페이지로
+   왔다는 게 이미 명확해서 화면에 또 메뉴 이름을 크게 띄우지 않는다. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }
 
 .status {

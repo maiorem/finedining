@@ -22,7 +22,7 @@ export default function ArtistsPage() {
 
   return (
     <main className={styles.page}>
-      <h1 className={styles.heading}>{t("nav.artists")}</h1>
+      <h1 className={styles.srOnly}>{t("nav.artists")}</h1>
 
       {canEdit && (
         <button

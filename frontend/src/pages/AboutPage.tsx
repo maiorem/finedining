@@ -47,7 +47,7 @@ export default function AboutPage() {
             {t("editing.enterEditMode")}
           </button>
         )}
-        <h1 className={styles.title}>{t("nav.about")}</h1>
+        <h1 className={styles.srOnly}>{t("nav.about")}</h1>
         <p className={styles.status}>{notFound ? t("about.notFound") : t("about.loadError")}</p>
       </main>
     );
@@ -70,7 +70,7 @@ export default function AboutPage() {
         {showPanel && !isDesktop && <p className={styles.desktopOnlyNotice}>{t("editing.desktopOnly")}</p>}
 
         <EditableSection active={showPanel}>
-          <h1 className={styles.title}>{t("nav.about")}</h1>
+          <h1 className={styles.srOnly}>{t("nav.about")}</h1>
           {about?.intro ? (
             <p className={styles.intro}>{about.intro}</p>
           ) : (

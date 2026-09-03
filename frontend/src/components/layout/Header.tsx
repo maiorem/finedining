@@ -51,6 +51,9 @@ export function Header() {
   }
 
   async function handleAccountClick() {
+    // 아이콘 하나로 로그인/로그아웃을 겸하다 보니 실수로 눌러 로그아웃되기 쉽다 — 한 번 더 확인한다.
+    if (!window.confirm(t("nav.logoutConfirm"))) return;
+
     if (adminSession) {
       await adminLogout();
     } else if (memberSession) {

@@ -87,7 +87,7 @@ describe("ProductionEditPanel", () => {
 
   // 제목·URL을 별개 저장 버튼으로 나눠뒀을 때 운영자가 URL 저장 버튼을 놓쳐 값이 비는 사고가
   // 실제로 있었다 — 저장 버튼 하나로 전부 같이 보내지는지 회귀 테스트로 고정한다.
-  it("저장 버튼 하나로 예매·위치 링크까지 함께 저장한다", async () => {
+  it("저장 버튼 하나로 예약·위치 링크까지 함께 저장한다", async () => {
     const user = userEvent.setup();
     const putCalls: string[] = [];
     const fetchMock = vi.fn((input: string, init?: RequestInit) => {

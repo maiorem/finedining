@@ -20,7 +20,7 @@ export default function ProgramsPage() {
 
   return (
     <main className={styles.page}>
-      <h1 className={styles.heading}>{t("nav.programs")}</h1>
+      <h1 className={styles.srOnly}>{t("nav.programs")}</h1>
 
       {canEdit && (
         <button

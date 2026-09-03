@@ -130,7 +130,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
   });
 
   /**
-   * "발행하기" 한 번으로 제목·설명(양쪽 로케일)·예매/위치 링크를 전부 저장한 뒤 발행까지
+   * "발행하기" 한 번으로 제목·설명(양쪽 로케일)·예약/위치 링크를 전부 저장한 뒤 발행까지
    * 마친다 — 따로 "임시저장"을 눌러야 했던 게 귀찮다는 피드백으로 합쳤다. bookingUrl 변경과
    * 발행 둘 다 PIN sudo 모드를 요구하지만(§3.4), sudo는 서버에서 15분간 유지되므로 순서대로
    * await하면 PIN 모달은 최대 한 번만 뜬다 — 뜬 뒤 같은 함수를 처음부터 다시 실행하면(이미
@@ -250,7 +250,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
         />
       </label>
 
-      {/* 캘린더는 만들지 않는다 — 네이버 예약이 이미 제공한다(CLAUDE.md §4). 예매/위치 링크만 붙인다.
+      {/* 캘린더는 만들지 않는다 — 네이버 예약이 이미 제공한다(CLAUDE.md §4). 예약/위치 링크만 붙인다.
           제목·설명과 별개 저장 버튼으로 나눠뒀더니 운영자가 URL 저장 버튼을 놓치고 값이 비는
           사고가 실제로 있었다 — 아래 저장 버튼 하나로 전부 같이 저장한다. */}
       <label className={styles.field}>
@@ -289,7 +289,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
           setActionError(null);
           saveDraftMutation.mutate();
           // 값이 바뀌지 않았으면 보내지 않는다 — bookingUrl은 매번 sudo(PIN)를 요구하므로(§3.4),
-          // 건드리지 않은 예매 링크 때문에 제목만 고치려는 저장에도 PIN이 뜨면 안 된다.
+          // 건드리지 않은 예약 링크 때문에 제목만 고치려는 저장에도 PIN이 뜨면 안 된다.
           if (locationUrlDraft !== (data.locationUrl ?? "")) locationUrlMutation.mutate();
           if (bookingUrlDraft !== (data.bookingUrl ?? "")) bookingUrlMutation.mutate();
         }}

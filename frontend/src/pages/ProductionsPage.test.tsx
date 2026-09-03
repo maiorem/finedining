@@ -70,7 +70,7 @@ describe("ProductionsPage", () => {
     expect(screen.queryByRole("button", { name: "새 작품 추가" })).not.toBeInTheDocument();
   });
 
-  it("작품마다 예매하기·위치보기 링크가 있으면 목록에 바로 보여준다", async () => {
+  it("작품마다 예약하기·위치보기 링크가 있으면 목록에 바로 보여준다", async () => {
     fetchMock.mockImplementation(
       mockUnauthenticatedThen([
         {
@@ -86,7 +86,7 @@ describe("ProductionsPage", () => {
 
     renderPage();
 
-    const bookingLink = await screen.findByRole("link", { name: /예매하기/ });
+    const bookingLink = await screen.findByRole("link", { name: /예약하기/ });
     expect(bookingLink).toHaveAttribute("href", "https://booking.naver.com/bizes/1");
     expect(bookingLink).toHaveAttribute("target", "_blank");
     expect(bookingLink).toHaveAttribute("rel", "noopener noreferrer");

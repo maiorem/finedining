@@ -35,15 +35,16 @@ describe("Header", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
-  it("소개·작품 예매하기·프로그램·아티스트·리뷰·협업제안 내비게이션 링크를 렌더한다", async () => {
+  it("소개·예약하기·프로그램·아티스트·리뷰·협업제안 내비게이션 링크를 렌더한다", async () => {
     fetchMock.mockResolvedValue(UNAUTHENTICATED);
     renderHeader();
     await screen.findByRole("link", { name: "로그인" }); // 초기 세션 복구(admin/member refresh)가 끝나길 기다린다
 
     expect(screen.getAllByRole("link", { name: "소개" })[0]).toHaveAttribute("href", "/about");
-    expect(screen.getAllByRole("link", { name: "작품 예매하기" })[0]).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "예약하기" })[0]).toHaveAttribute(
       "href",
       "/productions",
     );
@@ -69,10 +70,10 @@ describe("Header", () => {
     await screen.findByRole("link", { name: "로그인" });
 
     const menuButton = screen.getByRole("button", { name: "메뉴 열기" });
-    expect(screen.getAllByRole("link", { name: "작품 예매하기" })).toHaveLength(1);
+    expect(screen.getAllByRole("link", { name: "예약하기" })).toHaveLength(1);
 
     await user.click(menuButton);
-    expect(screen.getAllByRole("link", { name: "작품 예매하기" })).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: "예약하기" })).toHaveLength(2);
     expect(screen.getByRole("button", { name: "메뉴 닫기" })).toBeInTheDocument();
   });
 
@@ -84,8 +85,9 @@ describe("Header", () => {
     expect(await screen.findByRole("link", { name: "로그인" })).toHaveAttribute("href", "/login");
   });
 
-  it("관리자로 로그인된 상태면 로그아웃 버튼을 보여주고 누르면 로그아웃한다", async () => {
+  it("관리자로 로그인된 상태면 로그아웃 버튼을 보여주고 확인하면 로그아웃한다", async () => {
     const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
     fetchMock.mockImplementation((input: string) => {
       if (input === "/api/auth/admin/refresh") {
         return Promise.resolve(
@@ -109,16 +111,22 @@ describe("Header", () => {
 
     await user.click(logoutButton);
 
+    expect(confirmSpy).toHaveBeenCalledWith("로그아웃 하시겠습니까?");
     expect(await screen.findByRole("link", { name: "로그인" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith("/api/auth/admin/logout", expect.objectContaining({ method: "POST" }));
   });
 
-  it("카카오로 로그인된 일반 회원이면 로그아웃 버튼을 보여주고 누르면 로그아웃한다", async () => {
+  it("카카오로 로그인된 일반 회원이면 로그아웃 버튼을 보여주고 확인하면 로그아웃한다", async () => {
     const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
     fetchMock.mockImplementation((input: string) => {
       if (input === "/api/auth/member/refresh") {
         return Promise.resolve(
-          jsonResponse({ success: true, data: { accessToken: "token", nickname: "손님" }, error: null }),
+          jsonResponse({
+            success: true,
+            data: { accountId: 4, accessToken: "token", nickname: "손님" },
+            error: null,
+          }),
         );
       }
       if (input === "/api/auth/member/logout") {
@@ -136,5 +144,33 @@ describe("Header", () => {
 
     expect(await screen.findByRole("link", { name: "로그인" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith("/api/auth/member/logout", expect.objectContaining({ method: "POST" }));
+  });
+
+  it("로그아웃 확인을 취소하면 로그인 상태를 유지한다", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+    fetchMock.mockImplementation((input: string) => {
+      if (input === "/api/auth/admin/refresh") {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: { accessToken: "token", username: "admin", role: "SUPER_ADMIN" },
+            error: null,
+          }),
+        );
+      }
+      return Promise.resolve(UNAUTHENTICATED);
+    });
+
+    renderHeader();
+
+    const logoutButton = await screen.findByRole("button", { name: "관리자 로그아웃" });
+    await user.click(logoutButton);
+
+    expect(screen.queryByRole("link", { name: "로그인" })).not.toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      "/api/auth/admin/logout",
+      expect.objectContaining({ method: "POST" }),
+    );
   });
 });
