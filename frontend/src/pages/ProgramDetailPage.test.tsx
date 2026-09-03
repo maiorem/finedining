@@ -78,7 +78,7 @@ describe("ProgramDetailPage", () => {
     expect(screen.queryByRole("button", { name: "편집 모드 켜기" })).not.toBeInTheDocument();
   });
 
-  it("이미지가 여러 장이면 첫 장은 히어로로, 나머지는 캡션과 함께 블로그처럼 보여준다", async () => {
+  it("이미지가 여러 장이면 첫 장은 히어로로, 나머지는 블로그처럼 이미지와 설명 문단을 위아래로 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
         return Promise.resolve(
@@ -96,8 +96,14 @@ describe("ProgramDetailPage", () => {
             applyUrl: null,
             locationUrl: null,
             images: [
-              { id: 1, status: "READY", altText: "히어로 사진", url1600: "http://example.com/1-1600.jpg" },
-              { id: 2, status: "READY", altText: "두번째 사진", url1600: "http://example.com/2-1600.jpg" },
+              { id: 1, status: "READY", altText: "히어로 사진", caption: null, url1600: "http://example.com/1-1600.jpg" },
+              {
+                id: 2,
+                status: "READY",
+                altText: "두번째 사진 대체텍스트",
+                caption: "두번째 사진 설명 문단입니다.",
+                url1600: "http://example.com/2-1600.jpg",
+              },
             ],
           },
           error: null,
@@ -111,8 +117,11 @@ describe("ProgramDetailPage", () => {
       "src",
       "http://example.com/1-1600.jpg",
     );
-    expect(screen.getByRole("img", { name: "두번째 사진" })).toHaveAttribute("src", "http://example.com/2-1600.jpg");
-    expect(screen.getByText("두번째 사진")).toBeInTheDocument(); // figcaption
+    expect(screen.getByRole("img", { name: "두번째 사진 대체텍스트" })).toHaveAttribute(
+      "src",
+      "http://example.com/2-1600.jpg",
+    );
+    expect(screen.getByText("두번째 사진 설명 문단입니다.")).toBeInTheDocument(); // figcaption
   });
 
   it("참가·위치 링크가 있으면 새 창으로 여는 외부 링크 버튼을 보여준다", async () => {

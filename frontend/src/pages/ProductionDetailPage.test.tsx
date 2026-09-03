@@ -78,7 +78,7 @@ describe("ProductionDetailPage", () => {
     expect(screen.queryByRole("button", { name: "편집 모드 켜기" })).not.toBeInTheDocument();
   });
 
-  it("이미지가 여러 장이면 첫 장은 히어로로, 나머지는 에디토리얼 섹션에 캡션과 함께 보여준다", async () => {
+  it("이미지가 여러 장이면 첫 장은 히어로로, 나머지는 블로그처럼 이미지와 설명 문단을 위아래로 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
         return Promise.resolve(
@@ -95,9 +95,15 @@ describe("ProductionDetailPage", () => {
             subtitle: "부제",
             description: "설명",
             images: [
-              { id: 1, status: "READY", altText: "히어로 사진", url1600: "http://example.com/1-1600.jpg" },
-              { id: 2, status: "READY", altText: "두번째 사진", url1600: "http://example.com/2-1600.jpg" },
-              { id: 3, status: "READY", altText: "세번째 사진", url1600: "http://example.com/3-1600.jpg" },
+              { id: 1, status: "READY", altText: "히어로 사진", caption: null, url1600: "http://example.com/1-1600.jpg" },
+              {
+                id: 2,
+                status: "READY",
+                altText: "두번째 사진 대체텍스트",
+                caption: "두번째 사진 설명 문단입니다.",
+                url1600: "http://example.com/2-1600.jpg",
+              },
+              { id: 3, status: "READY", altText: "세번째 사진 대체텍스트", caption: null, url1600: "http://example.com/3-1600.jpg" },
             ],
           },
           error: null,
@@ -111,13 +117,19 @@ describe("ProductionDetailPage", () => {
       "src",
       "http://example.com/1-1600.jpg",
     );
-    expect(screen.getByRole("img", { name: "두번째 사진" })).toHaveAttribute("src", "http://example.com/2-1600.jpg");
-    expect(screen.getByRole("img", { name: "세번째 사진" })).toHaveAttribute("src", "http://example.com/3-1600.jpg");
-    expect(screen.getByText("두번째 사진")).toBeInTheDocument(); // figcaption
-    expect(screen.getByText("세번째 사진")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "두번째 사진 대체텍스트" })).toHaveAttribute(
+      "src",
+      "http://example.com/2-1600.jpg",
+    );
+    expect(screen.getByRole("img", { name: "세번째 사진 대체텍스트" })).toHaveAttribute(
+      "src",
+      "http://example.com/3-1600.jpg",
+    );
+    expect(screen.getByText("두번째 사진 설명 문단입니다.")).toBeInTheDocument(); // figcaption
+    expect(screen.queryByText("세번째 사진 대체텍스트")).not.toBeInTheDocument(); // 설명이 없으면 캡션을 렌더하지 않는다
   });
 
-  it("예매·위치 링크가 있으면 새 창으로 여는 외부 링크 버튼을 보여준다", async () => {
+  it("예약·위치 링크가 있으면 새 창으로 여는 외부 링크 버튼을 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
         return Promise.resolve(
@@ -144,7 +156,7 @@ describe("ProductionDetailPage", () => {
 
     renderAt("/productions/showcase");
 
-    const bookingLink = await screen.findByRole("link", { name: /예매하기/ });
+    const bookingLink = await screen.findByRole("link", { name: /예약하기/ });
     expect(bookingLink).toHaveAttribute("href", "https://booking.naver.com/bizes/1");
     expect(bookingLink).toHaveAttribute("target", "_blank");
     expect(bookingLink).toHaveAttribute("rel", "noopener noreferrer");

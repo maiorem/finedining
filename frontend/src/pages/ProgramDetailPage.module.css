@@ -169,7 +169,8 @@
   outline-offset: 3px;
 }
 
-/* 블로그처럼 본문 이미지를 하나씩, 좌우로 번갈아 큼직하게 배치하고 캡션을 붙인다(§8.2 응용). */
+/* 블로그처럼 본문 이미지와 설명 문단을 하나씩 위아래로 쌓는다(2026-09-04 결정, §8.2). 이미지는
+   본문 폭 전체를, 설명은 읽기 좋은 폭으로 그 아래에 둔다 — ProductionDetailPage와 동일한 패턴. */
 .editorial {
   display: flex;
   flex-direction: column;
@@ -182,25 +183,8 @@
   }
 }
 
-.editorialRow {
+.editorialBlock {
   margin: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-@media (min-width: 1024px) {
-  .editorialRow {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-  }
-
-  .editorialRow > .editorialImage {
-    grid-column: 1 / 8;
-  }
-
-  .editorialRowReverse > .editorialImage {
-    grid-column: 6 / 13;
-  }
 }
 
 .editorialImage {
@@ -210,20 +194,12 @@
 }
 
 .editorialCaption {
-  margin-top: 0.75rem;
-  color: var(--c-ink-60);
-  font-size: var(--t-caption);
+  max-width: 38em;
+  margin: 1.25rem 0 0;
+  color: var(--c-ink);
+  font-size: var(--t-body);
   line-height: var(--lh-body);
-}
-
-@media (min-width: 1024px) {
-  .editorialRow > .editorialCaption {
-    grid-column: 1 / 8;
-  }
-
-  .editorialRowReverse > .editorialCaption {
-    grid-column: 6 / 13;
-  }
+  white-space: pre-wrap;
 }
 
 .panelLoading {

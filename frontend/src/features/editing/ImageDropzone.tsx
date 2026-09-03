@@ -5,6 +5,7 @@ import {
   deleteMedia,
   presignUpload,
   updateMediaAltText,
+  updateMediaCaption,
   uploadToPresignedUrl,
   type MediaAsset,
   type MediaOwnerType,
@@ -18,6 +19,7 @@ type PendingUpload = {
   stage: "UPLOADING" | "NEEDS_ALT" | "SAVING" | "FAILED";
   mediaAssetId?: number;
   altText: string;
+  caption: string;
   errorMessage?: string;
 };
 
@@ -30,7 +32,11 @@ type ImageDropzoneProps = {
   maxImages?: number;
 };
 
-/** 드래그&드롭 → presign → S3 직접 업로드 → 완료(alt 필수) (CLAUDE.md §3.9·§7.5·§8.8). */
+/**
+ * 드래그&드롭 → presign → S3 직접 업로드 → 완료(alt 필수) (CLAUDE.md §3.9·§7.5·§8.8).
+ * 대체 텍스트(altText, 접근성용 짧은 문구)와 설명 문단(caption, 방문자에게 보이는 본문)은
+ * 별개 필드다 — 상세 페이지가 블로그형 레이아웃으로 바뀌면서(2026-09-04) 분리했다.
+ */
 export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages }: ImageDropzoneProps) {
   const { t } = useTranslation();
   const { session } = useAdminAuth();
@@ -38,7 +44,8 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
   const [pending, setPending] = useState<PendingUpload[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editText, setEditText] = useState("");
+  const [editAltText, setEditAltText] = useState("");
+  const [editCaption, setEditCaption] = useState("");
   const [savingEditId, setSavingEditId] = useState<number | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
 
@@ -51,7 +58,10 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
   async function startUpload(file: File) {
     if (!session) return;
     const localId = `${file.name}-${Date.now()}-${Math.random()}`;
-    setPending((prev) => [...prev, { localId, fileName: file.name, stage: "UPLOADING", altText: "" }]);
+    setPending((prev) => [
+      ...prev,
+      { localId, fileName: file.name, stage: "UPLOADING", altText: "", caption: "" },
+    ]);
 
     try {
       const { mediaAssetId, uploadUrl } = await presignUpload(session.accessToken, ownerType, ownerId, file);
@@ -68,6 +78,9 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
     updatePending(localId, { stage: "SAVING" });
     try {
       await completeMediaUpload(session.accessToken, item.mediaAssetId, item.altText);
+      if (item.caption.trim().length > 0) {
+        await updateMediaCaption(session.accessToken, item.mediaAssetId, item.caption.trim());
+      }
       setPending((prev) => prev.filter((p) => p.localId !== localId));
       onChanged();
     } catch {
@@ -100,22 +113,26 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
     onChanged();
   }
 
-  function startEditCaption(image: MediaAsset) {
+  function startEdit(image: MediaAsset) {
     setEditingId(image.id);
-    setEditText(image.altText ?? "");
+    setEditAltText(image.altText ?? "");
+    setEditCaption(image.caption ?? "");
     setEditError(null);
   }
 
-  function cancelEditCaption() {
+  function cancelEdit() {
     setEditingId(null);
     setEditError(null);
   }
 
-  async function saveEditCaption(mediaAssetId: number) {
-    if (!session || editText.trim().length === 0) return;
+  async function saveEdit(mediaAssetId: number) {
+    if (!session || editAltText.trim().length === 0) return;
     setSavingEditId(mediaAssetId);
     try {
-      await updateMediaAltText(session.accessToken, mediaAssetId, editText.trim());
+      await Promise.all([
+        updateMediaAltText(session.accessToken, mediaAssetId, editAltText.trim()),
+        updateMediaCaption(session.accessToken, mediaAssetId, editCaption.trim()),
+      ]);
       setEditingId(null);
       onChanged();
     } catch {
@@ -163,7 +180,7 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
           {item.stage === "UPLOADING" && <span>{t("editing.image.uploading")}</span>}
           {item.stage === "SAVING" && <span>{t("editing.image.saving")}</span>}
           {(item.stage === "NEEDS_ALT" || item.stage === "SAVING") && (
-            <div className={styles.altRow}>
+            <div className={styles.editFields}>
               <label>
                 <span>{t("editing.image.altLabel")}</span>
                 <input
@@ -173,13 +190,24 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
                   onChange={(e) => updatePending(item.localId, { altText: e.target.value })}
                 />
               </label>
-              <button
-                type="button"
-                disabled={item.stage === "SAVING" || item.altText.trim().length === 0}
-                onClick={() => void completeItem(item.localId)}
-              >
-                {t("editing.image.save")}
-              </button>
+              <label>
+                <span>{t("editing.image.captionLabel")}</span>
+                <textarea
+                  rows={3}
+                  value={item.caption}
+                  disabled={item.stage === "SAVING"}
+                  onChange={(e) => updatePending(item.localId, { caption: e.target.value })}
+                />
+              </label>
+              <div className={styles.editActions}>
+                <button
+                  type="button"
+                  disabled={item.stage === "SAVING" || item.altText.trim().length === 0}
+                  onClick={() => void completeItem(item.localId)}
+                >
+                  {t("editing.image.save")}
+                </button>
+              </div>
             </div>
           )}
           {item.errorMessage && <p className={styles.error}>{item.errorMessage}</p>}
@@ -196,33 +224,47 @@ export function ImageDropzone({ ownerType, ownerId, images, onChanged, maxImages
             )}
 
             {editingId === image.id ? (
-              <div className={styles.altRow}>
+              <div className={styles.editFields}>
                 <label>
                   <span>{t("editing.image.altLabel")}</span>
                   <input
                     type="text"
-                    value={editText}
+                    value={editAltText}
                     disabled={savingEditId === image.id}
-                    onChange={(e) => setEditText(e.target.value)}
+                    onChange={(e) => setEditAltText(e.target.value)}
                   />
                 </label>
-                <button
-                  type="button"
-                  disabled={savingEditId === image.id || editText.trim().length === 0}
-                  onClick={() => void saveEditCaption(image.id)}
-                >
-                  {t("editing.image.save")}
-                </button>
-                <button type="button" disabled={savingEditId === image.id} onClick={cancelEditCaption}>
-                  {t("editing.image.cancel")}
-                </button>
+                <label>
+                  <span>{t("editing.image.captionLabel")}</span>
+                  <textarea
+                    rows={4}
+                    value={editCaption}
+                    disabled={savingEditId === image.id}
+                    onChange={(e) => setEditCaption(e.target.value)}
+                  />
+                </label>
                 {editError && <p className={styles.error}>{editError}</p>}
+                <div className={styles.editActions}>
+                  <button
+                    type="button"
+                    disabled={savingEditId === image.id || editAltText.trim().length === 0}
+                    onClick={() => void saveEdit(image.id)}
+                  >
+                    {t("editing.image.save")}
+                  </button>
+                  <button type="button" disabled={savingEditId === image.id} onClick={cancelEdit}>
+                    {t("editing.image.cancel")}
+                  </button>
+                </div>
               </div>
             ) : (
               <>
-                <span className={styles.imageAlt}>{image.altText ?? t("editing.image.noAlt")}</span>
-                <button type="button" onClick={() => startEditCaption(image)}>
-                  {t("editing.image.editCaption")}
+                <span className={styles.imageSummary}>
+                  <span className={styles.imageAlt}>{image.altText ?? t("editing.image.noAlt")}</span>
+                  {image.caption && <span className={styles.imageCaptionPreview}>{image.caption}</span>}
+                </span>
+                <button type="button" onClick={() => startEdit(image)}>
+                  {t("editing.image.edit")}
                 </button>
               </>
             )}

@@ -125,15 +125,10 @@ export default function ProductionDetailPage() {
         {editorialImages.length > 0 && (
           <EditableSection active={showPanel}>
             <div className={styles.editorial}>
-              {editorialImages.map((image, index) => {
+              {editorialImages.map((image) => {
                 const src = image.url1600 ?? image.url960 ?? image.url640;
                 return (
-                  <figure
-                    key={image.id}
-                    className={
-                      index % 2 === 1 ? `${styles.editorialRow} ${styles.editorialRowReverse}` : styles.editorialRow
-                    }
-                  >
+                  <figure key={image.id} className={styles.editorialBlock}>
                     {src && (
                       <img
                         className={styles.editorialImage}
@@ -145,7 +140,7 @@ export default function ProductionDetailPage() {
                         decoding="async"
                       />
                     )}
-                    {image.altText && <figcaption className={styles.editorialCaption}>{image.altText}</figcaption>}
+                    {image.caption && <figcaption className={styles.editorialCaption}>{image.caption}</figcaption>}
                   </figure>
                 );
               })}

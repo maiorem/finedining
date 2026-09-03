@@ -11,6 +11,7 @@ export type MediaAsset = {
   width: number | null;
   height: number | null;
   altText: string | null;
+  caption: string | null;
   lqipBase64: string | null;
   url640: string | null;
   url960: string | null;
@@ -58,7 +59,12 @@ export function deleteMedia(accessToken: string, mediaAssetId: number): Promise<
   return apiAdminDelete<void>(`/api/media/${mediaAssetId}`, accessToken);
 }
 
-/** 이미 업로드가 끝난 이미지의 캡션(대체 텍스트)만 고친다 — 다시 올리지 않아도 된다. */
+/** 이미 업로드가 끝난 이미지의 대체 텍스트만 고친다 — 다시 올리지 않아도 된다. */
 export function updateMediaAltText(accessToken: string, mediaAssetId: number, altText: string): Promise<MediaAsset> {
   return apiAdminPut<MediaAsset>(`/api/media/${mediaAssetId}`, accessToken, { altText });
+}
+
+/** 방문자에게 보이는 설명 문단만 고친다 — altText와 별개 필드다(§8.2 블로그형 레이아웃). */
+export function updateMediaCaption(accessToken: string, mediaAssetId: number, caption: string): Promise<MediaAsset> {
+  return apiAdminPut<MediaAsset>(`/api/media/${mediaAssetId}/caption`, accessToken, { caption });
 }
