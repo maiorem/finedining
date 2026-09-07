@@ -5,6 +5,15 @@
   background: var(--c-black);
 }
 
+.heroSwipeable {
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.dragging {
+  cursor: grabbing;
+}
+
 .slide {
   position: absolute;
   inset: 0;
