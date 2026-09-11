@@ -96,6 +96,62 @@ describe("PressClippingManagementPanel", () => {
       expect(JSON.parse((createCall![1] as RequestInit).body as string)).toEqual({
         title: "새 기사",
         externalUrl: "https://example.com/new",
+        ogImageUrl: null,
+      });
+    });
+  });
+
+  it("미리보기 가져오기를 누르면 제목을 자동으로 채우고 이미지 미리보기를 보여준다", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn((input: string, init?: RequestInit) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: true, data: { accessToken: "t", username: "admin", role: "EDITOR" }, error: null }),
+        );
+      }
+      if (input === "/api/press-clippings/preview" && init?.method === "POST") {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: { title: "조선일보 기사 제목", description: "요약", imageUrl: "https://news.example.com/a.jpg" },
+            error: null,
+          }),
+        );
+      }
+      if (input === "/api/press-clippings" && init?.method === "POST") {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: { id: 3, title: "조선일보 기사 제목", externalUrl: "https://example.com/article", status: "DRAFT", images: [] },
+            error: null,
+          }),
+        );
+      }
+      if (input === "/api/press-clippings/manage") {
+        return Promise.resolve(jsonResponse({ success: true, data: [], error: null }));
+      }
+      return Promise.resolve(jsonResponse({ success: true, data: null, error: null }));
+    });
+
+    renderPanel(fetchMock);
+
+    await user.type(screen.getByLabelText("기사 링크"), "https://example.com/article");
+    await user.click(await screen.findByRole("button", { name: "미리보기 가져오기" }));
+
+    expect(await screen.findByDisplayValue("조선일보 기사 제목")).toBeInTheDocument();
+    expect(screen.getByText("조선일보 기사 제목")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "추가하기" }));
+
+    await waitFor(() => {
+      const createCall = fetchMock.mock.calls.find(
+        ([input, init]) => input === "/api/press-clippings" && (init as RequestInit | undefined)?.method === "POST",
+      );
+      expect(createCall).toBeDefined();
+      expect(JSON.parse((createCall![1] as RequestInit).body as string)).toEqual({
+        title: "조선일보 기사 제목",
+        externalUrl: "https://example.com/article",
+        ogImageUrl: "https://news.example.com/a.jpg",
       });
     });
   });

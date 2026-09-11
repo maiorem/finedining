@@ -4,11 +4,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
 import {
   createPressClipping,
+  fetchPressPreview,
   listPressClippingsForAdmin,
   publishPressClipping,
   unpublishPressClipping,
   updatePressClippingContent,
   type PressClippingAdmin,
+  type PressPreview,
 } from "../../api/pressClippingAdmin";
 import { ApiError } from "../../api/http";
 import { queryKeys } from "../../api/queryKeys";
@@ -18,7 +20,7 @@ import styles from "./PressClippingManagementPanel.module.css";
 
 type PinAction = { id: number; action: "publish" | "unpublish" };
 
-const KNOWN_ERROR_CODES = ["VALIDATION_ERROR"] as const;
+const KNOWN_ERROR_CODES = ["VALIDATION_ERROR", "EXTERNAL_FETCH_FAILED"] as const;
 
 function errorMessageKey(code: string): string {
   return (KNOWN_ERROR_CODES as readonly string[]).includes(code) ? `press.error.${code}` : "press.error.generic";
@@ -47,9 +49,31 @@ export default function PressClippingManagementPanel() {
   const [creating, setCreating] = useState(false);
   const [pinAction, setPinAction] = useState<PinAction | null>(null);
 
+  const [preview, setPreview] = useState<PressPreview | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
   function invalidate() {
     void queryClient.invalidateQueries({ queryKey: queryKeys.pressClippings.adminList });
     void queryClient.invalidateQueries({ queryKey: queryKeys.pressClippings.all });
+  }
+
+  async function handleFetchPreview() {
+    if (!session || newUrl.trim().length === 0) return;
+    setPreviewError(null);
+    setPreviewLoading(true);
+    try {
+      const result = await fetchPressPreview(session.accessToken, newUrl);
+      setPreview(result);
+      if (newTitle.trim().length === 0 && result.title) {
+        setNewTitle(result.title);
+      }
+    } catch (err) {
+      setPreview(null);
+      setPreviewError(err instanceof ApiError ? t(errorMessageKey(err.code)) : t("press.error.generic"));
+    } finally {
+      setPreviewLoading(false);
+    }
   }
 
   async function handleCreate(e: FormEvent) {
@@ -58,9 +82,11 @@ export default function PressClippingManagementPanel() {
     setCreateError(null);
     setCreating(true);
     try {
-      await createPressClipping(session.accessToken, newTitle, newUrl);
+      await createPressClipping(session.accessToken, newTitle, newUrl, preview?.imageUrl);
       setNewTitle("");
       setNewUrl("");
+      setPreview(null);
+      setPreviewError(null);
       invalidate();
     } catch (err) {
       setCreateError(err instanceof ApiError ? t(errorMessageKey(err.code)) : t("press.error.generic"));
@@ -105,11 +131,40 @@ export default function PressClippingManagementPanel() {
           <input
             type="url"
             value={newUrl}
-            onChange={(e) => setNewUrl(e.target.value)}
+            onChange={(e) => {
+              setNewUrl(e.target.value);
+              setPreview(null);
+              setPreviewError(null);
+            }}
             placeholder="https://..."
             required
           />
         </label>
+
+        <button
+          type="button"
+          className={styles.previewButton}
+          disabled={previewLoading || newUrl.trim().length === 0}
+          onClick={() => void handleFetchPreview()}
+        >
+          {previewLoading ? t("press.previewLoading") : t("press.fetchPreview")}
+        </button>
+
+        {previewError && (
+          <p className={styles.error} role="alert">
+            {previewError}
+          </p>
+        )}
+
+        {preview && (
+          <div className={styles.previewCard}>
+            {preview.imageUrl && (
+              <img src={preview.imageUrl} alt="" className={styles.previewThumb} width={64} height={64} />
+            )}
+            <span className={styles.previewTitle}>{preview.title ?? t("press.previewNoTitle")}</span>
+          </div>
+        )}
+
         {createError && (
           <p className={styles.error} role="alert">
             {createError}

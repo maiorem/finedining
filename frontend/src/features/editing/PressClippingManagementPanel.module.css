@@ -36,6 +36,52 @@
   outline-offset: 2px;
 }
 
+.previewButton {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 1.25em;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink-60);
+  cursor: pointer;
+}
+
+.previewButton:hover:not(:disabled),
+.previewButton:focus-visible {
+  border-color: var(--c-spot);
+  color: var(--c-ink);
+}
+
+.previewButton:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
+.previewButton:disabled {
+  color: var(--c-ink-35);
+  cursor: not-allowed;
+}
+
+.previewCard {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  border: 1px solid var(--c-line);
+  padding: 0.75rem;
+}
+
+.previewThumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.previewTitle {
+  font-size: var(--t-body);
+  color: var(--c-ink);
+}
+
 .status {
   color: var(--c-ink-60);
   padding: 1rem 0;
