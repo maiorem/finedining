@@ -49,6 +49,26 @@ class PressClippingServiceTest {
     }
 
     @Test
+    void og_이미지_URL이_있으면_생성_직후_MediaService로_수집한다() {
+        when(pressClippingRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        PressClipping result = service().create("제목", "https://example.com", "https://example.com/a.jpg", 42L);
+
+        verify(mediaService)
+                .ingestFromUrl(
+                        MediaOwnerType.PRESS_CLIPPING, result.getId(), 42L, "https://example.com/a.jpg", "제목");
+    }
+
+    @Test
+    void og_이미지_URL이_없으면_MediaService를_호출하지_않는다() {
+        when(pressClippingRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service().create("제목", "https://example.com", null, 42L);
+
+        verify(mediaService, org.mockito.Mockito.never()).ingestFromUrl(any(), any(), any(), any(), any());
+    }
+
+    @Test
     void updateContent은_제목과_링크를_바꾼다() {
         PressClipping clipping = new PressClipping("원래 제목", "https://example.com/old");
         when(pressClippingRepository.findById(1L)).thenReturn(Optional.of(clipping));

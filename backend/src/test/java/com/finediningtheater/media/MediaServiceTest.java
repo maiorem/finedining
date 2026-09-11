@@ -3,6 +3,7 @@ package com.finediningtheater.media;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
+import com.finediningtheater.global.security.SafeUrlFetcher;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.net.MalformedURLException;
@@ -30,11 +32,12 @@ class MediaServiceTest {
 
     @Mock private MediaAssetRepository mediaAssetRepository;
     @Mock private MediaStorageService storageService;
+    @Mock private SafeUrlFetcher safeUrlFetcher;
 
     private final ImageProcessor imageProcessor = new ImageProcessor();
 
     private MediaService service() {
-        return new MediaService(mediaAssetRepository, storageService, imageProcessor);
+        return new MediaService(mediaAssetRepository, storageService, imageProcessor, safeUrlFetcher);
     }
 
     @Test
@@ -167,6 +170,76 @@ class MediaServiceTest {
 
         verify(storageService).deleteObjects(List.of("originals/x.jpg"));
         verify(mediaAssetRepository).delete(asset);
+    }
+
+    @Test
+    void 외부_URL_이미지_수집은_유효한_이미지면_파생본을_만들고_기본_alt를_채운다() throws Exception {
+        byte[] jpeg = jpegBytes(640, 320);
+        when(mediaAssetRepository.countByOwnerTypeAndOwnerId(MediaOwnerType.PRESS_CLIPPING, 1L)).thenReturn(0);
+        when(mediaAssetRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(safeUrlFetcher.fetch(eq("https://news.example.com/a.jpg"), anyInt()))
+                .thenReturn(new SafeUrlFetcher.FetchResult(jpeg, "image/jpeg"));
+
+        MediaAsset result =
+                service()
+                        .ingestFromUrl(
+                                MediaOwnerType.PRESS_CLIPPING, 1L, 42L, "https://news.example.com/a.jpg", "기사 제목");
+
+        assertThat(result.getStatus()).isEqualTo(MediaAssetStatus.READY);
+        assertThat(result.getAltText()).isEqualTo("기사 제목");
+        verify(storageService, times(1)).putObject(eq(result.getOriginalKey()), eq(jpeg), eq("image/jpeg"));
+    }
+
+    @Test
+    void 외부_URL_이미지_수집은_이미지가_아니면_FAILED로_기록한다() throws Exception {
+        when(mediaAssetRepository.countByOwnerTypeAndOwnerId(MediaOwnerType.PRESS_CLIPPING, 1L)).thenReturn(0);
+        when(mediaAssetRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(safeUrlFetcher.fetch(eq("https://news.example.com/not-an-image"), anyInt()))
+                .thenReturn(new SafeUrlFetcher.FetchResult("<html></html>".getBytes(), "text/html"));
+
+        MediaAsset result =
+                service()
+                        .ingestFromUrl(
+                                MediaOwnerType.PRESS_CLIPPING,
+                                1L,
+                                42L,
+                                "https://news.example.com/not-an-image",
+                                "기사 제목");
+
+        assertThat(result.getStatus()).isEqualTo(MediaAssetStatus.FAILED);
+    }
+
+    @Test
+    void 외부_URL_이미지_수집은_요청_실패하면_FAILED로_기록한다() throws Exception {
+        when(mediaAssetRepository.countByOwnerTypeAndOwnerId(MediaOwnerType.PRESS_CLIPPING, 1L)).thenReturn(0);
+        when(mediaAssetRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(safeUrlFetcher.fetch(anyString(), anyInt())).thenThrow(new java.io.IOException("연결 실패"));
+
+        MediaAsset result =
+                service().ingestFromUrl(MediaOwnerType.PRESS_CLIPPING, 1L, 42L, "https://news.example.com/x.jpg", "제목");
+
+        assertThat(result.getStatus()).isEqualTo(MediaAssetStatus.FAILED);
+        assertThat(result.getFailureReason()).isNotBlank();
+    }
+
+    @Test
+    void 외부_URL_이미지_수집도_같은_시간당_상한을_공유한다() throws Exception {
+        when(mediaAssetRepository.countByOwnerTypeAndOwnerId(any(), any())).thenReturn(0);
+        when(mediaAssetRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(storageService.presignPut(anyString(), anyString(), any()))
+                .thenReturn(new URL("http://localhost:9000/fdt-media-local/originals/x.jpg"));
+
+        MediaService service = service();
+        for (int i = 0; i < 30; i++) {
+            service.presign(MediaOwnerType.PRODUCTION, 1L, 99L, "image/jpeg", 1000);
+        }
+
+        assertThatThrownBy(
+                        () ->
+                                service.ingestFromUrl(
+                                        MediaOwnerType.PRESS_CLIPPING, 1L, 99L, "https://news.example.com/x.jpg", "제목"))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(ErrorCode.RATE_LIMITED));
     }
 
     @Test

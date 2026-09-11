@@ -40,6 +40,7 @@ class PressClippingEditControllerTest {
 
     @MockitoBean private PressClippingService pressClippingService;
     @MockitoBean private MediaService mediaService;
+    @MockitoBean private OgPreviewFetcher ogPreviewFetcher;
     @MockitoBean private AuditLogger auditLogger;
     @MockitoBean private SudoMode sudoMode;
     @MockitoBean private JwtProvider jwtProvider;
@@ -72,7 +73,7 @@ class PressClippingEditControllerTest {
     void 생성에_성공하면_감사로그를_남긴다() throws Exception {
         loginAs(1L);
         PressClipping created = new PressClipping("새 제목", "https://example.com/a");
-        when(pressClippingService.create("새 제목", "https://example.com/a")).thenReturn(created);
+        when(pressClippingService.create("새 제목", "https://example.com/a", null, 1L)).thenReturn(created);
         when(mediaService.listForAdmin(any(MediaOwnerType.class), any())).thenReturn(List.of());
 
         mockMvc.perform(
@@ -84,6 +85,51 @@ class PressClippingEditControllerTest {
 
         verify(auditLogger)
                 .record(eq(1L), eq("PRESS_CLIPPING_CREATE"), eq("PressClipping"), any(), any(), any(), any());
+    }
+
+    @Test
+    void og_이미지_URL과_함께_생성하면_그대로_전달한다() throws Exception {
+        loginAs(1L);
+        PressClipping created = new PressClipping("기사 제목", "https://example.com/a");
+        when(pressClippingService.create("기사 제목", "https://example.com/a", "https://example.com/a.jpg", 1L))
+                .thenReturn(created);
+        when(mediaService.listForAdmin(any(MediaOwnerType.class), any())).thenReturn(List.of());
+
+        mockMvc.perform(
+                        post("/api/press-clippings")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"title\":\"기사 제목\",\"externalUrl\":\"https://example.com/a\","
+                                                + "\"ogImageUrl\":\"https://example.com/a.jpg\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.title").value("기사 제목"));
+    }
+
+    @Test
+    void 미리보기_요청에_성공하면_제목과_이미지_URL을_반환한다() throws Exception {
+        loginAs(1L);
+        when(ogPreviewFetcher.fetch("https://example.com/article"))
+                .thenReturn(new OgPreviewFetcher.OgPreview("기사 제목", "기사 요약", "https://example.com/a.jpg"));
+
+        mockMvc.perform(
+                        post("/api/press-clippings/preview")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"url\":\"https://example.com/article\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.title").value("기사 제목"))
+                .andExpect(jsonPath("$.data.imageUrl").value("https://example.com/a.jpg"));
+    }
+
+    @Test
+    void 미리보기_요청의_URL이_http_https가_아니면_검증_오류를_반환한다() throws Exception {
+        loginAs(1L);
+
+        mockMvc.perform(
+                        post("/api/press-clippings/preview")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"url\":\"javascript:alert(1)\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("VALIDATION_ERROR"));
     }
 
     @Test

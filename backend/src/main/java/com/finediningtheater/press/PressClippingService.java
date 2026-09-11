@@ -39,6 +39,21 @@ public class PressClippingService {
         return pressClippingRepository.save(new PressClipping(title, externalUrl));
     }
 
+    /**
+     * ogImageUrl은 "미리보기 가져오기"로 확인한 기사 이미지 URL이다(2026-09-12) — 있으면 서버가
+     * 대신 내려받아 바로 첨부하고, 다운로드가 실패해도 보도자료 등록 자체는 그대로 성공한다(이미지는
+     * ImageDropzone으로 나중에 수동 첨부할 수 있는 선택 사항이라서). 실패는 MediaAsset이 FAILED
+     * 상태로 남아 관리 화면에서 보인다(§7.5).
+     */
+    @Transactional
+    public PressClipping create(String title, String externalUrl, String ogImageUrl, Long adminId) {
+        PressClipping clipping = pressClippingRepository.save(new PressClipping(title, externalUrl));
+        if (ogImageUrl != null) {
+            mediaService.ingestFromUrl(MediaOwnerType.PRESS_CLIPPING, clipping.getId(), adminId, ogImageUrl, title);
+        }
+        return clipping;
+    }
+
     @Transactional
     public PressClipping updateContent(Long id, String title, String externalUrl) {
         PressClipping clipping = findOrThrow(id);

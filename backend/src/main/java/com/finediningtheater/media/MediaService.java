@@ -3,6 +3,7 @@ package com.finediningtheater.media;
 import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.ratelimit.FailureLockout;
+import com.finediningtheater.global.security.SafeUrlFetcher;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
@@ -34,6 +35,7 @@ public class MediaService {
     private final MediaAssetRepository mediaAssetRepository;
     private final MediaStorageService storageService;
     private final ImageProcessor imageProcessor;
+    private final SafeUrlFetcher safeUrlFetcher;
 
     // 계정당 발급 레이트리밋 (CLAUDE.md §3.5) — 스프링 빈이 아니라 이 서비스가 정책값으로 들고 있는다.
     private final FailureLockout presignRateLimiter = new FailureLockout(MAX_PRESIGNS_PER_HOUR, Duration.ofHours(1));
@@ -84,23 +86,62 @@ public class MediaService {
             }
 
             byte[] originalBytes = storageService.getObjectBytes(asset.getOriginalKey());
-            ImageProcessor.ProcessedImage processed = imageProcessor.process(originalBytes);
-
-            String base = asset.getOriginalKey().replaceFirst("^originals/", "derivatives/").replaceFirst("\\.[^.]+$", "");
-            String key640 = base + "-640.jpg";
-            String key960 = base + "-960.jpg";
-            String key1600 = base + "-1600.jpg";
-            storageService.putObject(key640, processed.jpegDerivativesByWidth().get(640), "image/jpeg");
-            storageService.putObject(key960, processed.jpegDerivativesByWidth().get(960), "image/jpeg");
-            storageService.putObject(key1600, processed.jpegDerivativesByWidth().get(1600), "image/jpeg");
-
-            asset.markReady(
-                    processed.width(), processed.height(), key640, key960, key1600, processed.lqipBase64(), altText);
+            processAndMarkReady(asset, originalBytes, altText);
         } catch (IOException | RuntimeException e) {
             asset.markFailed(e.getMessage() == null ? "이미지 처리 중 오류가 발생했습니다." : e.getMessage());
         }
 
         return asset;
+    }
+
+    /**
+     * 관리자가 붙여넣은 외부 이미지 URL(보도자료 링크 미리보기의 og:image, 2026-09-12)을 서버가
+     * 대신 내려받아 우리 S3에 원본부터 다시 저장한다 — 언론사 사이트가 나중에 이미지를 지우거나
+     * 핫링크를 막아도 우리 쪽 파생본은 그대로 남는다. presign 발급과 같은 시간당 상한을 공유한다
+     * — 이 경로도 결국 관리자 계정으로 우리 S3에 파일을 밀어넣는 것이기 때문이다(§3.5).
+     * defaultAltText는 대체로 기사 제목이다 — alt 입력을 건너뛰게 하지 않기 위한 최소한의 채움값
+     * 이고(§8.8), 관리자가 나중에 더 정확한 문구로 고칠 수 있다.
+     */
+    @Transactional
+    public MediaAsset ingestFromUrl(
+            MediaOwnerType ownerType, Long ownerId, Long adminId, String imageUrl, String defaultAltText) {
+        String rateLimitKey = String.valueOf(adminId);
+        if (presignRateLimiter.isLocked(rateLimitKey)) {
+            throw new BusinessException(ErrorCode.RATE_LIMITED);
+        }
+        presignRateLimiter.recordFailure(rateLimitKey);
+
+        int sortOrder = mediaAssetRepository.countByOwnerTypeAndOwnerId(ownerType, ownerId);
+        String key = "originals/" + UUID.randomUUID() + ".jpg"; // 확장자는 매직 바이트 검증 전이라 확정할 수 없어 임시로 둔다
+        MediaAsset asset = mediaAssetRepository.save(new MediaAsset(ownerType, ownerId, sortOrder, key));
+
+        try {
+            SafeUrlFetcher.FetchResult fetched = safeUrlFetcher.fetch(imageUrl, (int) MAX_FILE_SIZE_BYTES);
+            if (!ImageMagicBytes.isValidImage(fetched.body())) {
+                throw new IllegalStateException("이미지 파일이 아닙니다.");
+            }
+            storageService.putObject(key, fetched.body(), fetched.contentType());
+            processAndMarkReady(asset, fetched.body(), defaultAltText);
+        } catch (Exception e) {
+            asset.markFailed(e.getMessage() == null ? "이미지를 가져오지 못했습니다." : e.getMessage());
+        }
+
+        return asset;
+    }
+
+    private void processAndMarkReady(MediaAsset asset, byte[] originalBytes, String altText) throws IOException {
+        ImageProcessor.ProcessedImage processed = imageProcessor.process(originalBytes);
+
+        String base = asset.getOriginalKey().replaceFirst("^originals/", "derivatives/").replaceFirst("\\.[^.]+$", "");
+        String key640 = base + "-640.jpg";
+        String key960 = base + "-960.jpg";
+        String key1600 = base + "-1600.jpg";
+        storageService.putObject(key640, processed.jpegDerivativesByWidth().get(640), "image/jpeg");
+        storageService.putObject(key960, processed.jpegDerivativesByWidth().get(960), "image/jpeg");
+        storageService.putObject(key1600, processed.jpegDerivativesByWidth().get(1600), "image/jpeg");
+
+        asset.markReady(
+                processed.width(), processed.height(), key640, key960, key1600, processed.lqipBase64(), altText);
     }
 
     // media 패키지는 소유자(Production/Artist/Program)를 모르므로(§6), alt 텍스트·캡션을 고칠 때마다

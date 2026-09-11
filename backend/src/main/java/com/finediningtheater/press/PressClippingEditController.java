@@ -8,8 +8,11 @@ import com.finediningtheater.global.support.ClientIp;
 import com.finediningtheater.media.MediaOwnerType;
 import com.finediningtheater.media.MediaService;
 import com.finediningtheater.media.dto.MediaAssetResponse;
+import com.finediningtheater.press.dto.CreatePressClippingRequest;
 import com.finediningtheater.press.dto.PressClippingAdminResponse;
 import com.finediningtheater.press.dto.PressClippingContentRequest;
+import com.finediningtheater.press.dto.PressPreviewRequest;
+import com.finediningtheater.press.dto.PressPreviewResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -37,8 +40,15 @@ public class PressClippingEditController {
 
     private final PressClippingService pressClippingService;
     private final MediaService mediaService;
+    private final OgPreviewFetcher ogPreviewFetcher;
     private final AuditLogger auditLogger;
     private final SudoMode sudoMode;
+
+    /** 상태를 바꾸지 않는 조회성 호출이라 감사 로그를 남기지 않는다 — 실제 등록은 create()에서 남는다. */
+    @PostMapping("/preview")
+    public ApiResponse<PressPreviewResponse> preview(@Valid @RequestBody PressPreviewRequest request) {
+        return ApiResponse.success(PressPreviewResponse.from(ogPreviewFetcher.fetch(request.url())));
+    }
 
     @GetMapping("/manage")
     public ApiResponse<List<PressClippingAdminResponse>> listForAdmin() {
@@ -57,10 +67,11 @@ public class PressClippingEditController {
 
     @PostMapping
     public ApiResponse<PressClippingAdminResponse> create(
-            @Valid @RequestBody PressClippingContentRequest request,
+            @Valid @RequestBody CreatePressClippingRequest request,
             @AuthenticationPrincipal AdminPrincipal principal,
             HttpServletRequest httpRequest) {
-        PressClipping clipping = pressClippingService.create(request.title(), request.externalUrl());
+        PressClipping clipping =
+                pressClippingService.create(request.title(), request.externalUrl(), request.ogImageUrl(), principal.id());
 
         auditLogger.record(
                 principal.id(),
