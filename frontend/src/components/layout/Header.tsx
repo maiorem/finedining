@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useScrolled } from "../../hooks/useScrolled";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
 import { useMemberAuth } from "../../contexts/MemberAuthContext";
+import { useCan } from "../../hooks/useCan";
 import logo from "../../assets/logo.png";
 import styles from "./Header.module.css";
 
@@ -41,6 +42,11 @@ export function Header() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const { session: adminSession, logout: adminLogout } = useAdminAuth();
   const { session: memberSession, logout: memberLogout } = useMemberAuth();
+  const canViewMembers = useCan("account:view");
+
+  // 관리자 로그인 상태에서만 보이는 항목 — 서버가 이미 /api/accounts/manage를 막고 있으니
+  // (§3.5) 이 조건은 편의일 뿐 보안 장치가 아니다.
+  const navItems = canViewMembers ? [...NAV_ITEMS, { to: "/members", labelKey: "nav.members" }] : NAV_ITEMS;
 
   const nextLocale = i18n.language === "en" ? "ko" : "en";
   const loggedIn = Boolean(adminSession || memberSession);
@@ -111,7 +117,7 @@ export function Header() {
 
         <nav aria-label={t("nav.main")} className={styles.desktopNav}>
           <ul className={styles.navList}>
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <li key={item.to}>
                 <NavLink
                   to={item.to}
@@ -171,7 +177,7 @@ export function Header() {
       {menuOpen && (
         <div ref={panelRef} className={styles.mobilePanel}>
           <ul className={styles.mobileNavList}>
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <li key={item.to}>
                 <NavLink
                   to={item.to}

@@ -14,6 +14,7 @@ import ArtistsPage from "./pages/ArtistsPage";
 import ArtistDetailPage from "./pages/ArtistDetailPage";
 import LoginPage from "./pages/LoginPage";
 import OAuthCallbackPage from "./pages/OAuthCallbackPage";
+import MembersPage from "./pages/MembersPage";
 
 export function App() {
   return (
@@ -34,6 +35,8 @@ export function App() {
         {/* 내비게이션엔 노출하지 않는다 — 진입점은 Footer의 작은 링크뿐이다 (CLAUDE.md §3.5). */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+        {/* 관리자 로그인 상태에서만 Header가 메뉴로 노출한다 — 실제 접근 제어는 서버가 한다(§3.5). */}
+        <Route path="/members" element={<MembersPage />} />
       </Routes>
       <Footer />
     </>

@@ -16,6 +16,7 @@
   "nav.proposal": "Collaboration",
   "nav.reviews": "Reviews",
   "nav.artists": "Artists",
+  "nav.members": "Members",
   "nav.language": "Change language",
   "nav.openMenu": "Open menu",
   "nav.closeMenu": "Close menu",
@@ -210,5 +211,16 @@
   "programs.create.error.DUPLICATE_SLUG": "That slug is already in use.",
   "programs.create.error.VALIDATION_ERROR": "Use lowercase letters, numbers, and hyphens only.",
   "programs.create.error.generic": "Couldn't create the program.",
-  "oauthCallback.processing": "Signing you in…"
+  "oauthCallback.processing": "Signing you in…",
+  "members.eyebrow": "Members",
+  "members.heading": "Member Management",
+  "members.loading": "Loading…",
+  "members.empty": "No members yet.",
+  "members.nicknameLabel": "Nickname",
+  "members.providerLabel": "Login method",
+  "members.localeLabel": "Language",
+  "members.statusLabel": "Status",
+  "members.joinedAtLabel": "Joined",
+  "members.status.ACTIVE": "Active",
+  "members.status.WITHDRAWN": "Withdrawn"
 }

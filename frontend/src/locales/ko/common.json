@@ -16,6 +16,7 @@
   "nav.proposal": "협업제안",
   "nav.reviews": "리뷰",
   "nav.artists": "아티스트",
+  "nav.members": "회원 관리",
   "nav.language": "언어 변경",
   "nav.openMenu": "메뉴 열기",
   "nav.closeMenu": "메뉴 닫기",
@@ -210,5 +211,16 @@
   "programs.create.error.DUPLICATE_SLUG": "이미 사용 중인 슬러그입니다.",
   "programs.create.error.VALIDATION_ERROR": "소문자·숫자·하이픈만 사용해 주세요.",
   "programs.create.error.generic": "프로그램을 만들지 못했습니다.",
-  "oauthCallback.processing": "로그인 처리 중입니다…"
+  "oauthCallback.processing": "로그인 처리 중입니다…",
+  "members.eyebrow": "Members",
+  "members.heading": "회원 관리",
+  "members.loading": "불러오는 중입니다.",
+  "members.empty": "가입한 회원이 없습니다.",
+  "members.nicknameLabel": "닉네임",
+  "members.providerLabel": "로그인 방식",
+  "members.localeLabel": "언어",
+  "members.statusLabel": "상태",
+  "members.joinedAtLabel": "가입일",
+  "members.status.ACTIVE": "활동중",
+  "members.status.WITHDRAWN": "탈퇴"
 }

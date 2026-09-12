@@ -1,0 +1,35 @@
+.status {
+  color: var(--c-ink-60);
+  padding: 1rem 0;
+}
+
+.tableWrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  min-width: 480px;
+  font-size: var(--t-body);
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.75em 1em;
+  border-bottom: 1px solid var(--c-line);
+  white-space: nowrap;
+}
+
+.table th {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  color: var(--c-ink-60);
+  font-weight: 400;
+}
+
+.withdrawn {
+  color: var(--c-ink-35);
+}

@@ -85,6 +85,33 @@ describe("Header", () => {
     expect(await screen.findByRole("link", { name: "로그인" })).toHaveAttribute("href", "/login");
   });
 
+  it("로그인하지 않았으면 회원 관리 메뉴를 보여주지 않는다", async () => {
+    fetchMock.mockResolvedValue(UNAUTHENTICATED);
+    renderHeader();
+    await screen.findByRole("link", { name: "로그인" });
+
+    expect(screen.queryByRole("link", { name: "회원 관리" })).not.toBeInTheDocument();
+  });
+
+  it("관리자로 로그인된 상태에서만 회원 관리 메뉴를 보여준다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input === "/api/auth/admin/refresh") {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: { accessToken: "token", username: "admin", role: "SUPER_ADMIN" },
+            error: null,
+          }),
+        );
+      }
+      return Promise.resolve(UNAUTHENTICATED);
+    });
+
+    renderHeader();
+
+    expect(await screen.findByRole("link", { name: "회원 관리" })).toHaveAttribute("href", "/members");
+  });
+
   it("관리자로 로그인된 상태면 로그아웃 버튼을 보여주고 확인하면 로그아웃한다", async () => {
     const user = userEvent.setup();
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
