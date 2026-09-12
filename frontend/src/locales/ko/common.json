@@ -217,6 +217,8 @@
   "members.loading": "불러오는 중입니다.",
   "members.empty": "가입한 회원이 없습니다.",
   "members.nicknameLabel": "닉네임",
+  "members.emailLabel": "이메일",
+  "members.noEmail": "이메일 미제공",
   "members.providerLabel": "로그인 방식",
   "members.localeLabel": "언어",
   "members.statusLabel": "상태",

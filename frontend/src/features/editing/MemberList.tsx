@@ -10,8 +10,10 @@ function formatJoinedDate(iso: string) {
 }
 
 /**
- * 카카오로 로그인한 일반 회원의 "공개 정보"만 보여주는 관리자 전용 목록(2026-09-12) —
- * 조회 전용이다. email·카카오 내부 식별자는 서버가 애초에 내려주지 않는다(§3.2·§7.7).
+ * 카카오로 로그인한 일반 회원 정보를 보여주는 관리자 전용 목록(2026-09-12) — 조회
+ * 전용이다. 카카오 내부 식별자(providerUserId)는 서버가 애초에 내려주지 않는다(§3.2·§7.7).
+ * email은 노출하지만 개인정보처리방침에 이 열람 목적이 아직 명시돼 있지 않다 — 오픈 전
+ * 별도 문서 작업이 필요하다(§15).
  * MembersPage에서 React.lazy로만 import된다(§3.5·§9).
  */
 export default function MemberList() {
@@ -38,6 +40,7 @@ export default function MemberList() {
         <thead>
           <tr>
             <th scope="col">{t("members.nicknameLabel")}</th>
+            <th scope="col">{t("members.emailLabel")}</th>
             <th scope="col">{t("members.providerLabel")}</th>
             <th scope="col">{t("members.localeLabel")}</th>
             <th scope="col">{t("members.statusLabel")}</th>
@@ -48,6 +51,7 @@ export default function MemberList() {
           {accounts?.map((account) => (
             <tr key={account.id}>
               <td>{account.nickname}</td>
+              <td>{account.email ?? t("members.noEmail")}</td>
               <td>{account.provider}</td>
               <td>{account.locale}</td>
               <td>

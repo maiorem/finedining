@@ -217,6 +217,8 @@
   "members.loading": "Loading…",
   "members.empty": "No members yet.",
   "members.nicknameLabel": "Nickname",
+  "members.emailLabel": "Email",
+  "members.noEmail": "No email provided",
   "members.providerLabel": "Login method",
   "members.localeLabel": "Language",
   "members.statusLabel": "Status",

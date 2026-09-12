@@ -33,12 +33,14 @@ describe("MembersPage", () => {
   });
 
   it("관리자가 아니면 회원 목록을 렌더하지 않는다", async () => {
-    const fetchMock = vi.fn((_input: string) => Promise.resolve(UNAUTHENTICATED));
+    const fetchMock = vi.fn((input: string) => {
+      expect(input).not.toBe("/api/accounts/manage");
+      return Promise.resolve(UNAUTHENTICATED);
+    });
     renderPage(fetchMock);
 
     expect(await screen.findByText("회원 관리")).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    expect(fetchMock.mock.calls.some(([input]) => input === "/api/accounts/manage")).toBe(false);
   });
 
   it("관리자로 로그인했으면 회원 목록을 공개 정보와 함께 보여준다", async () => {
@@ -60,6 +62,7 @@ describe("MembersPage", () => {
               {
                 id: 1,
                 nickname: "김아무개",
+                email: "user@example.com",
                 provider: "kakao",
                 locale: "KO",
                 status: "ACTIVE",
@@ -76,6 +79,7 @@ describe("MembersPage", () => {
     renderPage(fetchMock);
 
     expect(await screen.findByText("김아무개")).toBeInTheDocument();
+    expect(screen.getByText("user@example.com")).toBeInTheDocument();
     expect(screen.getByText("kakao")).toBeInTheDocument();
     expect(screen.getByText("활동중")).toBeInTheDocument();
   });
