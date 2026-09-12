@@ -1,1 +1,172 @@
-Our privacy policy is coming soon.
+Fine Dining Theater Privacy Policy
+
+Effective Date: [Month] [Day], 2026
+
+Fine Dining Theater ("the Company") regards users' personal information as important and complies with the Personal Information Protection Act and other relevant laws.
+To protect users' personal information and safeguard users' rights concerning that information, the Company establishes and discloses the following Privacy Policy.
+This Privacy Policy applies to membership registration, login, and the website services provided on the Fine Dining Theater website (the "Site").
+
+Article 1 (Purposes of Processing Personal Information)
+The Company processes personal information for the following purposes.
+
+1. Website Membership Registration and Member Management
+The Company processes personal information to confirm the intent to register, identify and authenticate Members, maintain and manage membership eligibility, prevent fraudulent use, and provide and manage the services offered to Members.
+
+2. Website Login and Use of Services
+The Company processes personal information for Member login and identity verification, providing Member-specific services, managing usage history, and providing information necessary for the use of the Service.
+
+3. Information on Performances and Programs
+The Company processes personal information to provide Members with information related to the performances, programs, and cultural and artistic content it offers, and to enable use of Site-linked services such as reservations and applications.
+Payments for current performances and programs are not processed directly on the Fine Dining Theater website; where necessary, they are processed through Naver Reservation or another external booking page.
+
+4. Customer Inquiries and Complaint Handling
+The Company processes personal information to receive and address inquiries and complaints related to use of the Site, verify the facts, and provide responses and outcomes.
+
+Article 2 (Personal Information Items Processed)
+The Company processes only the minimum personal information necessary to provide the Service.
+Fine Dining Theater accepts membership registration and login only through Kakao Login. The Company does not operate a separate membership registration system that issues its own IDs and passwords.
+
+Kakao Login
+When a user registers or logs in to Fine Dining Theater with a Kakao account, the Company receives and processes the following information within the scope the user has agreed to provide through Kakao.
+Nickname (required) — Member identification and on-screen display
+Email address (optional) — Assisting Member identification and providing notices. If the user does not consent to providing an email address during Kakao Login, it will not be provided; this does not prevent the user from registering or using the Service.
+The user identifier provided by Kakao (required) — Member identification and login
+* Fine Dining Theater does not receive any personal information from Kakao beyond the items above.
+
+Article 3 (Processing and Retention Period of Personal Information)
+The Company processes and retains personal information for the retention/use period required by law or until the purpose of processing the personal information is achieved.
+
+1. Website Member Information
+Retained until the Member withdraws.
+When a Member withdraws, the Company does not immediately physically delete the account. Instead, the Member's nickname is changed to "Withdrawn Member," and information that could identify the individual, such as the email address and Kakao identifier, is anonymized without delay (deleted or replaced in a form that cannot be recovered).
+Content the Member posted (such as reviews) is not deleted and remains as is; the author is displayed on screen as "Withdrawn Member."
+A withdrawn account cannot be used to log in again; if the same Kakao account is used to log in again after withdrawal, it is treated as a new membership.
+However, personal information may be retained until the relevant reason ends in the following cases:
+where retention is required under applicable law;
+where a dispute or complaint related to the personal information is being processed; or
+where necessary to prevent fraudulent use.
+
+2. Customer Inquiry Information
+Retained for one year after the inquiry or complaint has been resolved, then destroyed.
+* It is recommended to finalize this retention period based on actual operational experience.
+
+3. Information on Use of External Booking Services such as Naver Reservation
+Where a user uses an external booking service instead of the Fine Dining Theater website processing payment or collecting reservation information directly, the personal information collected and processed by that external service is governed by that service's own privacy policy.
+
+Article 4 (Procedures and Methods for Destroying Personal Information)
+The Company destroys personal information without delay once the retention period has elapsed or the purpose of processing has been achieved and the personal information is no longer necessary.
+
+1. Destruction Procedure
+Personal information whose retention period has elapsed or whose processing purpose has been achieved is destroyed in accordance with internal procedures.
+
+2. Destruction Method
+Electronic files: Securely deleted so that they cannot be recovered or reproduced.
+Paper documents: Shredded or incinerated.
+
+Article 5 (Provision of Personal Information to Third Parties)
+The Company does not, in principle, provide users' personal information to third parties.
+The following are exceptions:
+where the user has given prior consent;
+where required by specific provisions of law; or
+where an investigative or other relevant authority requests it in accordance with procedures under applicable law.
+Fine Dining Theater does not currently process payment for performances or programs directly on the website, and instead connects users to external booking services.
+Where personal information is processed by such an external booking service, the Company informs users so they can review that service's own privacy policy.
+
+Article 6 (Outsourcing of Personal Information Processing)
+The Company may outsource part of its personal information processing to external specialized providers for the smooth operation of the Site.
+The Company currently uses Amazon Web Services (AWS) for the Site's servers and data storage.
+
+Trustee: Amazon Web Services (AWS)
+Outsourced work: Operation of cloud infrastructure, including the Site's servers and database
+
+Where the Company outsources personal information processing, it supervises and manages the trustee in accordance with Article 26 of the Personal Information Protection Act to ensure personal information is processed securely.
+
+Article 7 (Overseas Transfer of Personal Information)
+The Company uses Amazon Web Services (AWS) cloud services to operate its personal information processing systems, and the relevant servers are located in the Seoul region (ap-northeast-2) in the Republic of Korea. Accordingly, users' personal information is not transferred overseas.
+If the server location or outsourcing provider changes in the future such that personal information is transferred overseas, the Company will provide advance notice through this Privacy Policy, in accordance with the Personal Information Protection Act, of the destination country, the recipient, the purpose and items of transfer, the timing and method of transfer, and the retention/use period and relevant legal basis.
+
+Article 8 (Measures to Secure the Safety of Personal Information)
+The Company takes the following measures to safely protect users' personal information.
+
+Administrative measures
+Managing access authority to personal information
+Internal management for personal information protection
+Management and training of personnel handling personal information
+
+Technical measures
+Access control for personal information processing systems
+Encryption of personal information and passwords
+Management of access records
+Operation of security programs and systems
+
+Physical measures
+Access control for the systems and locations where personal information is stored
+
+Article 9 (Installation, Operation, and Refusal of Automatic Personal Information Collection Devices)
+The Company may use cookies to operate the Site smoothly and to maintain login status.
+A cookie is a small data file stored in a user's browser while using the Site.
+
+Purposes of Using Cookies
+Maintaining login status
+Improving the Site's usability
+Understanding Service usage
+
+Users may refuse to allow cookies to be stored through their web browser settings.
+However, refusing to store cookies may prevent some features of the Site, such as login, from working properly.
+
+Article 10 (Google Analytics and Advertising/Analytics Tools)
+Fine Dining Theater currently does not use separate analytics or advertising tools such as Google Analytics or Meta Pixel.
+Accordingly, this Privacy Policy does not currently include content on the collection or use of behavioral information.
+If the Company adopts services such as Google Analytics or Meta Pixel in the future, it will amend this Privacy Policy after reviewing how those services process personal information and whether they involve any overseas transfer.
+
+Article 11 (Text Message and Email Delivery Services)
+Fine Dining Theater currently does not use separate external text message or email delivery services such as Aligo, Naver Cloud, AWS SES, or Mailchimp.
+If the Company uses such an external text message or email delivery service in the future, it will add and disclose the trustee and the outsourced work in this Privacy Policy.
+
+Article 12 (Rights and Obligations of Data Subjects and How to Exercise Them)
+Users may exercise the following personal-information-related rights against the Company at any time.
+Requesting access to personal information
+Requesting correction of personal information
+Requesting deletion of personal information
+Requesting suspension of processing of personal information
+Withdrawing consent to the processing of personal information
+Withdrawing membership
+
+Modifying Member Information and Withdrawal
+A Member may check and modify their member information, and apply to withdraw their membership, from the My Page or member information menu on the Site.
+Where processing through the Site is not feasible, a request may be made to the Personal Information Protection Officer by email or phone.
+The Company takes the necessary action in accordance with applicable law after confirming that the request is made by the individual concerned or their legitimate representative.
+
+Article 13 (Personal Information Protection Officer)
+The Company designates a Personal Information Protection Officer to oversee matters related to the processing of personal information and to handle users' inquiries and grievances concerning their personal information.
+
+Personal Information Protection Officer
+Name: Lee In-seok
+Business name: Fine Dining Theater
+Title: Manager
+Phone: 010-6776-1801
+Email: finediningtheater@naver.com
+Inquiries, requests for access, correction, deletion, or suspension of processing, and other grievances related to personal information may be directed to the contact information above.
+
+Article 14 (Remedies for Infringement of Personal Information)
+Users may seek remedies for infringement of their personal information by consulting with, or applying for dispute mediation from, the Personal Information Infringement Report Center, the Personal Information Dispute Mediation Committee, and similar organizations.
+Reports of and consultation on personal information infringement may also be made through the following organizations.
+Personal Information Infringement Report Center: privacy.kisa.or.kr
+Personal Information Dispute Mediation Committee: www.kopico.go.kr
+Supreme Prosecutors' Office: www.spo.go.kr
+National Police Agency Cyber Crime Reporting System: ecrm.police.go.kr
+
+Article 15 (Automated Decision-Making)
+Fine Dining Theater currently does not use users' personal information to make decisions that significantly affect users through a fully automated process.
+If the Company adopts automated decision-making in the future, it will inform users, in accordance with applicable law, of that fact and of the criteria and procedures for the automated decision-making, as well as how users may exercise their rights.
+
+Article 16 (Changes to the Privacy Policy)
+This Privacy Policy may change due to changes in law, the content of the Service, or the Company's personal information processing practices.
+Where this Privacy Policy is changed, the Company will disclose the changes through the Site.
+
+Privacy Policy Revision History
+Effective date: [Month] [Day], 2026
+Description of change: Initial enactment of the Privacy Policy
+
+Fine Dining Theater
+Kim Mi-ran, Sole Proprietor
