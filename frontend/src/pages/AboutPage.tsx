@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePressClippings } from "../api/pressClippings";
 import { useCan } from "../hooks/useCan";
+import aboutImage from "../assets/about/about.jpg";
 import styles from "./AboutPage.module.css";
 
 // 관리자 전용 API 경로가 익명 방문자 번들에 섞이면 안 되므로 React.lazy로만 import한다
@@ -50,7 +51,20 @@ export default function AboutPage() {
         </button>
       </div>
 
-      {tab === "about" && <p className={styles.intro}>{t("about.introText")}</p>}
+      {tab === "about" && (
+        <div className={styles.aboutContent}>
+          <img
+            src={aboutImage}
+            alt=""
+            className={styles.aboutImage}
+            width={960}
+            height={1440}
+            loading="lazy"
+            decoding="async"
+          />
+          <p className={styles.intro}>{t("about.introText")}</p>
+        </div>
+      )}
 
       {tab === "press" && (
         <div className={styles.pressSection}>
