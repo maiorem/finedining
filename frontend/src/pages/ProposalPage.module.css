@@ -28,13 +28,15 @@
   .content {
     flex-direction: row;
     align-items: flex-start;
-    gap: 3rem;
+    gap: 2.5rem;
   }
 }
 
 .formColumn {
   min-width: 0;
-  flex: 1 1 auto;
+  /* form 자체가 480px에서 멈추는데 이 wrapper가 남는 폭까지 늘어나면 이미지가
+     컨테이너 오른쪽 끝으로 밀려나 폼과 크게 벌어진다 — form과 같은 폭으로 고정한다. */
+  flex: 0 1 480px;
 }
 
 .image {
