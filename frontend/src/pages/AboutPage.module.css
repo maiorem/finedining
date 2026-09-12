@@ -65,9 +65,8 @@
 
 .aboutImage {
   width: 100%;
-  max-width: 360px;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
+  max-width: 420px;
+  height: auto;
   flex-shrink: 0;
 }
 
