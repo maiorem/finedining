@@ -3,6 +3,7 @@ package com.finediningtheater.account;
 import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.SiteLocale;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,11 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final SignupPolicy signupPolicy;
+
+    /** 관리자 화면의 회원 목록 — 최신 가입순. 공개 정보만 노출하는 건 DTO 쪽 책임이다. */
+    public List<Account> listForAdmin() {
+        return accountRepository.findAllByOrderByCreatedAtDesc();
+    }
 
     @Transactional
     public Account findOrCreate(String provider, String providerUserId, String email, String nickname) {

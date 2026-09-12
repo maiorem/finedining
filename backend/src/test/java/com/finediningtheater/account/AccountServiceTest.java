@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.SiteLocale;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,16 @@ class AccountServiceTest {
 
     private AccountService service() {
         return new AccountService(accountRepository, signupPolicy);
+    }
+
+    @Test
+    void listForAdmin은_가입순으로_정렬된_목록을_그대로_반환한다() {
+        Account account = new Account("kakao", "1", "user@example.com", "김아무개", SiteLocale.KO);
+        when(accountRepository.findAllByOrderByCreatedAtDesc()).thenReturn(List.of(account));
+
+        List<Account> result = service().listForAdmin();
+
+        assertThat(result).containsExactly(account);
     }
 
     @Test
