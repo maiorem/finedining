@@ -8,6 +8,6 @@ describe("TermsPage", () => {
     render(<TermsPage />);
 
     expect(screen.getByRole("heading", { name: "이용약관" })).toBeInTheDocument();
-    expect(screen.getByText(/이용약관을 준비 중입니다/)).toBeInTheDocument();
+    expect(screen.getByText(/제1조 목적/)).toBeInTheDocument();
   });
 });

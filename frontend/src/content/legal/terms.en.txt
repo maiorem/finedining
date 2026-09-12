@@ -1,1 +1,97 @@
-Our terms of service are coming soon.
+Fine Dining Theater Website Terms of Service
+
+Effective Date: [Month] [Day], 2026
+
+Article 1 (Purpose)
+These Terms of Service ("Terms") set forth the conditions and procedures for using the internet-related services provided on the Fine Dining Theater website (the "Site"), operated by sole proprietor Kim Mi-ran (trade name: Fine Dining Theater; the "Company"), as well as the rights, obligations, and responsibilities between the Company and its Members.
+
+Article 2 (Definitions)
+The terms used in these Terms are defined as follows.
+"Site" means the Fine Dining Theater website operated by the Company.
+"Member" means a person who has registered as a member of the Site and uses the membership services provided by the Company.
+"Non-member" means a person who uses the services provided on the Site without registering as a member.
+"Content" means performances, programs, images, videos, text, designs, and other materials produced or provided by the Company on the Site.
+"Service" means membership management, information on performances and programs, provision of Content, connection to external booking services, and other services the Company provides through the Site.
+
+Article 3 (Effect and Amendment of the Terms)
+These Terms take effect by being posted on the Site or otherwise notified to users during the membership registration process.
+The Company may amend these Terms to the extent permitted by applicable law.
+When the Terms are amended, the Company will announce the amended content and its effective date through the Site.
+If an amendment is unfavorable to Members or involves a material change, the Company will announce the content and effective date on the Site, or separately notify Members, a reasonable period in advance.
+If a Member continues to use the Service after the effective date of the amended Terms, the Member is deemed to have agreed to the amended Terms.
+A Member who does not agree to the amended Terms may withdraw their membership.
+
+Article 4 (Membership Registration)
+A user may apply for membership by agreeing to these Terms and providing the required information in accordance with the membership registration procedure established by the Company.
+The Company will approve an application for membership unless there is a specific reason not to.
+The Company may restrict or refuse to approve membership registration in any of the following cases:
+- the application is made using another person's information;
+- false information is provided;
+- the application is made for the purpose of disrupting the normal operation of the Site; or
+- the application otherwise violates applicable law or standards established by the Company.
+
+Article 5 (Management of Member Information)
+Members must keep their member information up to date.
+Members are responsible for any consequences arising from their own negligence in changing or managing their member information.
+The Company processes Members' personal information securely in accordance with the Personal Information Protection Act and the Company's Privacy Policy.
+
+Article 6 (Management of Member IDs and Passwords)
+Members are responsible for managing their own IDs and passwords.
+Members must not allow a third party to use, or provide to a third party, their ID or password.
+If a Member becomes aware that their ID or password has been leaked or is being used by a third party, the Member must notify the Company immediately.
+The Company may request that a Member change their password or other credentials where necessary to protect the Member's personal information or to operate the Service.
+
+Article 7 (Provision of Services)
+The Company provides the following services:
+- website membership registration and login;
+- information on Fine Dining Theater performances and programs;
+- provision of Content and related information;
+- connection to external booking services for reservations for performances and programs;
+- customer inquiries and consultation; and
+- other services determined by the Company.
+Reservations and payments for current performances and programs are not processed directly on the Site; where necessary, users are directed to an external booking page such as Naver Reservation.
+Reservations, payments, and the processing of personal information on an external booking service are governed by that service's own terms of service and privacy policy.
+
+Article 8 (Change and Suspension of Services)
+The Company may change or suspend all or part of the Service for operational, technical, or other substantial reasons.
+Where a change or suspension of the Service is planned, the Company will give advance notice to the extent possible.
+This does not apply where the Company is unable to provide the Service due to force majeure, server failure, telecommunications failure, or other cause beyond the Company's reasonable control.
+
+Article 9 (Obligations of Members)
+Members must not engage in any of the following acts:
+- unlawfully using another person's personal information or account;
+- registering false information;
+- infringing the rights or reputation of the Company or a third party;
+- disrupting the normal operation of the Site;
+- reproducing, distributing, or modifying the Company's Content without authorization;
+- violating applicable law or public order and good morals; or
+- any other act the Company prohibits for the normal operation of the Service.
+
+Article 10 (Copyright in Content)
+Copyright and other intellectual property rights in the Content provided on the Site belong to the Company or the rightful rights holder.
+Members may not reproduce, transmit, distribute, sell, modify, or commercially use the Content on the Site without the Company's prior consent.
+Where content a Member posts on the Site infringes the rights of a third party, that Member is responsible for the infringement.
+
+Article 11 (Withdrawal of Membership and Termination of the Service Agreement)
+A Member may apply to withdraw their membership on the Site at any time.
+Upon confirming a Member's withdrawal request, the Company processes the Member's information in accordance with applicable law and the Privacy Policy.
+Personal information that must be retained under applicable law may be stored separately for the required period.
+
+Article 12 (Protection of Personal Information by the Company)
+The Company complies with applicable law to protect Members' personal information, and matters concerning the processing of personal information are governed by a separate Privacy Policy.
+
+Article 13 (External Services)
+For the convenience of users, the Site may link to external services such as Naver Reservation.
+Matters concerning the use of an external service are governed by that service's own terms of service and privacy policy.
+
+Article 14 (Disclaimer)
+The Company is not liable where it is unable to provide the Service due to force majeure or a cause beyond the Company's reasonable control.
+The Company is not liable for any disruption to a Member's use of the Service caused by that Member's own fault.
+Except to the extent the Company's liability is recognized under applicable law, the Company is not liable for damages arising from a Member's use of information provided on the Site.
+
+Article 15 (Dispute Resolution)
+The Company and Members will endeavor to resolve any dispute between them through mutual consultation.
+Where a dispute cannot be resolved through consultation, it will be handled in accordance with the procedures provided under applicable law.
+
+Article 16 (Governing Law)
+Matters not provided for in these Terms are governed by the relevant laws and customary practice of the Republic of Korea.
