@@ -2,9 +2,7 @@
   border-top: 1px solid var(--c-line);
   padding: 2rem var(--gutter-mobile);
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 1rem;
 }
 
@@ -12,6 +10,28 @@
   .footer {
     padding: 2rem var(--gutter-desktop);
   }
+}
+
+.bizInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.bizInfo p {
+  margin: 0;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+}
+
+.bizInfo a {
+  color: inherit;
+}
+
+.bizInfo a:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
 }
 
 .copyright {
