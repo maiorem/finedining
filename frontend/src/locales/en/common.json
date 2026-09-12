@@ -44,6 +44,9 @@
   "footer.address": "Address",
   "footer.phone": "Phone",
   "footer.email": "Email",
+  "footer.legalNav": "Legal",
+  "footer.privacyPolicy": "Privacy Policy",
+  "footer.terms": "Terms of Service",
   "footer.copyright": "© 2026 Fine Dining Theater",
   "nav.login": "Log in",
   "nav.adminLogout": "Admin logout",
@@ -229,5 +232,7 @@
   "members.statusLabel": "Status",
   "members.joinedAtLabel": "Joined",
   "members.status.ACTIVE": "Active",
-  "members.status.WITHDRAWN": "Withdrawn"
+  "members.status.WITHDRAWN": "Withdrawn",
+  "privacy.heading": "Privacy Policy",
+  "terms.heading": "Terms of Service"
 }

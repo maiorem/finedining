@@ -44,6 +44,9 @@
   "footer.address": "주소",
   "footer.phone": "연락처",
   "footer.email": "이메일",
+  "footer.legalNav": "법적 고지",
+  "footer.privacyPolicy": "개인정보처리방침",
+  "footer.terms": "이용약관",
   "footer.copyright": "© 2026 파인다이닝 씨어터",
   "nav.login": "로그인",
   "nav.adminLogout": "관리자 로그아웃",
@@ -229,5 +232,7 @@
   "members.statusLabel": "상태",
   "members.joinedAtLabel": "가입일",
   "members.status.ACTIVE": "활동중",
-  "members.status.WITHDRAWN": "탈퇴"
+  "members.status.WITHDRAWN": "탈퇴",
+  "privacy.heading": "개인정보처리방침",
+  "terms.heading": "이용약관"
 }

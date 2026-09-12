@@ -34,6 +34,23 @@
   outline-offset: 2px;
 }
 
+.legalLinks {
+  display: flex;
+  gap: 1rem;
+}
+
+.legalLinks a {
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+  text-decoration: underline;
+}
+
+.legalLinks a:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
 .copyright {
   margin: 0;
   font-family: var(--f-util);

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import styles from "./Footer.module.css";
 
 // 사업자 정보(§8.5)는 상호·주소 등 사실 값이라 로케일에 따라 달라지지 않는다 — 라벨만
@@ -32,6 +33,10 @@ export function Footer() {
           {t("footer.email")} <a href={`mailto:${BUSINESS_INFO.email}`}>{BUSINESS_INFO.email}</a>
         </p>
       </div>
+      <nav aria-label={t("footer.legalNav")} className={styles.legalLinks}>
+        <Link to="/privacy">{t("footer.privacyPolicy")}</Link>
+        <Link to="/terms">{t("footer.terms")}</Link>
+      </nav>
       <p className={styles.copyright}>{t("footer.copyright")}</p>
     </footer>
   );

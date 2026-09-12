@@ -1,0 +1,25 @@
+.page {
+  padding: var(--section-y-mobile) var(--gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--section-y-desktop) var(--gutter-desktop);
+  }
+}
+
+.heading {
+  margin: 0 0 2rem;
+  font-family: var(--f-body);
+  font-weight: 600;
+  font-size: var(--t-h2);
+  color: var(--c-ink);
+}
+
+.body {
+  margin: 0;
+  color: var(--c-ink);
+  line-height: var(--lh-body);
+  white-space: pre-wrap;
+  max-width: 38em;
+}
