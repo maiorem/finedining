@@ -41,8 +41,7 @@
   display: block;
   width: 100%;
   max-width: 420px;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
+  height: auto;
   flex-shrink: 0;
 }
 
