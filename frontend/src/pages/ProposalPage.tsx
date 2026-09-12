@@ -68,23 +68,32 @@ export default function ProposalPage() {
     </Suspense>
   );
 
+  // 소개 페이지(이미지-좌/텍스트-우)와 대칭되게 이 페이지는 폼-좌/이미지-우로 배치한다.
+  const proposalImageEl = (
+    <img
+      src={proposalImage}
+      alt=""
+      className={styles.image}
+      width={960}
+      height={1440}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+
   if (submitted) {
     return (
       <main className={styles.page}>
         <h1 className={styles.srOnly}>{t("nav.proposal")}</h1>
-        <img
-          src={proposalImage}
-          alt=""
-          className={styles.image}
-          width={960}
-          height={1440}
-          loading="lazy"
-          decoding="async"
-        />
         {reviewToggle}
         {reviewPanel}
-        <div className={styles.success}>
-          <p>{t("proposal.success")}</p>
+        <div className={styles.content}>
+          <div className={styles.formColumn}>
+            <div className={styles.success}>
+              <p>{t("proposal.success")}</p>
+            </div>
+          </div>
+          {proposalImageEl}
         </div>
       </main>
     );
@@ -93,119 +102,115 @@ export default function ProposalPage() {
   return (
     <main className={styles.page}>
       <h1 className={styles.srOnly}>{t("nav.proposal")}</h1>
-      <img
-        src={proposalImage}
-        alt=""
-        className={styles.image}
-        width={960}
-        height={1440}
-        loading="lazy"
-        decoding="async"
-      />
       {reviewToggle}
       {reviewPanel}
-      <p className={styles.tagline}>{t("proposal.tagline")}</p>
-      <p className={styles.lead}>{t("proposal.lead")}</p>
+      <div className={styles.content}>
+        <div className={styles.formColumn}>
+          <p className={styles.tagline}>{t("proposal.tagline")}</p>
+          <p className={styles.lead}>{t("proposal.lead")}</p>
 
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.field}>
-          <label htmlFor="proposal-name">{t("proposal.name")}</label>
-          <input
-            id="proposal-name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.field}>
+              <label htmlFor="proposal-name">{t("proposal.name")}</label>
+              <input
+                id="proposal-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="proposal-email">{t("proposal.contactEmail")}</label>
+              <input
+                id="proposal-email"
+                type="email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="proposal-category">{t("proposal.category.label")}</label>
+              <select
+                id="proposal-category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as ProposalCategory)}
+                required
+              >
+                <option value="" disabled>
+                  {t("proposal.category.placeholder")}
+                </option>
+                {PROPOSAL_CATEGORIES.map((value) => (
+                  <option key={value} value={value}>
+                    {t(`proposal.category.${value}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="proposal-title">{t("proposal.title")}</label>
+              <input
+                id="proposal-title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="proposal-body">{t("proposal.body")}</label>
+              <textarea
+                id="proposal-body"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* 허니팟: 사람에게는 안 보이고, 자동입력 봇만 채운다 */}
+            <div className={styles.honeypot} aria-hidden="true">
+              <label htmlFor="proposal-website">Website</label>
+              <input
+                id="proposal-website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+              />
+            </div>
+
+            <label className={styles.consent}>
+              <input
+                type="checkbox"
+                checked={privacyConsent}
+                onChange={(e) => setPrivacyConsent(e.target.checked)}
+                required
+              />
+              <span>
+                {t("proposal.consent")}
+                <span className={styles.consentDetail}>{t("proposal.consentDetail")}</span>
+              </span>
+            </label>
+
+            {error && (
+              <p className={styles.error} role="alert">
+                {error}
+              </p>
+            )}
+
+            <button type="submit" className={styles.submit} disabled={submitting}>
+              {t("proposal.submit")}
+            </button>
+          </form>
         </div>
-
-        <div className={styles.field}>
-          <label htmlFor="proposal-email">{t("proposal.contactEmail")}</label>
-          <input
-            id="proposal-email"
-            type="email"
-            value={contactEmail}
-            onChange={(e) => setContactEmail(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className={styles.field}>
-          <label htmlFor="proposal-category">{t("proposal.category.label")}</label>
-          <select
-            id="proposal-category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value as ProposalCategory)}
-            required
-          >
-            <option value="" disabled>
-              {t("proposal.category.placeholder")}
-            </option>
-            {PROPOSAL_CATEGORIES.map((value) => (
-              <option key={value} value={value}>
-                {t(`proposal.category.${value}`)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className={styles.field}>
-          <label htmlFor="proposal-title">{t("proposal.title")}</label>
-          <input
-            id="proposal-title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className={styles.field}>
-          <label htmlFor="proposal-body">{t("proposal.body")}</label>
-          <textarea
-            id="proposal-body"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            required
-          />
-        </div>
-
-        {/* 허니팟: 사람에게는 안 보이고, 자동입력 봇만 채운다 */}
-        <div className={styles.honeypot} aria-hidden="true">
-          <label htmlFor="proposal-website">Website</label>
-          <input
-            id="proposal-website"
-            type="text"
-            tabIndex={-1}
-            autoComplete="off"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-          />
-        </div>
-
-        <label className={styles.consent}>
-          <input
-            type="checkbox"
-            checked={privacyConsent}
-            onChange={(e) => setPrivacyConsent(e.target.checked)}
-            required
-          />
-          <span>
-            {t("proposal.consent")}
-            <span className={styles.consentDetail}>{t("proposal.consentDetail")}</span>
-          </span>
-        </label>
-
-        {error && (
-          <p className={styles.error} role="alert">
-            {error}
-          </p>
-        )}
-
-        <button type="submit" className={styles.submit} disabled={submitting}>
-          {t("proposal.submit")}
-        </button>
-      </form>
+        {proposalImageEl}
+      </div>
     </main>
   );
 }
