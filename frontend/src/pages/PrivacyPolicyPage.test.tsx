@@ -8,6 +8,6 @@ describe("PrivacyPolicyPage", () => {
     render(<PrivacyPolicyPage />);
 
     expect(screen.getByRole("heading", { name: "개인정보처리방침" })).toBeInTheDocument();
-    expect(screen.getByText(/개인정보처리방침을 준비 중입니다/)).toBeInTheDocument();
+    expect(screen.getByText(/제1조 개인정보의 처리 목적/)).toBeInTheDocument();
   });
 });
