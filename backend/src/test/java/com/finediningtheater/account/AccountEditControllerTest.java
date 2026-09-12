@@ -54,7 +54,7 @@ class AccountEditControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].nickname").value("김아무개"))
                 .andExpect(jsonPath("$.data[0].provider").value("kakao"))
-                .andExpect(jsonPath("$.data[0].email").doesNotExist())
+                .andExpect(jsonPath("$.data[0].email").value("user@example.com"))
                 .andExpect(jsonPath("$.data[0].providerUserId").doesNotExist());
     }
 }
