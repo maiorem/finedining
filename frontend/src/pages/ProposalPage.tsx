@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ApiError } from "../api/http";
 import { submitProposal, type ProposalCategory } from "../api/proposals";
 import { useCan } from "../hooks/useCan";
+import proposalImage from "../assets/proposal/proposal.jpg";
 import styles from "./ProposalPage.module.css";
 
 // 관리자 전용 API 경로가 익명 방문자 번들에 섞이면 안 되므로 React.lazy로만 import한다
@@ -71,6 +72,15 @@ export default function ProposalPage() {
     return (
       <main className={styles.page}>
         <h1 className={styles.srOnly}>{t("nav.proposal")}</h1>
+        <img
+          src={proposalImage}
+          alt=""
+          className={styles.image}
+          width={960}
+          height={1440}
+          loading="lazy"
+          decoding="async"
+        />
         {reviewToggle}
         {reviewPanel}
         <div className={styles.success}>
@@ -83,6 +93,15 @@ export default function ProposalPage() {
   return (
     <main className={styles.page}>
       <h1 className={styles.srOnly}>{t("nav.proposal")}</h1>
+      <img
+        src={proposalImage}
+        alt=""
+        className={styles.image}
+        width={960}
+        height={1440}
+        loading="lazy"
+        decoding="async"
+      />
       {reviewToggle}
       {reviewPanel}
       <p className={styles.tagline}>{t("proposal.tagline")}</p>
