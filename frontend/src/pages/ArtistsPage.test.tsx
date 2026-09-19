@@ -74,10 +74,10 @@ describe("ArtistsPage", () => {
     expect(link).toHaveAttribute("href", "/artists/kim-artist");
     expect(link.querySelector("img")).toHaveAttribute("src", "http://example.com/640.jpg");
     expect(await screen.findByText("배우 모집")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "새 아티스트 추가" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "새 프로필 추가" })).not.toBeInTheDocument();
   });
 
-  it("아티스트가 없으면 빈 상태 문구를 보여준다", async () => {
+  it("사람이 없으면 빈 상태 문구를 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
         return Promise.resolve(
@@ -89,10 +89,10 @@ describe("ArtistsPage", () => {
 
     renderPage();
 
-    expect(await screen.findByText("등록된 아티스트가 없습니다.")).toBeInTheDocument();
+    expect(await screen.findByText("등록된 사람이 없습니다.")).toBeInTheDocument();
   });
 
-  it("관리자로 로그인했으면 새 아티스트 추가 버튼이 보인다", async () => {
+  it("관리자로 로그인했으면 새 프로필 추가 버튼이 보인다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
         return Promise.resolve(
@@ -108,6 +108,6 @@ describe("ArtistsPage", () => {
 
     renderPage();
 
-    expect(await screen.findByRole("button", { name: "새 아티스트 추가" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "새 프로필 추가" })).toBeInTheDocument();
   });
 });

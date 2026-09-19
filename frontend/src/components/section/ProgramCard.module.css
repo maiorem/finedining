@@ -7,6 +7,8 @@
 .link {
   display: block;
   text-decoration: none;
+  background: transparent;
+  cursor: pointer;
   color: inherit;
 }
 
@@ -73,16 +75,26 @@
   letter-spacing: var(--ls-wide);
   text-transform: uppercase;
   text-decoration: none;
+  transition: color var(--d-fast) var(--e-out), background-color var(--d-fast) var(--e-out),
+    border-color var(--d-fast) var(--e-out);
 }
 
-.actionLink:hover,
+.actionLink:hover:not(:disabled),
 .actionLink:focus-visible {
-  border-color: var(--c-spot);
-  color: var(--c-spot);
+  background: var(--c-orange);
+  border-color: var(--c-orange);
+  color: var(--c-ink);
   outline: none;
 }
 
 .actionLink:focus-visible {
   outline: 2px solid var(--c-spot);
   outline-offset: 3px;
+}
+
+/* 링크가 아직 없는 프로그램의 "준비중" 버튼 — 눌리지 않는다. */
+.actionLink:disabled {
+  border-color: var(--c-line);
+  color: var(--c-ink-35);
+  cursor: not-allowed;
 }

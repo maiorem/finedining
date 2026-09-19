@@ -63,6 +63,11 @@ export default function ReviewsPage() {
     <main className={styles.page}>
       <h1 className={styles.srOnly}>{t("nav.reviews")}</h1>
 
+      <div className={styles.intro}>
+        <p className={styles.introTitle}>{t("reviews.intro.title")}</p>
+        <p className={styles.introBody}>{t("reviews.intro.body")}</p>
+      </div>
+
       {memberSession ? (
         <div className={styles.writeArea}>
           <button

@@ -150,7 +150,7 @@ describe("ProgramDetailPage", () => {
 
     renderAt("/programs/summer-tasting");
 
-    const applyLink = await screen.findByRole("link", { name: /참가하기/ });
+    const applyLink = await screen.findByRole("link", { name: /예약하기/ });
     expect(applyLink).toHaveAttribute("href", "https://forms.gle/abcd");
     expect(applyLink).toHaveAttribute("target", "_blank");
     expect(applyLink).toHaveAttribute("rel", "noopener noreferrer");

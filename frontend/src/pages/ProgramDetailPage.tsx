@@ -91,34 +91,37 @@ export default function ProgramDetailPage() {
           </EditableSection>
         )}
 
-        {(program.applyUrl || program.locationUrl) && (
-          <EditableSection active={showPanel}>
-            <div className={styles.actions}>
-              {program.applyUrl && (
-                <a
-                  className={styles.actionLink}
-                  href={program.applyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${t("programs.apply")} (${t("booking.opensNewWindow")})`}
-                >
-                  {t("programs.apply")}
-                </a>
-              )}
-              {program.locationUrl && (
-                <a
-                  className={styles.actionLink}
-                  href={program.locationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${t("booking.location")} (${t("booking.opensNewWindow")})`}
-                >
-                  {t("booking.location")}
-                </a>
-              )}
-            </div>
-          </EditableSection>
-        )}
+        <EditableSection active={showPanel}>
+          <div className={styles.actions}>
+            {program.applyUrl ? (
+              <a
+                className={styles.actionLink}
+                href={program.applyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${t("programs.apply")} (${t("booking.opensNewWindow")})`}
+              >
+                {t("programs.apply")}
+              </a>
+            ) : (
+              // 링크가 없으면 숨기지 않고 "준비중"으로 보여준다(2026-09-19 요청).
+              <button type="button" className={styles.actionLink} disabled>
+                {t("programs.comingSoon")}
+              </button>
+            )}
+            {program.locationUrl && (
+              <a
+                className={styles.actionLink}
+                href={program.locationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${t("booking.location")} (${t("booking.opensNewWindow")})`}
+              >
+                {t("booking.location")}
+              </a>
+            )}
+          </div>
+        </EditableSection>
 
         {editorialImages.length > 0 && (
           <EditableSection active={showPanel}>

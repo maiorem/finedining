@@ -38,7 +38,7 @@ describe("Header", () => {
     vi.restoreAllMocks();
   });
 
-  it("소개·예약하기·프로그램·아티스트·리뷰·협업제안 내비게이션 링크를 렌더한다", async () => {
+  it("소개·예약하기·프로그램·사람들·이야기·협업제안 내비게이션 링크를 렌더한다", async () => {
     fetchMock.mockResolvedValue(UNAUTHENTICATED);
     renderHeader();
     await screen.findByRole("link", { name: "로그인" }); // 초기 세션 복구(admin/member refresh)가 끝나길 기다린다
@@ -52,11 +52,11 @@ describe("Header", () => {
       "href",
       "/programs",
     );
-    expect(screen.getAllByRole("link", { name: "아티스트" })[0]).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "사람들" })[0]).toHaveAttribute(
       "href",
       "/artists",
     );
-    expect(screen.getAllByRole("link", { name: "리뷰" })[0]).toHaveAttribute("href", "/reviews");
+    expect(screen.getAllByRole("link", { name: "이야기" })[0]).toHaveAttribute("href", "/reviews");
     expect(screen.getAllByRole("link", { name: "협업제안" })[0]).toHaveAttribute(
       "href",
       "/proposal",

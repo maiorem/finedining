@@ -37,4 +37,21 @@ describe("Footer", () => {
     expect(screen.getByRole("link", { name: "개인정보처리방침" })).toHaveAttribute("href", "/privacy");
     expect(screen.getByRole("link", { name: "이용약관" })).toHaveAttribute("href", "/terms");
   });
+
+  it("유튜브·인스타그램·페이스북 링크를 새 창으로 여는 외부 링크로 렌더한다", () => {
+    renderFooter();
+
+    const youtube = screen.getByRole("link", { name: /유튜브/ });
+    expect(youtube.getAttribute("href")).toContain("https://www.youtube.com/@");
+    expect(screen.getByRole("link", { name: /인스타그램/ })).toHaveAttribute(
+      "href",
+      "https://www.instagram.com/finediningtheater/",
+    );
+    const facebook = screen.getByRole("link", { name: /페이스북/ });
+    expect(facebook.getAttribute("href")).toContain("https://www.facebook.com/people/Finediningtheater/");
+    for (const link of [youtube, facebook, screen.getByRole("link", { name: /인스타그램/ })]) {
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    }
+  });
 });

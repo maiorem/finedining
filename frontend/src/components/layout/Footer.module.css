@@ -51,6 +51,40 @@
   outline-offset: 2px;
 }
 
+/* 저작권은 왼쪽, 소셜 아이콘은 오른쪽 하단(2026-09-19 요청). */
+.bottomRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.social {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--c-ink-60);
+  transition: color var(--d-fast) var(--e-out);
+}
+
+.socialLink:hover,
+.socialLink:focus-visible {
+  color: var(--c-ink);
+}
+
+.socialLink:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
 .copyright {
   margin: 0;
   font-family: var(--f-util);

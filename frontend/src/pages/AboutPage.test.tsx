@@ -49,6 +49,28 @@ describe("AboutPage", () => {
     expect(screen.queryByRole("button", { name: "보도자료 관리" })).not.toBeInTheDocument();
   });
 
+  it("소개 탭에 미션·세 가지 가치·주요 상품군·마지막 문장을 보여준다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) return Promise.resolve(UNAUTHENTICATED);
+      return Promise.resolve(jsonResponse({ success: true, data: [], error: null }));
+    });
+
+    renderPage();
+    await screen.findByRole("tab", { name: "소개" });
+
+    expect(screen.getByText("MISSION")).toBeInTheDocument();
+    for (const label of ["STORY", "FOOD", "TOGETHER"]) {
+      expect(screen.getByText(label)).toBeInTheDocument();
+    }
+    expect(screen.getByText("한 사람의 삶을 듣습니다.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "주요 상품군" })).toBeInTheDocument();
+    for (const label of ["EXPERIENCE CONTENT", "CULTURAL EVENT", "LOCAL CONTENT", "K-FOOD CONTENT", "CUSTOM CONTENT"]) {
+      expect(screen.getByText(label)).toBeInTheDocument();
+    }
+    expect(screen.getByText(/당신과 다시 마주 앉고 싶습니다\./)).toBeInTheDocument();
+    expect(screen.getByText("FINEDINING THEATER")).toBeInTheDocument();
+  });
+
   it("보도자료 탭을 누르면 발행된 보도자료를 외부 링크로 보여준다", async () => {
     const user = userEvent.setup();
     fetchMock.mockImplementation((input: string) => {

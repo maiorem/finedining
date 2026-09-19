@@ -49,35 +49,6 @@
   color: var(--c-ink);
 }
 
-.aboutContent {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-@media (min-width: 1024px) {
-  .aboutContent {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 3rem;
-  }
-}
-
-.aboutImage {
-  width: 100%;
-  max-width: 420px;
-  height: auto;
-  flex-shrink: 0;
-}
-
-.intro {
-  margin: 0;
-  color: var(--c-ink);
-  line-height: var(--lh-body);
-  white-space: pre-wrap;
-  max-width: 38em;
-}
-
 .pressSection {
   display: flex;
   flex-direction: column;

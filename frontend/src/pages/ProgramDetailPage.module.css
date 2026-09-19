@@ -155,9 +155,11 @@
   letter-spacing: var(--ls-wide);
   text-transform: uppercase;
   text-decoration: none;
+  background: transparent;
+  cursor: pointer;
 }
 
-.actionLink:hover,
+.actionLink:hover:not(:disabled),
 .actionLink:focus-visible {
   border-color: var(--c-spot);
   color: var(--c-spot);
@@ -209,4 +211,11 @@
   border-left: 1px solid var(--c-line);
   color: var(--c-ink-60);
   font-size: var(--t-caption);
+}
+
+/* 링크가 아직 없는 프로그램의 "준비중" 버튼 — 눌리지 않는다. */
+.actionLink:disabled {
+  border-color: var(--c-line);
+  color: var(--c-ink-35);
+  cursor: not-allowed;
 }

@@ -35,7 +35,7 @@ describe("ProgramsPage", () => {
     vi.unstubAllGlobals();
   });
 
-  it("프로그램 목록과 참가하기·위치보기 링크를 보여준다", async () => {
+  it("프로그램 목록과 예약하기·위치보기 링크를 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
         return Promise.resolve(
@@ -67,7 +67,7 @@ describe("ProgramsPage", () => {
     expect(titleLink).toHaveAttribute("href", "/programs/summer-tasting");
     expect(screen.getByText("참가는 구글폼으로 접수합니다.")).toBeInTheDocument();
 
-    const applyLink = screen.getByRole("link", { name: /참가하기/ });
+    const applyLink = screen.getByRole("link", { name: /예약하기/ });
     expect(applyLink).toHaveAttribute("href", "https://forms.gle/abcd");
     expect(applyLink).toHaveAttribute("target", "_blank");
 
@@ -75,6 +75,39 @@ describe("ProgramsPage", () => {
     expect(locationLink).toHaveAttribute("href", "https://map.naver.com/p/somewhere");
 
     expect(screen.queryByRole("button", { name: "새 프로그램 추가" })).not.toBeInTheDocument();
+  });
+
+  it("예약 링크가 없는 프로그램은 눌리지 않는 준비중 버튼을 보여준다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: [
+            {
+              id: 1,
+              slug: "memory-table",
+              title: "기억의 식탁",
+              description: null,
+              applyUrl: null,
+              locationUrl: null,
+              thumbnail: null,
+            },
+          ],
+          error: null,
+        }),
+      );
+    });
+
+    renderPage();
+
+    const comingSoon = await screen.findByRole("button", { name: "준비중" });
+    expect(comingSoon).toBeDisabled();
+    expect(screen.queryByRole("link", { name: /예약하기/ })).not.toBeInTheDocument();
   });
 
   it("프로그램이 없으면 빈 상태 문구를 보여준다", async () => {

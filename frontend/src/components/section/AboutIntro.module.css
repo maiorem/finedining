@@ -1,0 +1,223 @@
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  /* stretch — 텍스트 열이 이미지 높이만큼 늘어나야 MISSION 박스를 이미지 맨 아래에 붙일 수 있다. */
+  .top {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 3rem;
+  }
+}
+
+.image {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.text,
+.values,
+.products,
+.closing {
+  word-break: keep-all;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 38em;
+}
+
+/* 위 두 문장 묶음과 "우리는 누구에게나…" 두 문장을 두껍고 크게(2026-09-19 요청). */
+.headline {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-h2);
+  line-height: var(--lh-tight);
+  color: var(--c-ink);
+  white-space: pre-line;
+}
+
+.body {
+  margin: 0;
+  color: var(--c-ink);
+  line-height: var(--lh-body);
+  white-space: pre-line;
+}
+
+/* 본문과 살짝 떨어뜨리고 바탕색을 깔아 가독성을 높인다. margin-top: auto로 이미지 하단에 맞춘다. */
+.mission {
+  margin-top: auto;
+  padding: 1.5rem;
+  background: var(--c-brown);
+  color: var(--c-white);
+}
+
+.missionLabel {
+  margin: 0 0 0.75rem;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide);
+  color: var(--c-orange);
+}
+
+.missionText {
+  margin: 0;
+  font-weight: 700;
+  line-height: var(--lh-body);
+  white-space: pre-line;
+}
+
+/* 세 가지 가치 — 브라운 배경에 주황 굵은 글씨(2026-09-19 요청). 주황은 이 배경 위에서 대비 약 4.9:1이다. */
+.values {
+  margin-top: var(--section-y-mobile);
+  padding: 2.5rem var(--gutter-mobile);
+  background: var(--c-brown);
+  color: var(--c-white);
+}
+
+@media (min-width: 1024px) {
+  .values {
+    margin-top: var(--section-y-desktop);
+    padding: 3.5rem 3rem;
+  }
+}
+
+.valueList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .valueList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.valueLabel {
+  margin: 0 0 0.75rem;
+  font-family: var(--f-util);
+  font-size: var(--t-h2);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide);
+  color: var(--c-orange);
+}
+
+.valueTitle {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  line-height: var(--lh-tight);
+}
+
+.valueBody {
+  margin: 0;
+  line-height: var(--lh-body);
+}
+
+.products {
+  margin-top: var(--section-y-mobile);
+}
+
+@media (min-width: 1024px) {
+  .products {
+    margin-top: var(--section-y-desktop);
+  }
+}
+
+.productsHeading {
+  margin: 0 0 2rem;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  font-weight: 400;
+  color: var(--c-ink-60);
+}
+
+.productList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .productList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .productList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 주황 세로선 — 흰/종이 배경 위에서는 주황이 글자색으로는 대비가 약해 장식 선으로만 쓴다(§8.8). */
+.product {
+  padding-left: 1rem;
+  border-left: 3px solid var(--c-orange);
+}
+
+.productLabel {
+  margin: 0 0 0.5rem;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  font-weight: 700;
+  letter-spacing: var(--ls-wide);
+  color: var(--c-ink-60);
+}
+
+.productTitle {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--c-ink);
+}
+
+.productBody {
+  margin: 0;
+  color: var(--c-ink-60);
+  line-height: var(--lh-body);
+}
+
+.closing {
+  margin: var(--section-y-mobile) 0 0;
+  text-align: center;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-h1-sm);
+  line-height: var(--lh-tight);
+  white-space: pre-line;
+  color: var(--c-ink);
+}
+
+@media (min-width: 1024px) {
+  .closing {
+    margin-top: var(--section-y-desktop);
+  }
+}
+
+.closingBrand {
+  display: block;
+  margin-top: 1.5rem;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  font-weight: 400;
+  letter-spacing: var(--ls-wide);
+  color: var(--c-ink-60);
+}

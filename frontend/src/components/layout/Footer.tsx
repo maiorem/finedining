@@ -14,6 +14,41 @@ const BUSINESS_INFO = {
   email: "finediningtheater@naver.com",
 };
 
+// 소셜 채널 링크 — 전부 새 창으로 연다(2026-09-19 요청). 유튜브 핸들은 한글이라 인코딩해서 쓴다.
+const SOCIAL_LINKS = [
+  {
+    key: "youtube",
+    href: `https://www.youtube.com/@${encodeURIComponent("파인다이닝씨어터")}`,
+    icon: (
+      <>
+        <rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" strokeWidth="1.6" />
+        <path d="M10 9.2l5 2.8-5 2.8z" fill="currentColor" />
+      </>
+    ),
+  },
+  {
+    key: "instagram",
+    href: "https://www.instagram.com/finediningtheater/",
+    icon: (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.6" />
+        <circle cx="17.2" cy="6.8" r="1" fill="currentColor" />
+      </>
+    ),
+  },
+  {
+    key: "facebook",
+    href: "https://www.facebook.com/people/Finediningtheater/61584524015779/",
+    icon: (
+      <path
+        d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.6-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.9v3h2.6V21z"
+        fill="currentColor"
+      />
+    ),
+  },
+] as const;
+
 // 로그인/로그아웃 진입점은 헤더로 옮겼다 — 푸터에 숨어 있으면 너무 안 보인다는 피드백.
 export function Footer() {
   const { t } = useTranslation();
@@ -37,7 +72,25 @@ export function Footer() {
         <Link to="/privacy">{t("footer.privacyPolicy")}</Link>
         <Link to="/terms">{t("footer.terms")}</Link>
       </nav>
-      <p className={styles.copyright}>{t("footer.copyright")}</p>
+      <div className={styles.bottomRow}>
+        <p className={styles.copyright}>{t("footer.copyright")}</p>
+        <nav aria-label={t("footer.socialNav")} className={styles.social}>
+          {SOCIAL_LINKS.map(({ key, href, icon }) => (
+            <a
+              key={key}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.socialLink}
+              aria-label={`${t(`footer.social.${key}`)} (${t("booking.opensNewWindow")})`}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                {icon}
+              </svg>
+            </a>
+          ))}
+        </nav>
+      </div>
     </footer>
   );
 }

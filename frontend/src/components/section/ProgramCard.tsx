@@ -29,32 +29,35 @@ export function ProgramCard({ program }: { program: ProgramSummary }) {
       </Link>
       {program.description && <p className={styles.description}>{program.description}</p>}
 
-      {(program.applyUrl || program.locationUrl) && (
-        <div className={styles.actions}>
-          {program.applyUrl && (
-            <a
-              className={styles.actionLink}
-              href={program.applyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${t("programs.apply")} (${t("booking.opensNewWindow")})`}
-            >
-              {t("programs.apply")}
-            </a>
-          )}
-          {program.locationUrl && (
-            <a
-              className={styles.actionLink}
-              href={program.locationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${t("booking.location")} (${t("booking.opensNewWindow")})`}
-            >
-              {t("booking.location")}
-            </a>
-          )}
-        </div>
-      )}
+      <div className={styles.actions}>
+        {program.applyUrl ? (
+          <a
+            className={styles.actionLink}
+            href={program.applyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${t("programs.apply")} (${t("booking.opensNewWindow")})`}
+          >
+            {t("programs.apply")}
+          </a>
+        ) : (
+          // 링크가 없으면 숨기지 않고 "준비중"으로 보여준다(2026-09-19 요청). 링크를 넣으면 예약하기로 바뀐다.
+          <button type="button" className={styles.actionLink} disabled>
+            {t("programs.comingSoon")}
+          </button>
+        )}
+        {program.locationUrl && (
+          <a
+            className={styles.actionLink}
+            href={program.locationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${t("booking.location")} (${t("booking.opensNewWindow")})`}
+          >
+            {t("booking.location")}
+          </a>
+        )}
+      </div>
     </article>
   );
 }

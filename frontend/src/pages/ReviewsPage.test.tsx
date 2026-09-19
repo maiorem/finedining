@@ -61,12 +61,13 @@ describe("ReviewsPage", () => {
       "href",
       "/reviews/1",
     );
+    expect(screen.getByText("여러분의 이야기를 남겨주세요.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "모더레이션 모드" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "리뷰 작성" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "이야기 남기기" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "로그인" })).toBeInTheDocument();
   });
 
-  it("리뷰가 없으면 빈 상태 문구를 보여준다", async () => {
+  it("이야기가 없으면 빈 상태 문구를 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh") || input.includes("/api/auth/member/refresh")) {
         return Promise.resolve(UNAUTHENTICATED);
@@ -76,7 +77,7 @@ describe("ReviewsPage", () => {
 
     renderPage();
 
-    expect(await screen.findByText("등록된 리뷰가 없습니다.")).toBeInTheDocument();
+    expect(await screen.findByText("등록된 이야기가 없습니다.")).toBeInTheDocument();
   });
 
   it("관리자로 로그인했으면 모더레이션 토글이 보인다", async () => {
@@ -101,7 +102,7 @@ describe("ReviewsPage", () => {
     expect(await screen.findByRole("button", { name: "모더레이션 모드" })).toBeInTheDocument();
   });
 
-  it("회원으로 로그인했으면 리뷰 작성 폼을 열어 등록할 수 있다", async () => {
+  it("회원으로 로그인했으면 이야기 작성 폼을 열어 등록할 수 있다", async () => {
     const user = userEvent.setup();
     fetchMock.mockImplementation((input: string, init?: RequestInit) => {
       if (input.includes("/api/auth/admin/refresh")) {
@@ -126,13 +127,13 @@ describe("ReviewsPage", () => {
 
     renderPage();
 
-    await user.click(await screen.findByRole("button", { name: "리뷰 작성" }));
+    await user.click(await screen.findByRole("button", { name: "이야기 남기기" }));
     await user.type(screen.getByLabelText("제목"), "새 리뷰");
     await user.type(screen.getByLabelText("본문"), "새 본문");
     await user.click(screen.getByRole("button", { name: "등록하기" }));
 
     expect(
-      await screen.findByRole("button", { name: "리뷰 작성" }),
+      await screen.findByRole("button", { name: "이야기 남기기" }),
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/reviews",

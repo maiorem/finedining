@@ -70,7 +70,7 @@ describe("ReviewDetailPage", () => {
     expect(screen.queryByRole("button", { name: "수정" })).not.toBeInTheDocument();
   });
 
-  it("존재하지 않는 리뷰면 안내 문구를 보여준다", async () => {
+  it("존재하지 않는 이야기면 안내 문구를 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh") || input.includes("/api/auth/member/refresh")) {
         return Promise.resolve(UNAUTHENTICATED);
@@ -82,7 +82,7 @@ describe("ReviewDetailPage", () => {
 
     renderAt("/reviews/99");
 
-    expect(await screen.findByText("존재하지 않는 리뷰입니다.")).toBeInTheDocument();
+    expect(await screen.findByText("존재하지 않는 이야기입니다.")).toBeInTheDocument();
   });
 
   it("관리자가 모더레이션 모드를 켜면 원문 수정 폼과 댓글 삭제 버튼이 보인다", async () => {

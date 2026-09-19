@@ -225,3 +225,25 @@
   outline: 2px solid var(--c-spot);
   outline-offset: 2px;
 }
+
+/* 게시판의 성격을 열어두는 맨 위 안내 문구 — 주제를 작품으로 좁히지 않고 이야기를 남기라고 초대한다. */
+.intro {
+  margin: 0 0 2.5rem;
+}
+
+.introTitle {
+  margin: 0 0 0.75rem;
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: var(--t-h1-sm);
+  line-height: var(--lh-tight);
+  color: var(--c-ink);
+}
+
+.introBody {
+  margin: 0;
+  max-width: 38em;
+  color: var(--c-ink-60);
+  line-height: var(--lh-body);
+  white-space: pre-line;
+}
