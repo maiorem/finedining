@@ -50,7 +50,7 @@
 .tagline {
   max-width: 32em;
   font-family: var(--f-display);
-  font-weight: 400;
+  font-weight: var(--w-display);
   font-size: var(--t-h2);
   line-height: var(--lh-tight);
   color: var(--c-ink);

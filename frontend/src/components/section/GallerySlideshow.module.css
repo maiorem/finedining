@@ -114,7 +114,7 @@
   margin: 1rem 0 0;
   text-align: center;
   font-family: var(--f-display);
-  font-weight: 400;
+  font-weight: var(--w-display);
   font-size: var(--t-h2);
   line-height: var(--lh-tight);
   color: var(--c-ink);

@@ -41,7 +41,7 @@
 .headline {
   margin: 0 0 1.5rem;
   font-family: var(--f-display);
-  font-weight: 400;
+  font-weight: var(--w-display);
   font-size: var(--t-hero);
   line-height: var(--lh-tight);
   white-space: pre-line;
@@ -110,7 +110,7 @@
 .archiveHeading {
   margin: 0 0 1.5rem;
   font-family: var(--f-display);
-  font-weight: 400;
+  font-weight: var(--w-display);
   font-size: var(--t-h1);
   line-height: var(--lh-tight);
   white-space: pre-line;

@@ -33,7 +33,7 @@
 
 .title {
   font-family: var(--f-display);
-  font-weight: 400;
+  font-weight: var(--w-display);
   font-size: var(--t-h1);
   margin: 0 0 1rem;
 }
