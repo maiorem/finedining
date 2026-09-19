@@ -146,8 +146,8 @@ Requesting suspension of processing of personal information
 Withdrawing consent to the processing of personal information
 Withdrawing membership
 
-Modifying Member Information and Withdrawal
-A Member may check and modify their member information, and apply to withdraw their membership, from the My Page or member information menu on the Site.
+Checking Member Information and Withdrawal
+After logging in, a Member may check their member information and apply to withdraw their membership from the "My account" menu on the Site.
 Where processing through the Site is not feasible, a request may be made to the Personal Information Protection Officer by email or phone.
 The Company takes the necessary action in accordance with applicable law after confirming that the request is made by the individual concerned or their legitimate representative.
 
