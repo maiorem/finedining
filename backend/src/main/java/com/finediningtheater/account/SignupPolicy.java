@@ -1,5 +1,6 @@
 package com.finediningtheater.account;
 
+import com.finediningtheater.site.SiteVisibilityService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,16 +18,23 @@ public class SignupPolicy {
     }
 
     private final SignupAllowlistRepository signupAllowlistRepository;
+    private final SiteVisibilityService siteVisibilityService;
     private final Policy policy;
 
     public SignupPolicy(
             SignupAllowlistRepository signupAllowlistRepository,
+            SiteVisibilityService siteVisibilityService,
             @Value("${app.signup.policy:OPEN}") Policy policy) {
         this.signupAllowlistRepository = signupAllowlistRepository;
+        this.siteVisibilityService = siteVisibilityService;
         this.policy = policy;
     }
 
     public boolean canSignUp(String provider, String providerUserId, String email) {
+        // 오픈 전 비공개 동안에는 /login이 열려 있어서 카카오로 신규 가입이 가능해진다 — 공개 전에는 받지 않는다.
+        if (!siteVisibilityService.isPublic()) {
+            return false;
+        }
         if (policy == Policy.OPEN) {
             return true;
         }
