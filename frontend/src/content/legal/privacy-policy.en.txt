@@ -22,6 +22,9 @@ Payments for current performances and programs are not processed directly on the
 4. Customer Inquiries and Complaint Handling
 The Company processes personal information to receive and address inquiries and complaints related to use of the Site, verify the facts, and provide responses and outcomes.
 
+5. Posting Stories (Bulletin Board) and Thank-You Reward Notices
+The Company processes personal information to publish and manage stories written by Members and, where a thank-you reward is to be provided, to contact the author.
+
 Article 2 (Personal Information Items Processed)
 The Company processes only the minimum personal information necessary to provide the Service.
 Fine Dining Theater accepts membership registration and login only through Kakao Login. The Company does not operate a separate membership registration system that issues its own IDs and passwords.
@@ -32,6 +35,13 @@ Nickname (required) — Member identification and on-screen display
 Email address (optional) — Assisting Member identification and providing notices. If the user does not consent to providing an email address during Kakao Login, it will not be provided; this does not prevent the user from registering or using the Service.
 The user identifier provided by Kakao (required) — Member identification and login
 * Fine Dining Theater does not receive any personal information from Kakao beyond the items above.
+
+Posting Stories (Bulletin Board)
+When a Member writes a story, the Company additionally collects the following information.
+Name (required) — Verifying the author and providing thank-you reward notices. Visible to administrators only and not shown on the Site.
+Contact (optional, phone number or email) — Providing thank-you reward notices. Visible to administrators only and not shown on the Site.
+Attached photos (optional, up to 3) — Published on the Site together with the story. Please take care not to reveal other people's faces or personal information.
+Consent to the collection and use of the above items is obtained when a story is written; if you do not consent, you cannot write a story. This does not affect registration or use of other services.
 
 Article 3 (Processing and Retention Period of Personal Information)
 The Company processes and retains personal information for the retention/use period required by law or until the purpose of processing the personal information is achieved.
@@ -46,11 +56,15 @@ where retention is required under applicable law;
 where a dispute or complaint related to the personal information is being processed; or
 where necessary to prevent fraudulent use.
 
-2. Customer Inquiry Information
+2. Name and Contact Collected When Posting a Story
+Retained until the story is deleted or the Member withdraws, and destroyed without delay thereafter.
+The story text and attached photos follow the handling of posted content described in item 1 above.
+
+3. Customer Inquiry Information
 Retained for one year after the inquiry or complaint has been resolved, then destroyed.
 * It is recommended to finalize this retention period based on actual operational experience.
 
-3. Information on Use of External Booking Services such as Naver Reservation
+4. Information on Use of External Booking Services such as Naver Reservation
 Where a user uses an external booking service instead of the Fine Dining Theater website processing payment or collecting reservation information directly, the personal information collected and processed by that external service is governed by that service's own privacy policy.
 
 Article 4 (Procedures and Methods for Destroying Personal Information)
