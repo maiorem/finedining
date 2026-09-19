@@ -6,6 +6,8 @@ import { useProductions } from "../api/productions";
 import { usePrograms } from "../api/programs";
 import { ProductionCard } from "../components/section/ProductionCard";
 import { ProgramCard } from "../components/section/ProgramCard";
+import { TrailerVideo } from "../components/section/TrailerVideo";
+import { TRAILER_VIDEO_ID } from "../components/section/trailer";
 import styles from "./HomePage.module.css";
 
 const FEATURED_COUNT = 2;
@@ -52,6 +54,13 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {TRAILER_VIDEO_ID && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionHeading}>{t("home.trailerHeading")}</h2>
+          <TrailerVideo videoId={TRAILER_VIDEO_ID} title={t("trailer.title")} />
         </section>
       )}
 
