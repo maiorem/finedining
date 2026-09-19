@@ -10,6 +10,8 @@ export type ArtistSummary = {
   slug: string;
   name: string | null;
   role: string | null;
+  quote: string | null;
+  email: string | null;
   photo: MediaAsset | null;
 };
 
@@ -20,6 +22,9 @@ export type ArtistDetail = {
   role: string | null;
   bio: string | null;
   credits: string | null;
+  quote: string | null;
+  email: string | null;
+  interviewUrl: string | null;
   linkUrl: string | null;
   photo: MediaAsset | null;
 };

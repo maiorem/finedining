@@ -1,11 +1,13 @@
 import { lazy, Suspense, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useArtist } from "../api/artists";
 import { ApiError } from "../api/http";
 import { useAdminAuth } from "../contexts/AdminAuthContext";
 import { useCan } from "../hooks/useCan";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { TrailerVideo } from "../components/section/TrailerVideo";
+import { extractYoutubeId } from "../utils/youtube";
 import { EditableSection } from "../features/editing/EditableSection";
 import styles from "./ArtistDetailPage.module.css";
 
@@ -41,6 +43,7 @@ export default function ArtistDetailPage() {
   }
 
   const showPanel = canEdit && editMode;
+  const interviewId = extractYoutubeId(artist.interviewUrl);
 
   return (
     <div className={showPanel ? styles.layoutWithPanel : styles.layout}>
@@ -59,10 +62,11 @@ export default function ArtistDetailPage() {
         {showPanel && !isDesktop && <p className={styles.desktopOnlyNotice}>{t("editing.desktopOnly")}</p>}
 
         <EditableSection active={showPanel}>
+          <p className={styles.storyEyebrow}>{t("artists.storyEyebrow")}</p>
           {artist.photo?.url640 && (
             <img
               className={styles.photo}
-              src={artist.photo.url640}
+              src={artist.photo.url960 ?? artist.photo.url640}
               alt={artist.photo.altText ?? ""}
               width={artist.photo.width ?? undefined}
               height={artist.photo.height ?? undefined}
@@ -72,8 +76,22 @@ export default function ArtistDetailPage() {
           )}
           {artist.role && <p className={styles.eyebrow}>{artist.role}</p>}
           <h1 className={styles.name}>{artist.name}</h1>
+          {artist.quote && <p className={styles.quote}>“{artist.quote}”</p>}
 
           {artist.bio && <p className={styles.bio}>{artist.bio}</p>}
+
+          {interviewId && (
+            <div className={styles.interview}>
+              <h2 className={styles.productionsHeading}>{t("artists.interviewHeading")}</h2>
+              <TrailerVideo videoId={interviewId} title={`${artist.name ?? ""} ${t("artists.interviewTitle")}`} />
+            </div>
+          )}
+
+          {artist.email && (
+            <a className={styles.link} href={`mailto:${artist.email}`}>
+              {artist.email}
+            </a>
+          )}
 
           {artist.linkUrl && (
             <a
@@ -94,6 +112,10 @@ export default function ArtistDetailPage() {
             <p className={styles.credits}>{artist.credits}</p>
           </section>
         )}
+
+        <Link to="/artists" className={styles.backLink}>
+          {t("artists.backToList")}
+        </Link>
       </main>
 
       {showPanel && isDesktop && (

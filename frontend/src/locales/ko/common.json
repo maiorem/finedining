@@ -302,7 +302,7 @@
   "ft.intro": "한 딸이 아버지의 삶을 따라갑니다.\n30년간 경양식 요리사로 일했던 시간.\n주방을 떠난 뒤에도\n계속해서 이어진 한 사람의 노동.\n그리고\n아버지가 만들었던 경양식 돈까스.\n공연과 미식이 만나\n한 사람의 삶을 함께 경험하는 시간입니다.",
   "ft.info.heading": "예약안내",
   "ft.info.dateLabel": "일시",
-  "ft.info.dateValue": "2026.10.21.~10.27.\n평일 19:30\n토 13:00\n일 18:00",
+  "ft.info.dateValue": "2026.10.21.~10.27.\n평일 19:30\n토 13:00, 18:00\n일 18:00",
   "ft.info.durationLabel": "시간",
   "ft.info.durationValue": "120분 내외",
   "ft.info.placeLabel": "장소",
@@ -345,5 +345,16 @@
   "ft.archive.heading": "지난 공연",
   "ft.archive.alt2023": "2023 시범공연 포스터",
   "ft.archive.alt2024": "2024 공연 포스터",
-  "ft.archive.alt2025": "2025 공연 포스터"
+  "ft.archive.alt2025": "2025 공연 포스터",
+  "programs.pageTitle": "우리는 다양한 방식으로\n사람과 이야기, 그리고 음식을 만납니다.",
+  "artists.pageTitle": "우리가 만드는 이야기는\n언제나 사람에게서 시작됩니다.",
+  "artists.pageIntro": "한 사람의 삶과 음식은\n콘텐츠가 되기 전에\n먼저 충분히 만나야 하는 이야기입니다.",
+  "artists.storyEyebrow": "파인다이닝 씨어터 · PEOPLE's STORY",
+  "artists.interviewHeading": "인터뷰",
+  "artists.interviewTitle": "인터뷰 영상",
+  "artists.backToList": "사람들 전체 보기",
+  "editing.panel.artistQuoteLabel": "한마디 (카드에 표시)",
+  "editing.panel.artistEmailLabel": "이메일 (카드에 공개 — 본인 동의를 받은 경우만)",
+  "editing.panel.artistOrderLabel": "노출 순서 (작을수록 앞)",
+  "editing.panel.artistInterviewLabel": "인터뷰 유튜브 주소"
 }

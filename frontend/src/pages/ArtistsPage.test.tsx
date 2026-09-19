@@ -110,4 +110,43 @@ describe("ArtistsPage", () => {
 
     expect(await screen.findByRole("button", { name: "새 프로필 추가" })).toBeInTheDocument();
   });
+
+  it("카드에 한마디와 이메일을 보여주고 상단 소개 문구를 렌더한다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      if (input.startsWith("/api/artists")) {
+        return Promise.resolve(
+          jsonResponse({
+            success: true,
+            data: [
+              {
+                id: 1,
+                slug: "kim-miran",
+                name: "김미란",
+                role: "대표/기획/연출",
+                quote: "삶의 이야기를 목격합니다.",
+                email: "miran@example.com",
+                photo: null,
+              },
+            ],
+            error: null,
+          }),
+        );
+      }
+      return Promise.resolve(jsonResponse({ success: true, data: [], error: null }));
+    });
+
+    renderPage();
+
+    expect(await screen.findByText(/삶의 이야기를 목격합니다/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "miran@example.com" })).toHaveAttribute(
+      "href",
+      "mailto:miran@example.com",
+    );
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("언제나 사람에게서 시작됩니다.");
+  });
 });

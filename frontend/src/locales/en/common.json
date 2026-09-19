@@ -302,7 +302,7 @@
   "ft.intro": "A daughter follows her father's life.\nThirty years as a diner-style cook.\nEven after leaving the kitchen,\nhe kept on working.\nAnd the diner-style pork cutlet\nhe used to make.\nPerformance meets dining —\na time to experience one person's life together.",
   "ft.info.heading": "Booking information",
   "ft.info.dateLabel": "Dates",
-  "ft.info.dateValue": "Oct 21–27, 2026\nWeekdays 19:30\nSat 13:00\nSun 18:00",
+  "ft.info.dateValue": "Oct 21–27, 2026\nWeekdays 19:30\nSat 13:00, 18:00\nSun 18:00",
   "ft.info.durationLabel": "Duration",
   "ft.info.durationValue": "About 120 min",
   "ft.info.placeLabel": "Venue",
@@ -345,5 +345,16 @@
   "ft.archive.heading": "Past performances",
   "ft.archive.alt2023": "2023 pilot performance poster",
   "ft.archive.alt2024": "2024 performance poster",
-  "ft.archive.alt2025": "2025 performance poster"
+  "ft.archive.alt2025": "2025 performance poster",
+  "programs.pageTitle": "In many different ways,\nwe meet people, stories and food.",
+  "artists.pageTitle": "The stories we make\nalways begin with people.",
+  "artists.pageIntro": "A person's life and food are stories\nthat must first be met fully\nbefore they become content.",
+  "artists.storyEyebrow": "Finedining Theater · PEOPLE's STORY",
+  "artists.interviewHeading": "Interview",
+  "artists.interviewTitle": "Interview video",
+  "artists.backToList": "All people",
+  "editing.panel.artistQuoteLabel": "Quote (shown on the card)",
+  "editing.panel.artistEmailLabel": "Email (public on the card — only with the person's consent)",
+  "editing.panel.artistOrderLabel": "Display order (lower comes first)",
+  "editing.panel.artistInterviewLabel": "Interview YouTube URL"
 }

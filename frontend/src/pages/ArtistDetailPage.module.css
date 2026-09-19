@@ -11,7 +11,7 @@
   flex: 1;
   min-width: 0;
   padding: var(--section-y-mobile) var(--gutter-mobile);
-  max-width: 640px;
+  max-width: 800px;
 }
 
 @media (min-width: 1024px) {
@@ -48,7 +48,7 @@
 .photo {
   display: block;
   width: 100%;
-  max-width: 320px;
+  max-width: 420px;
   height: auto;
   margin: 0 0 1.5rem;
 }
@@ -65,8 +65,42 @@
 .name {
   font-family: var(--f-display);
   font-size: var(--t-h1);
-  font-weight: 400;
+  font-weight: var(--w-display);
   margin: 0 0 1.5rem;
+}
+
+.storyEyebrow {
+  margin: 0 0 1.5rem;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  color: var(--c-ink-60);
+}
+
+.quote {
+  margin: 0 0 2rem;
+  font-size: var(--t-lead);
+  line-height: var(--lh-body);
+  word-break: keep-all;
+}
+
+.interview {
+  margin: 0 0 2.5rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 3rem;
+  color: var(--c-ink-60);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+}
+
+.backLink:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
 }
 
 .bio {

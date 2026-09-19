@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
 import {
   changeArtistLinkUrl,
+  changeArtistPeopleInfo,
   getArtistForAdmin,
   publishArtist,
   saveArtistDraftTranslation,
@@ -18,15 +19,15 @@ import styles from "./ArtistEditPanel.module.css";
 type Locale = "KO" | "EN";
 const LOCALES: Locale[] = ["KO", "EN"];
 
-type DraftState = Record<Locale, { name: string; role: string; bio: string; credits: string }>;
+type DraftState = Record<Locale, { name: string; role: string; bio: string; credits: string; quote: string }>;
 
 type ArtistEditPanelProps = {
   artistId: number;
 };
 
 const EMPTY_DRAFTS: DraftState = {
-  KO: { name: "", role: "", bio: "", credits: "" },
-  EN: { name: "", role: "", bio: "", credits: "" },
+  KO: { name: "", role: "", bio: "", credits: "", quote: "" },
+  EN: { name: "", role: "", bio: "", credits: "", quote: "" },
 };
 
 /**
@@ -51,6 +52,9 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
   const [activeLocale, setActiveLocale] = useState<Locale>("KO");
   const [drafts, setDrafts] = useState<DraftState>(EMPTY_DRAFTS);
   const [linkUrlDraft, setLinkUrlDraft] = useState("");
+  const [emailDraft, setEmailDraft] = useState("");
+  const [orderDraft, setOrderDraft] = useState("0");
+  const [interviewDraft, setInterviewDraft] = useState("");
   const [pinAction, setPinAction] = useState<"publish" | "unpublish" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
@@ -65,11 +69,15 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
           role: translation.draftRole ?? translation.role ?? "",
           bio: translation.draftBio ?? translation.bio ?? "",
           credits: translation.draftCredits ?? translation.credits ?? "",
+          quote: translation.draftQuote ?? translation.quote ?? "",
         };
       }
       return next;
     });
     setLinkUrlDraft(data.linkUrl ?? "");
+    setEmailDraft(data.email ?? "");
+    setOrderDraft(String(data.displayOrder));
+    setInterviewDraft(data.interviewUrl ?? "");
   }, [data]);
 
   function invalidate() {
@@ -87,6 +95,7 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
         drafts[activeLocale].role || null,
         drafts[activeLocale].bio || null,
         drafts[activeLocale].credits || null,
+        drafts[activeLocale].quote || null,
       ),
     onSuccess: () => {
       setActionError(null);
@@ -101,6 +110,24 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
 
   const linkMutation = useMutation({
     mutationFn: () => changeArtistLinkUrl(session!.accessToken, artistId, linkUrlDraft || null),
+    onSuccess: () => {
+      setActionError(null);
+      setSaveNotice(t("editing.panel.saved"));
+      invalidate();
+    },
+    onError: (err: unknown) => {
+      setSaveNotice(null);
+      setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
+    },
+  });
+
+  const peopleInfoMutation = useMutation({
+    mutationFn: () =>
+      changeArtistPeopleInfo(session!.accessToken, artistId, {
+        email: emailDraft || null,
+        displayOrder: Number.parseInt(orderDraft, 10) || 0,
+        interviewUrl: interviewDraft || null,
+      }),
     onSuccess: () => {
       setActionError(null);
       setSaveNotice(t("editing.panel.saved"));
@@ -200,6 +227,18 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
       </label>
 
       <label className={styles.field}>
+        <span>{t("editing.panel.artistQuoteLabel")}</span>
+        <input
+          type="text"
+          maxLength={500}
+          value={drafts[activeLocale].quote}
+          onChange={(e) =>
+            setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], quote: e.target.value } }))
+          }
+        />
+      </label>
+
+      <label className={styles.field}>
         <span>{t("editing.panel.artistCreditsLabel")}</span>
         <textarea
           rows={5}
@@ -256,6 +295,39 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
           setSaveNotice(null);
           setActionError(null);
           linkMutation.mutate();
+        }}
+      >
+        {t("editing.image.save")}
+      </button>
+
+      <hr className={styles.divider} />
+
+      {/* 이메일·순서·인터뷰 링크도 발행을 거치지 않고 즉시 반영된다. */}
+      <label className={styles.field}>
+        <span>{t("editing.panel.artistEmailLabel")}</span>
+        <input type="email" value={emailDraft} onChange={(e) => setEmailDraft(e.target.value)} />
+      </label>
+      <label className={styles.field}>
+        <span>{t("editing.panel.artistOrderLabel")}</span>
+        <input type="number" min={0} max={9999} value={orderDraft} onChange={(e) => setOrderDraft(e.target.value)} />
+      </label>
+      <label className={styles.field}>
+        <span>{t("editing.panel.artistInterviewLabel")}</span>
+        <input
+          type="url"
+          value={interviewDraft}
+          onChange={(e) => setInterviewDraft(e.target.value)}
+          placeholder="https://www.youtube.com/watch?v=..."
+        />
+      </label>
+      <button
+        type="button"
+        className={styles.saveButton}
+        disabled={peopleInfoMutation.isPending}
+        onClick={() => {
+          setSaveNotice(null);
+          setActionError(null);
+          peopleInfoMutation.mutate();
         }}
       >
         {t("editing.image.save")}

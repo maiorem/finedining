@@ -1,17 +1,24 @@
 .card {
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  padding: 1.5rem 0;
-  border-bottom: 1px solid var(--c-line);
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.link {
+  display: block;
   text-decoration: none;
   color: inherit;
 }
 
+.link:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+/* 인물 사진은 세로형(3:4)으로 보여준다. */
 .thumbnail {
-  flex-shrink: 0;
-  width: 72px;
-  height: 72px;
+  aspect-ratio: 3 / 4;
+  margin-bottom: 1rem;
   background-color: var(--c-paper);
   background-size: cover;
   background-position: center;
@@ -25,29 +32,45 @@
   display: block;
 }
 
-.card:hover .name,
-.card:focus-visible .name {
-  color: var(--c-spot);
-}
-
-.card:focus-visible {
-  outline: 2px solid var(--c-spot);
-  outline-offset: 3px;
-}
-
-.name {
-  font-family: var(--f-display);
-  font-size: var(--t-h2);
-  font-weight: 400;
-  margin: 0 0 0.3em;
-  transition: color var(--d-fast) var(--e-out);
-}
-
 .role {
+  margin: 0 0 0.35rem;
   font-family: var(--f-util);
   font-size: var(--t-caption);
   letter-spacing: var(--ls-wide);
-  text-transform: uppercase;
   color: var(--c-ink-60);
+}
+
+.name {
+  margin: 0 0 0.6rem;
+  font-family: var(--f-display);
+  font-size: var(--t-h2);
+  font-weight: var(--w-display);
+  transition: color var(--d-fast) var(--e-out);
+}
+
+.link:hover .name,
+.link:focus-visible .name {
+  color: var(--c-spot);
+}
+
+.quote {
   margin: 0;
+  line-height: var(--lh-body);
+  word-break: keep-all;
+}
+
+.email {
+  align-self: flex-start;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--c-ink-60);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  text-decoration: underline;
+}
+
+.email:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
 }

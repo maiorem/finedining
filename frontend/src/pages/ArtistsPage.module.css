@@ -8,14 +8,27 @@
   }
 }
 
-/* 접근성·SEO용 h1 — 화면에는 안 보이지만 스크린리더·검색엔진은 읽는다. 메뉴를 눌러 이 페이지로
-   왔다는 게 이미 명확해서 화면에 또 메뉴 이름을 크게 띄우지 않는다. */
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
+.header {
+  margin-bottom: 3rem;
+}
+
+.pageTitle {
+  margin: 0 0 1.5rem;
+  font-family: var(--f-display);
+  font-weight: var(--w-display);
+  font-size: var(--t-h1);
+  line-height: var(--lh-tight);
+  white-space: pre-line;
+  word-break: keep-all;
+}
+
+.pageIntro {
+  margin: 0;
+  max-width: 38em;
+  color: var(--c-ink-60);
+  line-height: var(--lh-body);
+  white-space: pre-line;
+  word-break: keep-all;
 }
 
 .addToggle {
@@ -40,7 +53,22 @@
   list-style: none;
   margin: 0 0 4rem;
   padding: 0;
-  max-width: 640px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem 2rem;
+}
+
+@media (min-width: 640px) {
+  .list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .list {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4rem 3rem;
+  }
 }
 
 .status {
@@ -51,7 +79,7 @@
 .castingHeading {
   font-family: var(--f-display);
   font-size: var(--t-h2);
-  font-weight: 400;
+  font-weight: var(--w-display);
   margin: 0 0 1.5rem;
 }
 
