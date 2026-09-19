@@ -51,16 +51,19 @@
   color: var(--c-ink-60);
 }
 
+/* 원형 아이콘 버튼 — 무채색 원칙의 예외로 허용된 모양이다(§8.5). 터치 타겟은 44px. */
 .pauseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-top: 1rem;
-  min-height: 44px;
-  padding: 0 1.25em;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   border: 1px solid var(--c-line);
+  border-radius: 50%;
   background: transparent;
   color: var(--c-ink-60);
-  font-family: var(--f-util);
-  font-size: var(--t-caption);
-  letter-spacing: var(--ls-wide);
   cursor: pointer;
 }
 

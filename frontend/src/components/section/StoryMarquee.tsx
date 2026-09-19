@@ -103,9 +103,20 @@ export function StoryMarquee() {
             type="button"
             className={styles.pauseButton}
             aria-pressed={userPaused}
+            aria-label={userPaused ? t("story.play") : t("story.pause")}
             onClick={() => setUserPaused((paused) => !paused)}
           >
-            {userPaused ? t("story.play") : t("story.pause")}
+            {/* 글자 대신 아이콘 — 멈춰 있으면 재생(▶), 흐르는 중이면 일시정지(❚❚)를 보여준다. */}
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              {userPaused ? (
+                <path d="M4.5 2.5v11l9-5.5z" fill="currentColor" />
+              ) : (
+                <>
+                  <rect x="3.5" y="2.5" width="3" height="11" fill="currentColor" />
+                  <rect x="9.5" y="2.5" width="3" height="11" fill="currentColor" />
+                </>
+              )}
+            </svg>
           </button>
         )}
       </div>
