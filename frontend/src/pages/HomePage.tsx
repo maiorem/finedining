@@ -10,7 +10,7 @@ import { TrailerVideo } from "../components/section/TrailerVideo";
 import { TRAILER_VIDEO_ID } from "../components/section/trailer";
 import styles from "./HomePage.module.css";
 
-const FEATURED_COUNT = 2;
+const FEATURED_COUNT = 3;
 
 export default function HomePage() {
   const { t, i18n } = useTranslation();

@@ -50,7 +50,7 @@ describe("HomePage", () => {
     expect(screen.queryByText("Finedining Theater")).not.toBeInTheDocument();
   });
 
-  it("작품·프로그램을 각각 최대 2개까지 보여주고 각 상세 페이지로 연결한다", async () => {
+  it("작품·프로그램을 각각 최대 3개까지 보여주고 각 상세 페이지로 연결한다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.startsWith("/api/productions")) {
         return Promise.resolve(
@@ -60,6 +60,7 @@ describe("HomePage", () => {
               { id: 1, slug: "showcase-1", title: "쇼케이스 1", bookingUrl: null, locationUrl: null, thumbnail: null },
               { id: 2, slug: "showcase-2", title: "쇼케이스 2", bookingUrl: null, locationUrl: null, thumbnail: null },
               { id: 3, slug: "showcase-3", title: "쇼케이스 3", bookingUrl: null, locationUrl: null, thumbnail: null },
+              { id: 4, slug: "showcase-4", title: "쇼케이스 4", bookingUrl: null, locationUrl: null, thumbnail: null },
             ],
             error: null,
           }),
@@ -88,6 +89,24 @@ describe("HomePage", () => {
                 locationUrl: null,
                 thumbnail: null,
               },
+              {
+                id: 12,
+                slug: "program-3",
+                title: "프로그램 3",
+                description: null,
+                applyUrl: null,
+                locationUrl: null,
+                thumbnail: null,
+              },
+              {
+                id: 13,
+                slug: "program-4",
+                title: "프로그램 4",
+                description: null,
+                applyUrl: null,
+                locationUrl: null,
+                thumbnail: null,
+              },
             ],
             error: null,
           }),
@@ -102,11 +121,14 @@ describe("HomePage", () => {
     expect(showcase1).toHaveAttribute("href", "/productions/showcase-1");
     const showcase2 = screen.getByRole("link", { name: /쇼케이스 2/ });
     expect(showcase2).toHaveAttribute("href", "/productions/showcase-2");
-    expect(screen.queryByRole("link", { name: /쇼케이스 3/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /쇼케이스 3/ })).toHaveAttribute("href", "/productions/showcase-3");
+    expect(screen.queryByRole("link", { name: /쇼케이스 4/ })).not.toBeInTheDocument();
 
     const program1 = screen.getByRole("link", { name: /프로그램 1/ });
     expect(program1).toHaveAttribute("href", "/programs/program-1");
     const program2 = screen.getByRole("link", { name: /프로그램 2/ });
     expect(program2).toHaveAttribute("href", "/programs/program-2");
+    expect(screen.getByRole("link", { name: /프로그램 3/ })).toHaveAttribute("href", "/programs/program-3");
+    expect(screen.queryByRole("link", { name: /프로그램 4/ })).not.toBeInTheDocument();
   });
 });
