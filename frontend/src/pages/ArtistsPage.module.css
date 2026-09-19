@@ -56,6 +56,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 3rem 2rem;
+  max-width: 840px;
 }
 
 @media (min-width: 640px) {
@@ -67,7 +68,7 @@
 @media (min-width: 1024px) {
   .list {
     grid-template-columns: repeat(3, 1fr);
-    gap: 4rem 3rem;
+    gap: 3.5rem 2.5rem;
   }
 }
 

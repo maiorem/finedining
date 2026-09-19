@@ -48,8 +48,10 @@
 .photo {
   display: block;
   width: 100%;
-  max-width: 420px;
+  max-width: 280px;
   height: auto;
+  aspect-ratio: 3 / 4; /* 목록의 프로필 사진과 같은 세로형 비율 */
+  object-fit: cover;
   margin: 0 0 1.5rem;
 }
 
