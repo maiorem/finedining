@@ -130,6 +130,10 @@ describe("ReviewsPage", () => {
     await user.click(await screen.findByRole("button", { name: "이야기 남기기" }));
     await user.type(screen.getByLabelText("제목"), "새 리뷰");
     await user.type(screen.getByLabelText("본문"), "새 본문");
+    await user.type(screen.getByLabelText("이름"), "홍길동");
+    await user.type(screen.getByLabelText(/연락처/), "010-1234-5678");
+    expect(screen.getByRole("button", { name: "등록하기" })).toBeDisabled(); // 동의 전에는 등록할 수 없다
+    await user.click(screen.getByRole("checkbox", { name: /개인정보 수집/ }));
     await user.click(screen.getByRole("button", { name: "등록하기" }));
 
     expect(
@@ -137,7 +141,14 @@ describe("ReviewsPage", () => {
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/reviews",
-      expect.objectContaining({ method: "POST", body: JSON.stringify({ title: "새 리뷰", body: "새 본문" }) }),
+      expect.objectContaining({ method: "POST", body: JSON.stringify({
+          title: "새 리뷰",
+          body: "새 본문",
+          authorName: "홍길동",
+          contact: "010-1234-5678",
+          privacyConsent: true,
+        }),
+      }),
     );
   });
 });

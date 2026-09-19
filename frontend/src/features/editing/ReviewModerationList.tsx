@@ -58,6 +58,24 @@ export default function ReviewModerationList() {
           <Link to={`/reviews/${review.id}`} className={styles.itemLink}>
             <h3 className={styles.itemTitle}>{review.title}</h3>
           </Link>
+          <p className={styles.authorInfo}>
+            {review.authorName
+              ? `${t("reviews.adminName")}: ${review.authorName}${review.contact ? ` · ${t("reviews.adminContact")}: ${review.contact}` : ""}`
+              : t("reviews.adminNoAuthorInfo")}
+          </p>
+          {review.images.length > 0 && (
+            <ul className={styles.attachments}>
+              {review.images.map((image) => (
+                <li key={image.id}>
+                  {image.url640 ? (
+                    <img src={image.url640} alt={image.altText ?? ""} loading="lazy" decoding="async" />
+                  ) : (
+                    <span>{image.status}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
           <div className={styles.moderationRow}>
             <span className={styles.statusBadge}>{review.status}</span>
             {review.status === "PUBLISHED" && (

@@ -144,6 +144,23 @@ export default function ReviewDetailPage() {
         <h1 className={styles.title}>{review.title}</h1>
         <p className={styles.body}>{review.body}</p>
 
+        {review.images.length > 0 && (
+          <ul className={styles.images}>
+            {review.images.map((image) => (
+              <li key={image.id}>
+                <img
+                  src={image.url960 ?? image.url640 ?? undefined}
+                  alt={image.altText ?? ""}
+                  width={image.width ?? undefined}
+                  height={image.height ?? undefined}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+
         {isOwner && (
           <div className={styles.selfActions}>
             <button type="button" onClick={startSelfEdit}>

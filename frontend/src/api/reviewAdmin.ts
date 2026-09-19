@@ -1,4 +1,5 @@
 import { apiAdminDelete, apiAdminGet, apiAdminPost, apiAdminPut } from "./adminHttp";
+import type { MediaAsset } from "./media";
 import type { ReviewCommentView } from "./reviews";
 
 export type ReviewAdmin = {
@@ -6,10 +7,13 @@ export type ReviewAdmin = {
   title: string;
   body: string;
   accountId: number;
+  authorName: string | null;
+  contact: string | null;
   status: "PUBLISHED" | "HIDDEN" | "DELETED";
   createdAt: string;
   updatedAt: string;
   comments: ReviewCommentView[];
+  images: MediaAsset[];
 };
 
 export function listReviewsForAdmin(accessToken: string): Promise<ReviewAdmin[]> {

@@ -39,6 +39,7 @@ const REVIEW_DATA = {
   accountId: 4,
   createdAt: "2026-01-01T00:00:00Z",
   comments: [{ id: 10, accountId: 4, body: "저도 좋았어요", createdAt: "2026-01-02T00:00:00Z" }],
+  images: [],
 };
 
 describe("ReviewDetailPage", () => {
@@ -113,6 +114,7 @@ describe("ReviewDetailPage", () => {
               createdAt: "2026-01-01T00:00:00Z",
               updatedAt: "2026-01-01T00:00:00Z",
               comments: [{ id: 10, accountId: 4, body: "저도 좋았어요", createdAt: "2026-01-02T00:00:00Z" }],
+              images: [],
             },
             error: null,
           }),

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "./http";
 import { queryKeys } from "./queryKeys";
+import type { MediaAsset } from "./media";
 
 export type ReviewSummary = {
   id: number;
@@ -23,6 +24,7 @@ export type ReviewDetail = {
   accountId: number;
   createdAt: string;
   comments: ReviewCommentView[];
+  images: MediaAsset[];
 };
 
 export function useReviews() {

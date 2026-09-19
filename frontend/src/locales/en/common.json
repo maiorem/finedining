@@ -356,5 +356,21 @@
   "editing.panel.artistQuoteLabel": "Quote (shown on the card)",
   "editing.panel.artistEmailLabel": "Email (public on the card — only with the person's consent)",
   "editing.panel.artistOrderLabel": "Display order (lower comes first)",
-  "editing.panel.artistInterviewLabel": "Interview YouTube URL"
+  "editing.panel.artistInterviewLabel": "Interview YouTube URL",
+  "reviews.nameLabel": "Name",
+  "reviews.nameHint": "Collected to contact you about a thank-you reward. Visible to administrators only.",
+  "reviews.contactLabel": "Contact (optional)",
+  "reviews.contactHint": "Phone or email. We only reach out when sending a reward.",
+  "reviews.imagesLabel": "Attach photos (optional, up to 3 · 10MB each · JPG/PNG/WebP)",
+  "reviews.imagesRemove": "Remove",
+  "reviews.consentPrefix": "I agree to the collection and use of my personal information.",
+  "reviews.consentPolicyLink": "View the privacy policy",
+  "reviews.error.IMAGE_TYPE": "Only JPG, PNG or WebP images can be attached.",
+  "reviews.error.IMAGE_TOO_LARGE": "Each photo must be 10MB or smaller.",
+  "reviews.error.IMAGE_COUNT": "You can attach up to 3 photos.",
+  "reviews.notice.imageFailed": "Your story was posted, but {{count}} photo(s) could not be uploaded. Please check the file type and size.",
+  "reviews.adminName": "Name",
+  "reviews.adminContact": "Contact",
+  "reviews.adminNoAuthorInfo": "(older post — no name or contact)",
+  "reviews.consentDetail": "Collected: name (required), contact (optional), attached photos · Purpose: posting your story and contacting you about a thank-you reward · Retention: until the story is deleted or you leave"
 }

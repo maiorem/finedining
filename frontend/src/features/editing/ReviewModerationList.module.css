@@ -66,3 +66,25 @@
   outline: 2px solid var(--c-spot);
   outline-offset: 2px;
 }
+
+.authorInfo {
+  margin: 0.4rem 0 0;
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+}
+
+.attachments {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.attachments img {
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+}
