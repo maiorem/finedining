@@ -1,0 +1,145 @@
+.section {
+  padding: var(--section-y-mobile) 0;
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: var(--section-y-desktop) 0;
+  }
+}
+
+.header {
+  padding: 0 var(--gutter-mobile);
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .header {
+    padding: 0 var(--gutter-desktop);
+  }
+}
+
+.title {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: var(--t-h1-sm);
+  line-height: var(--lh-tight);
+  color: var(--c-ink);
+  word-break: keep-all;
+}
+
+.subtitle {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* 브랜드명 강조는 글자색이 아니라 주황 밑줄로 한다 — 주황은 종이색 배경 위 글자로는 대비가 약하다(§8.8). */
+.brand {
+  text-decoration: underline;
+  text-decoration-color: var(--c-orange);
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.2em;
+}
+
+.keywords {
+  margin: 1.25rem 0 0;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  color: var(--c-ink-60);
+}
+
+.pauseButton {
+  margin-top: 1rem;
+  min-height: 44px;
+  padding: 0 1.25em;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink-60);
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  cursor: pointer;
+}
+
+.pauseButton:hover,
+.pauseButton:focus-visible {
+  border-color: var(--c-spot);
+  color: var(--c-ink);
+}
+
+.pauseButton:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+/* 진짜 가로 스크롤 영역이라 손가락·트랙패드로 밀 수 있다. 스크롤바는 숨긴다. */
+.viewport {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.viewport:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: -2px;
+}
+
+.list {
+  display: flex;
+  flex-shrink: 0;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0 0.625rem;
+  list-style: none;
+}
+
+.card {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .card {
+    width: 300px;
+  }
+}
+
+.photo {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--c-brown);
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardTitle {
+  margin: 1rem 0 0.5rem;
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-size: var(--t-lead);
+  line-height: var(--lh-tight);
+  color: var(--c-ink);
+  word-break: keep-all;
+}
+
+.cardBody {
+  margin: 0;
+  font-size: var(--t-caption);
+  line-height: var(--lh-body);
+  color: var(--c-ink-60);
+  white-space: pre-line;
+  word-break: keep-all;
+}
