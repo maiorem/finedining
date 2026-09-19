@@ -1,6 +1,9 @@
 package com.finediningtheater.review;
 
 import com.finediningtheater.global.response.ApiResponse;
+import com.finediningtheater.media.MediaOwnerType;
+import com.finediningtheater.media.MediaService;
+import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.review.dto.ReviewCommentResponse;
 import com.finediningtheater.review.dto.ReviewDetailResponse;
 import com.finediningtheater.review.dto.ReviewSummaryResponse;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final MediaService mediaService;
 
     @GetMapping
     public ApiResponse<List<ReviewSummaryResponse>> list() {
@@ -31,6 +35,10 @@ public class ReviewController {
         Review review = reviewService.getPublished(id);
         List<ReviewCommentResponse> comments =
                 reviewService.listActiveComments(id).stream().map(ReviewCommentResponse::from).toList();
-        return ApiResponse.success(ReviewDetailResponse.from(review, comments));
+        List<MediaAssetResponse> images =
+                mediaService.listPublished(MediaOwnerType.REVIEW, id).stream()
+                        .map(asset -> MediaAssetResponse.from(asset, mediaService))
+                        .toList();
+        return ApiResponse.success(ReviewDetailResponse.from(review, comments, images));
     }
 }

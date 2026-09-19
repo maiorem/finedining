@@ -7,6 +7,10 @@ import com.finediningtheater.global.response.ApiResponse;
 import com.finediningtheater.global.security.AdminPrincipal;
 import com.finediningtheater.global.security.MemberPrincipal;
 import com.finediningtheater.global.support.ClientIp;
+import com.finediningtheater.media.MediaOwnerType;
+import com.finediningtheater.media.MediaService;
+import com.finediningtheater.media.dto.MediaAssetResponse;
+import com.finediningtheater.review.dto.CreateReviewRequest;
 import com.finediningtheater.review.dto.ReviewAdminResponse;
 import com.finediningtheater.review.dto.ReviewCommentResponse;
 import com.finediningtheater.review.dto.ReviewContentRequest;
@@ -43,19 +47,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewEditController {
 
     private final ReviewService reviewService;
+    private final MediaService mediaService;
     private final AuditLogger auditLogger;
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<ReviewAdminResponse> create(
-            @Valid @RequestBody ReviewContentRequest request,
+            @Valid @RequestBody CreateReviewRequest request,
             @AuthenticationPrincipal MemberPrincipal memberPrincipal,
             HttpServletRequest httpRequest) {
         if (memberPrincipal == null) {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
 
-        Review review = reviewService.create(memberPrincipal.id(), request.title(), request.body());
+        Review review = reviewService.create(
+                        memberPrincipal.id(), request.title(), request.body(), request.authorName(), request.contact());
 
         auditLogger.record(
                 memberPrincipal.id(),
@@ -74,7 +80,7 @@ public class ReviewEditController {
         // 목록에서는 리뷰마다 댓글을 함께 불러올 필요가 없다 — N+1을 피하려고 빈 목록으로 둔다.
         List<ReviewAdminResponse> body =
                 reviewService.listForAdmin().stream()
-                        .map(review -> ReviewAdminResponse.from(review, List.of()))
+                        .map(review -> ReviewAdminResponse.from(review, List.of(), imagesFor(review)))
                         .toList();
         return ApiResponse.success(body);
     }
@@ -218,6 +224,13 @@ public class ReviewEditController {
     private ReviewAdminResponse toAdminResponse(Review review) {
         List<ReviewCommentResponse> comments =
                 reviewService.listActiveComments(review.getId()).stream().map(ReviewCommentResponse::from).toList();
-        return ReviewAdminResponse.from(review, comments);
+        return ReviewAdminResponse.from(review, comments, imagesFor(review));
+    }
+
+    // 모더레이션에서 첨부 이미지를 봐야 해서 목록에도 싣는다 — 글이 수십 건 규모라 글마다 조회해도 무시할 만하다.
+    private List<MediaAssetResponse> imagesFor(Review review) {
+        return mediaService.listForAdmin(MediaOwnerType.REVIEW, review.getId()).stream()
+                .map(asset -> MediaAssetResponse.from(asset, mediaService))
+                .toList();
     }
 }

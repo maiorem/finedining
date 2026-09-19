@@ -19,6 +19,7 @@ import com.finediningtheater.global.security.AdminPrincipal;
 import com.finediningtheater.global.security.JwtProvider;
 import com.finediningtheater.global.security.MemberPrincipal;
 import java.util.List;
+import com.finediningtheater.media.MediaService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ class ReviewEditControllerTest {
     @Autowired private MockMvc mockMvc;
 
     @MockitoBean private ReviewService reviewService;
+    @MockitoBean private MediaService mediaService;
     @MockitoBean private AuditLogger auditLogger;
     @MockitoBean private JwtProvider jwtProvider;
 
@@ -150,12 +152,13 @@ class ReviewEditControllerTest {
     void 회원이_리뷰를_작성하면_감사로그를_남긴다() throws Exception {
         loginAsMember(4L);
         Review created = new Review(4L, "제목", "본문");
-        when(reviewService.create(4L, "제목", "본문")).thenReturn(created);
+        when(reviewService.create(4L, "제목", "본문", "홍길동", "010-1234-5678")).thenReturn(created);
 
         mockMvc.perform(
                         post("/api/reviews")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"title\":\"제목\",\"body\":\"본문\"}"))
+                                .content(
+                                        "{\"title\":\"제목\",\"body\":\"본문\",\"authorName\":\"홍길동\",\"contact\":\"010-1234-5678\",\"privacyConsent\":true}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.title").value("제목"))
                 .andExpect(jsonPath("$.data.accountId").value(4));
@@ -221,5 +224,28 @@ class ReviewEditControllerTest {
         mockMvc.perform(delete("/api/reviews/1"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error.code").value("POST_NOT_OWNED"));
+    }
+
+    @Test
+    void 개인정보_동의가_없으면_작성을_거부한다() throws Exception {
+        loginAsMember(4L);
+
+        mockMvc.perform(
+                        post("/api/reviews")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"title\":\"제목\",\"body\":\"본문\",\"authorName\":\"홍길동\",\"privacyConsent\":false}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void 이름이_없으면_작성을_거부한다() throws Exception {
+        loginAsMember(4L);
+
+        mockMvc.perform(
+                        post("/api/reviews")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"title\":\"제목\",\"body\":\"본문\",\"privacyConsent\":true}"))
+                .andExpect(status().isBadRequest());
     }
 }

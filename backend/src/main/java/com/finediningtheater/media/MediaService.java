@@ -31,6 +31,9 @@ public class MediaService {
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
     private static final Duration PRESIGN_VALIDITY = Duration.ofMinutes(10);
     private static final int MAX_PRESIGNS_PER_HOUR = 30;
+    // 회원(이야기 첨부) 업로드는 관리자보다 훨씬 좁게 잡는다 — 인증만 있으면 누구나 올릴 수 있는 경로다.
+    private static final long MEMBER_MAX_FILE_SIZE_BYTES = 10L * 1024 * 1024;
+    private static final int MAX_MEMBER_PRESIGNS_PER_HOUR = 10;
 
     private final MediaAssetRepository mediaAssetRepository;
     private final MediaStorageService storageService;
@@ -39,23 +42,51 @@ public class MediaService {
 
     // 계정당 발급 레이트리밋 (CLAUDE.md §3.5) — 스프링 빈이 아니라 이 서비스가 정책값으로 들고 있는다.
     private final FailureLockout presignRateLimiter = new FailureLockout(MAX_PRESIGNS_PER_HOUR, Duration.ofHours(1));
+    private final FailureLockout memberPresignRateLimiter =
+            new FailureLockout(MAX_MEMBER_PRESIGNS_PER_HOUR, Duration.ofHours(1));
 
     public record PresignResult(Long mediaAssetId, String uploadUrl) {}
 
     @Transactional
     public PresignResult presign(
             MediaOwnerType ownerType, Long ownerId, Long adminId, String contentType, long contentLengthBytes) {
+        return issuePresign(
+                ownerType, ownerId, contentType, contentLengthBytes, MAX_FILE_SIZE_BYTES, presignRateLimiter, String.valueOf(adminId));
+    }
+
+    /** 회원(이야기 첨부) 전용 — 10MB 상한과 시간당 10회 상한을 쓴다. 소유권·장수 검사는 호출부가 한다. */
+    @Transactional
+    public PresignResult presignForMember(
+            MediaOwnerType ownerType, Long ownerId, Long accountId, String contentType, long contentLengthBytes) {
+        return issuePresign(
+                ownerType,
+                ownerId,
+                contentType,
+                contentLengthBytes,
+                MEMBER_MAX_FILE_SIZE_BYTES,
+                memberPresignRateLimiter,
+                String.valueOf(accountId));
+    }
+
+    private PresignResult issuePresign(
+            MediaOwnerType ownerType,
+            Long ownerId,
+            String contentType,
+            long contentLengthBytes,
+            long maxBytes,
+            FailureLockout rateLimiter,
+            String rateLimitKey) {
         if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "이미지 파일만 업로드할 수 있습니다.");
         }
-        if (contentLengthBytes <= 0 || contentLengthBytes > MAX_FILE_SIZE_BYTES) {
-            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "파일 크기는 20MB 이하여야 합니다.");
+        if (contentLengthBytes <= 0 || contentLengthBytes > maxBytes) {
+            throw new BusinessException(
+                    ErrorCode.VALIDATION_ERROR, "파일 크기는 " + (maxBytes / (1024 * 1024)) + "MB 이하여야 합니다.");
         }
-        String rateLimitKey = String.valueOf(adminId);
-        if (presignRateLimiter.isLocked(rateLimitKey)) {
+        if (rateLimiter.isLocked(rateLimitKey)) {
             throw new BusinessException(ErrorCode.RATE_LIMITED);
         }
-        presignRateLimiter.recordFailure(rateLimitKey);
+        rateLimiter.recordFailure(rateLimitKey);
 
         String key = "originals/" + UUID.randomUUID() + extensionFor(contentType);
         int sortOrder = mediaAssetRepository.countByOwnerTypeAndOwnerId(ownerType, ownerId);
@@ -71,13 +102,27 @@ public class MediaService {
      */
     @Transactional
     public MediaAsset completeUpload(Long id, String altText) {
+        return completeUpload(id, altText, MAX_FILE_SIZE_BYTES);
+    }
+
+    /** 회원 첨부 완료 — 회원 상한(10MB)으로 다시 검사하고, 성공하면 바로 공개한다(글과 함께 노출되므로). */
+    @Transactional
+    public MediaAsset completeMemberUpload(Long id, String altText) {
+        MediaAsset asset = completeUpload(id, altText, MEMBER_MAX_FILE_SIZE_BYTES);
+        if (asset.getStatus() == MediaAssetStatus.READY) {
+            asset.publish();
+        }
+        return asset;
+    }
+
+    private MediaAsset completeUpload(Long id, String altText, long maxBytes) {
         MediaAsset asset =
                 mediaAssetRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
         try {
             HeadObjectResponse head = storageService.headObject(asset.getOriginalKey());
-            if (head.contentLength() == null || head.contentLength() > MAX_FILE_SIZE_BYTES) {
-                throw new IllegalStateException("파일 크기가 20MB를 넘습니다.");
+            if (head.contentLength() == null || head.contentLength() > maxBytes) {
+                throw new IllegalStateException("파일 크기가 " + (maxBytes / (1024 * 1024)) + "MB를 넘습니다.");
             }
 
             byte[] header = storageService.getObjectRange(asset.getOriginalKey(), 0, 31);

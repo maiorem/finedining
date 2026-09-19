@@ -10,6 +10,7 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.security.JwtProvider;
 import java.util.List;
+import com.finediningtheater.media.MediaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,6 +25,7 @@ class ReviewControllerTest {
     @Autowired private MockMvc mockMvc;
 
     @MockitoBean private ReviewService reviewService;
+    @MockitoBean private MediaService mediaService;
     @MockitoBean private JwtProvider jwtProvider;
 
     @Test

@@ -5,5 +5,6 @@ public enum MediaOwnerType {
     PRODUCTION,
     ARTIST,
     PROGRAM,
-    PRESS_CLIPPING
+    PRESS_CLIPPING,
+    REVIEW
 }

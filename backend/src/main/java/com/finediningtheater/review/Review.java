@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import lombok.Getter;
 
 /**
@@ -36,6 +37,15 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false, length = 4000)
     private String body;
 
+    /** 감사 리워드 연락용 — 관리자에게만 보이고 공개 응답에는 나가지 않는다(2026-09-19). */
+    @Column(length = 50)
+    private String authorName;
+
+    @Column(length = 100)
+    private String contact;
+
+    private Instant privacyConsentAt;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ReviewStatus status = ReviewStatus.PUBLISHED;
@@ -46,6 +56,13 @@ public class Review extends BaseTimeEntity {
         this.accountId = accountId;
         this.title = title;
         this.body = body;
+    }
+
+    public Review(Long accountId, String title, String body, String authorName, String contact, Instant consentAt) {
+        this(accountId, title, body);
+        this.authorName = authorName;
+        this.contact = contact;
+        this.privacyConsentAt = consentAt;
     }
 
     public void hide() {

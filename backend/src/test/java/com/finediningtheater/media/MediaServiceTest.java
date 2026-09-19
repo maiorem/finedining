@@ -262,4 +262,29 @@ class MediaServiceTest {
         ImageIO.write(image, "jpg", out);
         return out.toByteArray();
     }
+
+    @Test
+    void 회원_presign은_10MB를_넘으면_거부한다() {
+        long tooLarge = 11L * 1024 * 1024;
+
+        assertThatThrownBy(() -> service().presignForMember(MediaOwnerType.REVIEW, 1L, 4L, "image/jpeg", tooLarge))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(ErrorCode.VALIDATION_ERROR));
+    }
+
+    @Test
+    void 회원_presign은_시간당_10회를_넘으면_RATE_LIMITED를_던진다() throws MalformedURLException {
+        when(mediaAssetRepository.countByOwnerTypeAndOwnerId(MediaOwnerType.REVIEW, 1L)).thenReturn(0);
+        when(mediaAssetRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(storageService.presignPut(anyString(), anyString(), any()))
+                .thenReturn(new URL("http://localhost:9000/fdt-media-local/originals/x.jpg"));
+        MediaService service = service();
+        for (int i = 0; i < 10; i++) {
+            service.presignForMember(MediaOwnerType.REVIEW, 1L, 4L, "image/jpeg", 1000);
+        }
+
+        assertThatThrownBy(() -> service.presignForMember(MediaOwnerType.REVIEW, 1L, 4L, "image/jpeg", 1000))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(ErrorCode.RATE_LIMITED));
+    }
 }

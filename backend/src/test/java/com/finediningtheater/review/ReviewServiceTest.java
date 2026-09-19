@@ -129,10 +129,13 @@ class ReviewServiceTest {
         when(reviewRepository.findTopByAccountIdOrderByCreatedAtDesc(4L)).thenReturn(Optional.empty());
         when(reviewRepository.save(any())).thenAnswer((InvocationOnMock invocation) -> invocation.getArgument(0));
 
-        Review result = service().create(4L, "제목", "본문");
+        Review result = service().create(4L, "제목", "본문", "홍길동", "010-1234-5678");
 
         assertThat(result.getAccountId()).isEqualTo(4L);
         assertThat(result.getTitle()).isEqualTo("제목");
+        assertThat(result.getAuthorName()).isEqualTo("홍길동");
+        assertThat(result.getContact()).isEqualTo("010-1234-5678");
+        assertThat(result.getPrivacyConsentAt()).isNotNull();
         assertThat(result.isPublished()).isTrue();
     }
 
@@ -140,7 +143,7 @@ class ReviewServiceTest {
     void 하루_게시_상한을_넘기면_작성을_거부한다() {
         when(reviewRepository.countByAccountIdAndCreatedAtAfter(eq(4L), any())).thenReturn(10L);
 
-        assertThatThrownBy(() -> service().create(4L, "제목", "본문"))
+        assertThatThrownBy(() -> service().create(4L, "제목", "본문", "홍길동", null))
                 .isInstanceOf(BusinessException.class)
                 .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(ErrorCode.RATE_LIMITED));
     }
@@ -152,7 +155,7 @@ class ReviewServiceTest {
         when(reviewRepository.countByAccountIdAndCreatedAtAfter(eq(4L), any())).thenReturn(1L);
         when(reviewRepository.findTopByAccountIdOrderByCreatedAtDesc(4L)).thenReturn(Optional.of(previous));
 
-        assertThatThrownBy(() -> service().create(4L, "제목", "본문"))
+        assertThatThrownBy(() -> service().create(4L, "제목", "본문", "홍길동", null))
                 .isInstanceOf(BusinessException.class)
                 .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(ErrorCode.RATE_LIMITED));
     }
@@ -162,7 +165,7 @@ class ReviewServiceTest {
         when(reviewRepository.countByAccountIdAndCreatedAtAfter(eq(4L), any())).thenReturn(0L);
         when(reviewRepository.findTopByAccountIdOrderByCreatedAtDesc(4L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service().create(4L, "제목", "<script>alert(1)</script>"))
+        assertThatThrownBy(() -> service().create(4L, "제목", "<script>alert(1)</script>", "홍길동", null))
                 .isInstanceOf(BusinessException.class)
                 .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(ErrorCode.VALIDATION_ERROR));
     }
@@ -229,5 +232,35 @@ class ReviewServiceTest {
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Test
+    void 연락처가_비어_있으면_null로_저장한다() {
+        when(reviewRepository.countByAccountIdAndCreatedAtAfter(eq(4L), any())).thenReturn(0L);
+        when(reviewRepository.findTopByAccountIdOrderByCreatedAtDesc(4L)).thenReturn(Optional.empty());
+        when(reviewRepository.save(any())).thenAnswer((InvocationOnMock invocation) -> invocation.getArgument(0));
+
+        Review result = service().create(4L, "제목", "본문", "홍길동", "  ");
+
+        assertThat(result.getContact()).isNull();
+    }
+
+    @Test
+    void 이름에_HTML_태그가_있으면_작성을_거부한다() {
+        when(reviewRepository.countByAccountIdAndCreatedAtAfter(eq(4L), any())).thenReturn(0L);
+        when(reviewRepository.findTopByAccountIdOrderByCreatedAtDesc(4L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service().create(4L, "제목", "본문", "<b>홍</b>", null))
+                .isInstanceOf(BusinessException.class);
+    }
+
+    @Test
+    void 남의_글에는_이미지를_붙일_수_없다() {
+        Review review = new Review(9L, "제목", "본문");
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+
+        assertThatThrownBy(() -> service().requireOwnedForImages(1L, 4L))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(ErrorCode.POST_NOT_OWNED));
     }
 }

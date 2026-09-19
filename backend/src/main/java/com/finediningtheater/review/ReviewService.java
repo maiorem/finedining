@@ -94,10 +94,22 @@ public class ReviewService {
 
     /** 회원 본인 작성. 하루 상한·연속 등록 간격은 §3.6, 새니타이즈는 아래 sanitize() 참고. */
     @Transactional
-    public Review create(Long accountId, String title, String body) {
+    public Review create(Long accountId, String title, String body, String authorName, String contact) {
         enforcePostingLimits(accountId);
-        Review review = new Review(accountId, sanitize(title), sanitize(body));
+        String cleanContact = contact == null || contact.isBlank() ? null : sanitize(contact);
+        Review review =
+                new Review(accountId, sanitize(title), sanitize(body), sanitize(authorName), cleanContact, Instant.now());
         return reviewRepository.save(review);
+    }
+
+    /** 이미지 첨부 전 확인 — 내 글이어야 하고 삭제된 글이 아니어야 한다(§3.3). */
+    public Review requireOwnedForImages(Long id, Long accountId) {
+        Review review = findOrThrow(id);
+        requireOwnership(review, accountId);
+        if (review.getStatus() == ReviewStatus.DELETED) {
+            throw new BusinessException(ErrorCode.INVALID_STATE_TRANSITION);
+        }
+        return review;
     }
 
     /** 본인 글만 수정할 수 있다 — 아니면 POST_NOT_OWNED(§3.3). 삭제된 글은 수정 대상이 아니다. */
