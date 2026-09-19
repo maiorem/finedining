@@ -1,5 +1,6 @@
 package com.finediningtheater.global.web;
 
+import com.finediningtheater.site.SiteVisibilityService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -31,11 +33,19 @@ public class IndexHtmlFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(IndexHtmlFilter.class);
 
+    private static final String NOINDEX_META = "<meta name=\"robots\" content=\"noindex, nofollow\" />";
+
     private final Path indexPath;
+    private final SiteVisibilityService siteVisibilityService;
     private volatile CachedIndex cached;
 
-    public IndexHtmlFilter(@Value("${app.web.index-html-path:/web-dist/index.html}") String indexHtmlPath) {
+    public IndexHtmlFilter(
+            @Value("${app.web.index-html-path:/web-dist/index.html}") String indexHtmlPath,
+            // @WebMvcTest는 Filter 빈을 전부 로드하는데 서비스 빈은 없다 — 첫 요청 때 해석하게 미뤄서
+            // 컨트롤러 테스트마다 이 서비스를 목으로 채우지 않아도 되게 한다(실제 앱에서는 동일하게 동작).
+            @Lazy SiteVisibilityService siteVisibilityService) {
         this.indexPath = Path.of(indexHtmlPath);
+        this.siteVisibilityService = siteVisibilityService;
     }
 
     @Override
@@ -55,8 +65,26 @@ public class IndexHtmlFilter extends OncePerRequestFilter {
             return;
         }
         response.setContentType("text/html;charset=UTF-8");
-        response.setHeader("Cache-Control", "public, max-age=60");
-        response.getWriter().write(html);
+        if (isSitePublic()) {
+            response.setHeader("Cache-Control", "public, max-age=60");
+            response.getWriter().write(html);
+            return;
+        }
+        // 오픈 전(비공개)에는 검색엔진이 색인하지 못하게 하고, CDN·브라우저가 이 HTML을 캐시해서
+        // 공개로 바꾼 뒤에도 noindex가 남지 않게 한다.
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("X-Robots-Tag", "noindex, nofollow");
+        response.getWriter().write(html.replace("</head>", NOINDEX_META + "</head>"));
+    }
+
+    // DB를 못 읽는 순간에도 HTML 서빙 자체는 살아 있어야 한다 — 이 경우엔 색인을 막는 쪽(비공개)으로 본다.
+    private boolean isSitePublic() {
+        try {
+            return siteVisibilityService.isPublic();
+        } catch (RuntimeException e) {
+            log.warn("사이트 공개 여부를 읽을 수 없어 비공개로 처리합니다: {}", e.getMessage());
+            return false;
+        }
     }
 
     private String readIndexHtml() {

@@ -3,6 +3,7 @@ package com.finediningtheater.global.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.response.ApiResponse;
+import com.finediningtheater.site.SiteVisibilityService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class SecurityConfig {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final ObjectMapper objectMapper;
+    private final SiteVisibilityService siteVisibilityService;
     private final List<String> corsAllowedOrigins;
 
     public SecurityConfig(
@@ -57,11 +59,13 @@ public class SecurityConfig {
             OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
             OAuth2LoginFailureHandler oAuth2LoginFailureHandler,
             ObjectMapper objectMapper,
+            SiteVisibilityService siteVisibilityService,
             @Value("${app.cors.allowed-origins}") String corsAllowedOrigins) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
         this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
         this.objectMapper = objectMapper;
+        this.siteVisibilityService = siteVisibilityService;
         this.corsAllowedOrigins = Arrays.stream(corsAllowedOrigins.split(",")).map(String::trim).toList();
     }
 
@@ -110,6 +114,9 @@ public class SecurityConfig {
                                                 "/api/auth/member/refresh",
                                                 "/api/auth/member/logout")
                                         .permitAll()
+                                        // 프론트가 "준비 중" 화면을 띄울지 정하려고 부팅 때 묻는다 — 비공개여도 열려 있어야 한다.
+                                        .requestMatchers(HttpMethod.GET, "/api/site/status")
+                                        .permitAll()
                                         .requestMatchers(
                                                 HttpMethod.GET,
                                                 "/api/productions/**",
@@ -121,16 +128,17 @@ public class SecurityConfig {
                                         // /manage 하위 경로도 이 와일드카드에 걸리지만 안전하다 — 그쪽은
                                         // ArtistEditController/CastingEditController/ReviewEditController/
                                         // ProgramEditController/PressClippingEditController의 클래스 레벨
-                                        // @PreAuthorize가 별도 AOP 계층에서 여전히 막는다. 여기서 permitAll은
-                                        // "필터 체인을 통과시킨다"는 뜻이지 인가를 면제하지 않는다.
-                                        .permitAll()
+                                        // @PreAuthorize가 별도 AOP 계층에서 여전히 막는다. 여기서 access는
+                                        // "필터 체인을 통과시킨다"는 뜻이지 인가를 면제하지 않는다. 공개 상태면
+                                        // 누구나, 비공개(오픈 전)면 관리자만 통과한다.
+                                        .access(new SiteAccessAuthorizationManager(siteVisibilityService, false))
                                         // 협업제안은 카카오 로그인이 붙기 전까지 로그인 없이 받는다(2026-08-27, §3.7).
                                         .requestMatchers(HttpMethod.POST, "/api/proposals")
-                                        .permitAll()
+                                        .access(new SiteAccessAuthorizationManager(siteVisibilityService, false))
                                         .requestMatchers("/actuator/health/**")
                                         .permitAll()
                                         .requestMatchers("/api/**")
-                                        .authenticated()
+                                        .access(new SiteAccessAuthorizationManager(siteVisibilityService, true))
                                         .anyRequest()
                                         .permitAll())
                 // 카카오 로그인(§7.4). 인가·리다이렉트 엔드포인트를 /api/oauth2/** 아래로 몰아서
