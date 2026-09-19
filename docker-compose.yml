@@ -23,6 +23,9 @@ services:
     image: ${BACKEND_IMAGE:-finedining-backend:local}
     build:
       context: ./backend
+    # EC2가 재부팅되거나 프로세스가 죽어도 스스로 다시 뜨게 한다. 직접 `docker compose stop`한 것은
+    # 되살리지 않는다(unless-stopped). Docker 데몬은 서버에서 부팅 시 자동 시작으로 켜져 있다.
+    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -45,6 +48,7 @@ services:
 
   nginx:
     image: nginx:1.27-alpine
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
