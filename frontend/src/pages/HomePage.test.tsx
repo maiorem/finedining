@@ -45,9 +45,9 @@ describe("HomePage", () => {
     expect(screen.getByText("당신의 식탁 위에 이야기를 올립니다")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "협업 제안하기" })).not.toBeInTheDocument();
 
-    // 맨 아래 갤러리 캡션 — 아직 사진이 없어도(assets/gallery/ 비어있음) 카피는 항상 보여준다.
-    expect(screen.getByText("삶의 이야기를 담은 좋은 식사")).toBeInTheDocument();
-    expect(screen.getByText("Finedining Theater")).toBeInTheDocument();
+    // 흐르는 브랜드 문장 아래의 갤러리는 걷어냈다(2026-09-19) — 캡션이 더 이상 나오지 않는다.
+    expect(screen.getByRole("heading", { level: 2, name: /삶의 이야기를 식탁 위에 올리다/ })).toBeInTheDocument();
+    expect(screen.queryByText("Finedining Theater")).not.toBeInTheDocument();
   });
 
   it("작품·프로그램을 각각 최대 2개까지 보여주고 각 상세 페이지로 연결한다", async () => {

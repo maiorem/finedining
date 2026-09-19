@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { HeroSlideshow } from "../components/section/HeroSlideshow";
-import { GallerySlideshow } from "../components/section/GallerySlideshow";
 import { StoryMarquee } from "../components/section/StoryMarquee";
 import { useProductions } from "../api/productions";
 import { usePrograms } from "../api/programs";
@@ -57,8 +56,6 @@ export default function HomePage() {
       )}
 
       <StoryMarquee />
-
-      <GallerySlideshow />
     </main>
   );
 }
