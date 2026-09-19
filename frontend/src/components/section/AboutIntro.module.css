@@ -195,6 +195,44 @@
   line-height: var(--lh-body);
 }
 
+.history {
+  margin-top: var(--section-y-mobile);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .history {
+    margin-top: var(--section-y-desktop);
+    gap: 3rem;
+  }
+}
+
+/* 슬라이드 그림은 흰 바탕이라 종이색 배경 위에서 경계가 흐려진다 — 얇은 선으로 카드처럼 구분한다. */
+.historyItem {
+  margin: 0;
+  width: 100%;
+  max-width: 960px;
+  border: 1px solid var(--c-line);
+  background: var(--c-white);
+}
+
+.historyImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
 .closing {
   margin: var(--section-y-mobile) 0 0;
   text-align: center;

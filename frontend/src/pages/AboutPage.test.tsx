@@ -44,7 +44,8 @@ describe("AboutPage", () => {
     renderPage();
     await screen.findByRole("tab", { name: "소개" });
 
-    expect(screen.getByText(/당신의 식탁 위에 이야기를 올립니다\./)).toBeInTheDocument();
+    // 연혁 슬라이드의 숨김 캡션에도 같은 문장이 있어서 화면에 보이는 문단(p)으로 범위를 좁힌다.
+    expect(screen.getByText(/당신의 식탁 위에 이야기를 올립니다\./, { selector: "p" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "소개" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "보도자료 관리" })).not.toBeInTheDocument();
   });
@@ -68,6 +69,11 @@ describe("AboutPage", () => {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
     expect(screen.getByText(/당신과 다시 마주 앉고 싶습니다\./)).toBeInTheDocument();
+    // 연혁 슬라이드 3장 — 그림 속 글은 스크린리더용 캡션으로 함께 실린다.
+    expect(screen.getByRole("region", { name: "기업 연혁과 소개" })).toBeInTheDocument();
+    expect(screen.getByText(/2025 서울문화재단 서울예술상 후보작 선정/)).toBeInTheDocument();
+    expect(screen.getByText(/공연으로 공감하고, 음식으로 경험하고, 대화로 연결됩니다/)).toBeInTheDocument();
+    expect(screen.getByText(/프라이빗 씨어터 레스토랑/)).toBeInTheDocument();
     expect(screen.getByText("FINEDINING THEATER")).toBeInTheDocument();
   });
 

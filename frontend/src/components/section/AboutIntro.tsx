@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next";
 import aboutImage from "../../assets/about/about.jpg";
+import history1 from "../../assets/about/history-1.png";
+import history2 from "../../assets/about/history-2.jpg";
+import history3 from "../../assets/about/history-3.jpg";
 import styles from "./AboutIntro.module.css";
 
 // 라벨은 영문 그대로 노출하는 디자인 문구라 로케일과 무관하다 — 번역 대상은 제목·설명뿐이다.
@@ -15,6 +18,14 @@ const PRODUCTS = [
   { key: "local", label: "LOCAL CONTENT" },
   { key: "kfood", label: "K-FOOD CONTENT" },
   { key: "custom", label: "CUSTOM CONTENT" },
+] as const;
+
+// 기업 연혁·소개 슬라이드 3장(2026-09-19 요청). 글이 그림에 박혀 있어서 같은 내용을 숨김 캡션으로 함께
+// 싣는다 — 스크린리더와 검색엔진이 읽을 수 있고, 영문 페이지에서도 번역된 내용을 전달한다(§8.8).
+const HISTORY = [
+  { key: "1", src: history1 },
+  { key: "2", src: history2 },
+  { key: "3", src: history3 },
 ] as const;
 
 /**
@@ -70,6 +81,23 @@ export function AboutIntro() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className={styles.history} aria-label={t("about.historyLabel")}>
+        {HISTORY.map(({ key, src }) => (
+          <figure key={key} className={styles.historyItem}>
+            <img
+              src={src}
+              alt=""
+              className={styles.historyImage}
+              width={1920}
+              height={1080}
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption className={styles.srOnly}>{t(`about.history.${key}`)}</figcaption>
+          </figure>
+        ))}
       </section>
 
       <p className={styles.closing}>
