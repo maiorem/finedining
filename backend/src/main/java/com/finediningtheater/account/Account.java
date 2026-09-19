@@ -26,6 +26,8 @@ import lombok.Getter;
 @Table(name = "account")
 public class Account extends BaseTimeEntity {
 
+    public static final String WITHDRAWN_NICKNAME = "탈퇴한 회원";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -58,6 +60,18 @@ public class Account extends BaseTimeEntity {
         this.email = email;
         this.nickname = nickname;
         this.locale = locale;
+    }
+
+    /**
+     * 탈퇴(§3.2) — 물리 삭제가 아니라 상태 전환이다. 작성한 글의 account_id 참조가 끊기지 않도록
+     * 행은 남기고 개인정보만 지운다. provider_user_id를 지우므로 같은 카카오 계정으로 다시 로그인하면
+     * 새 계정으로 취급된다.
+     */
+    public void withdraw() {
+        this.status = AccountStatus.WITHDRAWN;
+        this.nickname = WITHDRAWN_NICKNAME;
+        this.email = null;
+        this.providerUserId = null;
     }
 
     public boolean isActive() {

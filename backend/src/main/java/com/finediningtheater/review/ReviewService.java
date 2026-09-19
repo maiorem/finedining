@@ -102,6 +102,12 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
+    /** 회원 탈퇴 시 그 회원 글의 이름·연락처를 지운다(글은 남긴다, §3.2). */
+    @Transactional
+    public void clearAuthorInfo(Long accountId) {
+        reviewRepository.clearAuthorInfoByAccountId(accountId);
+    }
+
     /** 이미지 첨부 전 확인 — 내 글이어야 하고 삭제된 글이 아니어야 한다(§3.3). */
     public Review requireOwnedForImages(Long id, Long accountId) {
         Review review = findOrThrow(id);
