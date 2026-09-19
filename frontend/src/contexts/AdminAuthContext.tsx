@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { loginAdmin, logoutAdmin, refreshAdminSession, type AdminSession } from "../api/auth";
 import { registerAdminSessionHandlers } from "../api/adminHttp";
+import { registerPublicAuthorizer } from "../api/http";
 
 type AdminAuthContextValue = {
   session: AdminSession | null;
@@ -14,6 +15,9 @@ const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AdminSession | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  // 공개 조회(apiGet)가 렌더 직후 바로 최신 토큰을 읽어야 해서 ref에 렌더 시점 값을 둔다.
+  const tokenRef = useRef<string | null>(null);
+  tokenRef.current = session?.accessToken ?? null;
 
   // 새로고침해도 로그인 상태를 유지하되 access token은 localStorage에 두지 않는다(§7.4) —
   // 대신 HttpOnly refresh 쿠키로 조용히 재발급받는다. 쿠키가 없거나 만료됐으면 그냥 로그아웃 상태.
@@ -39,6 +43,22 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     registerAdminSessionHandlers({
       onRefreshed: (refreshed) => setSession(refreshed),
       onExpired: () => setSession(null),
+    });
+  }, []);
+
+  useEffect(() => {
+    registerPublicAuthorizer({
+      getToken: () => tokenRef.current,
+      refreshToken: () =>
+        refreshAdminSession()
+          .then((refreshed) => {
+            setSession(refreshed);
+            return refreshed.accessToken;
+          })
+          .catch(() => {
+            setSession(null);
+            return null;
+          }),
     });
   }, []);
 
