@@ -3,6 +3,7 @@ import aboutImage from "../../assets/about/about.jpg";
 import history1 from "../../assets/about/history-1.png";
 import history2 from "../../assets/about/history-2.jpg";
 import history3 from "../../assets/about/history-3.jpg";
+import { StoryMarquee } from "./StoryMarquee";
 import styles from "./AboutIntro.module.css";
 
 // 라벨은 영문 그대로 노출하는 디자인 문구라 로케일과 무관하다 — 번역 대상은 제목·설명뿐이다.
@@ -69,6 +70,8 @@ export function AboutIntro() {
           ))}
         </ul>
       </section>
+
+      <StoryMarquee />
 
       <section className={styles.products}>
         <h2 className={styles.productsHeading}>{t("about.productsHeading")}</h2>
