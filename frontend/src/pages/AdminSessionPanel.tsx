@@ -1,8 +1,12 @@
-import { useState, type FormEvent } from "react";
+import { lazy, Suspense, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../api/http";
 import { changeAdminPassword, setAdminPin, type AdminSession } from "../api/auth";
+import { useCan } from "../hooks/useCan";
 import styles from "./LoginPage.module.css";
+
+// 사이트 공개 전환 UI는 관리자 전용이라 익명 방문자 번들에 섞이면 안 된다(CLAUDE.md §3.5·§9).
+const SiteVisibilityControl = lazy(() => import("../features/editing/SiteVisibilityControl"));
 
 const PIN_ERROR_CODES = ["INVALID_CREDENTIALS", "WEAK_PIN", "VALIDATION_ERROR"] as const;
 
@@ -32,6 +36,7 @@ type AdminSessionPanelProps = {
  */
 export function AdminSessionPanel({ session, onLogout }: AdminSessionPanelProps) {
   const { t } = useTranslation();
+  const canManageSite = useCan("site:manage");
 
   const [pinFormOpen, setPinFormOpen] = useState(false);
   const [currentPasswordForPin, setCurrentPasswordForPin] = useState("");
@@ -208,6 +213,12 @@ export function AdminSessionPanel({ session, onLogout }: AdminSessionPanelProps)
             {t("login.password.submit")}
           </button>
         </form>
+      )}
+
+      {canManageSite && (
+        <Suspense fallback={null}>
+          <SiteVisibilityControl />
+        </Suspense>
       )}
     </div>
   );

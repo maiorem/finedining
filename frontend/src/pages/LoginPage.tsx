@@ -1,7 +1,10 @@
 import { useState, type FormEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../api/http";
+import { queryKeys } from "../api/queryKeys";
+import { getSiteStatus } from "../api/site";
 import { useAdminAuth } from "../contexts/AdminAuthContext";
 import { useMemberAuth } from "../contexts/MemberAuthContext";
 import { useNoIndex } from "../hooks/useNoIndex";
@@ -38,6 +41,14 @@ export default function LoginPage() {
     isInitializing: memberInitializing,
     logout: memberLogout,
   } = useMemberAuth();
+  const { data: siteStatus } = useQuery({
+    queryKey: queryKeys.site.status,
+    queryFn: getSiteStatus,
+    staleTime: 30 * 1000,
+    retry: false,
+  });
+  // 오픈 전 비공개 동안에는 회원 가입을 받지 않으므로 카카오 로그인 버튼을 숨긴다(SignupPolicy).
+  const siteIsPrivate = siteStatus?.open === false;
   const [searchParams] = useSearchParams();
   const kakaoError = searchParams.get("error");
   const [adminFormOpen, setAdminFormOpen] = useState(false);
@@ -77,6 +88,7 @@ export default function LoginPage() {
         )}
 
         {!memberInitializing &&
+          !siteIsPrivate &&
           (memberSession ? (
             <div className={styles.sessionCard}>
               <p className={styles.sessionText}>{t("login.memberLoggedInAs", { nickname: memberSession.nickname })}</p>

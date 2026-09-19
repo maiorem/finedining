@@ -46,4 +46,7 @@ export const queryKeys = {
   accounts: {
     adminList: ["accounts", "admin", "list"] as const,
   },
+  site: {
+    status: ["site", "status"] as const,
+  },
 } as const;

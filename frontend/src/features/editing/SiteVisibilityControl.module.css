@@ -1,0 +1,55 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid var(--c-line);
+  padding-top: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  color: var(--c-ink-60);
+}
+
+.state {
+  margin: 0;
+  color: var(--c-ink);
+}
+
+.button {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0 1.25em;
+  border: 1px solid var(--c-ink);
+  background: transparent;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled),
+.button:focus-visible {
+  border-color: var(--c-spot);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
+.button:disabled {
+  color: var(--c-ink-35);
+  border-color: var(--c-line);
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 0;
+  font-size: var(--t-caption);
+  color: var(--c-ink);
+  border: 1px solid var(--c-line);
+  padding: 0.5em 0.7em;
+}

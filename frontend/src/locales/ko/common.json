@@ -234,5 +234,14 @@
   "members.status.ACTIVE": "활동중",
   "members.status.WITHDRAWN": "탈퇴",
   "privacy.heading": "개인정보처리방침",
-  "terms.heading": "이용약관"
+  "terms.heading": "이용약관",
+  "site.private.message": "홈페이지 오픈을 준비하고 있습니다.",
+  "site.private.sub": "조금만 기다려 주세요.",
+  "site.visibility.heading": "사이트 공개 상태",
+  "site.visibility.open": "현재 공개 상태입니다. 누구나 볼 수 있습니다.",
+  "site.visibility.closed": "현재 비공개 상태입니다. 관리자로 로그인한 사람만 볼 수 있습니다.",
+  "site.visibility.openButton": "사이트 공개하기",
+  "site.visibility.closeButton": "비공개로 전환",
+  "site.visibility.confirmOpen": "사이트를 공개하면 누구나 볼 수 있습니다. 공개할까요?",
+  "site.visibility.error": "변경에 실패했습니다. 잠시 후 다시 시도해 주세요."
 }

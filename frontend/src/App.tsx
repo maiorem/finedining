@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { Header } from "./components/layout/Header";
 import { Footer } from "./components/layout/Footer";
+import { SiteGate } from "./components/layout/SiteGate";
 import HomePage from "./pages/HomePage";
 import ProductionsPage from "./pages/ProductionsPage";
 import ProductionDetailPage from "./pages/ProductionDetailPage";
@@ -20,7 +21,7 @@ import TermsPage from "./pages/TermsPage";
 
 export function App() {
   return (
-    <>
+    <SiteGate>
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -43,6 +44,6 @@ export function App() {
         <Route path="/terms" element={<TermsPage />} />
       </Routes>
       <Footer />
-    </>
+    </SiteGate>
   );
 }

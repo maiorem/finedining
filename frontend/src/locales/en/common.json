@@ -234,5 +234,14 @@
   "members.status.ACTIVE": "Active",
   "members.status.WITHDRAWN": "Withdrawn",
   "privacy.heading": "Privacy Policy",
-  "terms.heading": "Terms of Service"
+  "terms.heading": "Terms of Service",
+  "site.private.message": "We're getting our website ready to open.",
+  "site.private.sub": "Please check back soon.",
+  "site.visibility.heading": "Site visibility",
+  "site.visibility.open": "The site is public. Anyone can view it.",
+  "site.visibility.closed": "The site is private. Only logged-in admins can view it.",
+  "site.visibility.openButton": "Make site public",
+  "site.visibility.closeButton": "Make site private",
+  "site.visibility.confirmOpen": "Once public, anyone can view the site. Make it public?",
+  "site.visibility.error": "Couldn't change the setting. Please try again."
 }

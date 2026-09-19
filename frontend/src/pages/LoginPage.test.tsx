@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -16,14 +17,17 @@ function unauthenticated(): Response {
 }
 
 function renderLoginPage(initialPath = "/login") {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <MemoryRouter initialEntries={[initialPath]}>
-      <AdminAuthProvider>
-        <MemberAuthProvider>
-          <LoginPage />
-        </MemberAuthProvider>
-      </AdminAuthProvider>
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={[initialPath]}>
+        <AdminAuthProvider>
+          <MemberAuthProvider>
+            <LoginPage />
+          </MemberAuthProvider>
+        </AdminAuthProvider>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
@@ -49,6 +53,20 @@ describe("LoginPage", () => {
       "href",
       "/api/oauth2/authorization/kakao",
     );
+  });
+
+  it("사이트가 비공개면 카카오 로그인 버튼을 숨긴다(오픈 전에는 가입을 받지 않는다)", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input === "/api/site/status") {
+        return Promise.resolve(jsonResponse({ success: true, data: { open: false }, error: null }));
+      }
+      return Promise.resolve(unauthenticated());
+    });
+
+    renderLoginPage();
+
+    expect(await screen.findByRole("button", { name: "ADMIN" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "카카오로 로그인" })).not.toBeInTheDocument();
   });
 
   it("ADMIN 버튼을 누르면 폼이 나타나고 로그인에 성공하면 세션이 보인다", async () => {
