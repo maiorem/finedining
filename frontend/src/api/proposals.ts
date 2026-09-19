@@ -1,6 +1,12 @@
 import { ApiError } from "./http";
 
-export type ProposalCategory = "CORPORATE_EVENT" | "LOCAL_CULTURE" | "CUSTOM_CONSULTING";
+export type ProposalCategory =
+  | "PERFORMANCE_INQUIRY"
+  | "CONTENT_FOOD_COLLAB"
+  | "CORPORATE_EVENT"
+  | "LOCAL_CULTURE"
+  | "CUSTOM_CONSULTING"
+  | "OTHER";
 
 export type CreateProposalInput = {
   name: string;

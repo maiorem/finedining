@@ -10,7 +10,14 @@ import styles from "./ProposalPage.module.css";
 // (CLAUDE.md §3.5·§9).
 const ProposalReviewList = lazy(() => import("../features/editing/ProposalReviewList"));
 
-const PROPOSAL_CATEGORIES: ProposalCategory[] = ["CORPORATE_EVENT", "LOCAL_CULTURE", "CUSTOM_CONSULTING"];
+const PROPOSAL_CATEGORIES: ProposalCategory[] = [
+  "PERFORMANCE_INQUIRY",
+  "CONTENT_FOOD_COLLAB",
+  "CORPORATE_EVENT",
+  "LOCAL_CULTURE",
+  "CUSTOM_CONSULTING",
+  "OTHER",
+];
 
 const KNOWN_ERROR_CODES = ["VALIDATION_ERROR", "RATE_LIMITED"] as const;
 

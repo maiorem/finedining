@@ -373,5 +373,8 @@
   "reviews.adminContact": "Contact",
   "reviews.adminNoAuthorInfo": "(older post — no name or contact)",
   "reviews.consentDetail": "Collected: name (required), contact (optional), attached photos · Purpose: posting your story and contacting you about a thank-you reward · Retention: until the story is deleted or you leave",
-  "editing.panel.artistBioHint": "Wrap a whole line in two asterisks, like **question text**, to show it as a bold question. Separate paragraphs with a blank line."
+  "editing.panel.artistBioHint": "Wrap a whole line in two asterisks, like **question text**, to show it as a bold question. Separate paragraphs with a blank line.",
+  "proposal.category.PERFORMANCE_INQUIRY": "Performance inquiry",
+  "proposal.category.CONTENT_FOOD_COLLAB": "Content and dining collaboration",
+  "proposal.category.OTHER": "Other (open proposal)"
 }
