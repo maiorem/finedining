@@ -1,2 +1,5 @@
 User-agent: *
 Disallow: /login
+Disallow: /account
+
+Sitemap: https://finediningtheater.com/sitemap.xml
