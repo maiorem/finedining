@@ -41,7 +41,7 @@
   margin: 0;
   font-family: var(--f-display);
   font-weight: 700;
-  font-size: var(--t-h2);
+  font-size: var(--t-h3);
   line-height: var(--lh-tight);
   color: var(--c-ink);
   white-space: pre-line;
