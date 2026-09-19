@@ -376,5 +376,17 @@
   "editing.panel.artistBioHint": "Wrap a whole line in two asterisks, like **question text**, to show it as a bold question. Separate paragraphs with a blank line.",
   "proposal.category.PERFORMANCE_INQUIRY": "Performance inquiry",
   "proposal.category.CONTENT_FOOD_COLLAB": "Content and dining collaboration",
-  "proposal.category.OTHER": "Other (open proposal)"
+  "proposal.category.OTHER": "Other (open proposal)",
+  "account.title": "My account",
+  "account.loggedInAs": "Signed in as {{nickname}}.",
+  "account.needLogin": "Please sign in to use this page.",
+  "account.withdraw.heading": "Leave the membership",
+  "account.withdraw.info1": "Your nickname will change to \"Withdrawn Member\", and your email and Kakao identifier will be erased.",
+  "account.withdraw.info2": "The name and contact you left with your stories will also be erased.",
+  "account.withdraw.info3": "Stories and attached photos you posted are not deleted; they remain as posts by a \"Withdrawn Member\". If you want them removed, delete them yourself before leaving.",
+  "account.withdraw.info4": "You cannot sign in again with the withdrawn account. Signing in with the same Kakao account again creates a new membership.",
+  "account.withdraw.confirm": "I have read the above and want to leave.",
+  "account.withdraw.submit": "Leave the membership",
+  "account.withdraw.error": "We could not process your withdrawal. Please try again shortly.",
+  "footer.account": "My account · Leave membership"
 }

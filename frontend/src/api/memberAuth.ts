@@ -1,4 +1,5 @@
 import { ApiError } from "./http";
+import { apiMemberDelete } from "./memberHttp";
 
 export type MemberSession = {
   accountId: number;
@@ -32,4 +33,9 @@ export function refreshMemberSession(): Promise<MemberSession> {
 
 export async function logoutMember(): Promise<void> {
   await postMemberAuth("logout");
+}
+
+/** 회원 탈퇴 — 계정은 남기고 개인정보만 지운다(CLAUDE.md §3.2). 서버가 refresh 쿠키도 지운다. */
+export async function withdrawMember(accessToken: string): Promise<void> {
+  await apiMemberDelete<null>("/api/auth/member/me", accessToken);
 }

@@ -16,6 +16,7 @@ import ArtistDetailPage from "./pages/ArtistDetailPage";
 import LoginPage from "./pages/LoginPage";
 import OAuthCallbackPage from "./pages/OAuthCallbackPage";
 import MembersPage from "./pages/MembersPage";
+import AccountPage from "./pages/AccountPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsPage from "./pages/TermsPage";
 
@@ -40,6 +41,7 @@ export function App() {
         <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
         {/* 관리자 로그인 상태에서만 Header가 메뉴로 노출한다 — 실제 접근 제어는 서버가 한다(§3.5). */}
         <Route path="/members" element={<MembersPage />} />
+        <Route path="/account" element={<AccountPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
       </Routes>

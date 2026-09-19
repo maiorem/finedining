@@ -1,18 +1,56 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "../../i18n";
+import { MemberAuthProvider } from "../../contexts/MemberAuthContext";
 import { Footer } from "./Footer";
 
 function renderFooter() {
   return render(
     <MemoryRouter>
-      <Footer />
+      <MemberAuthProvider>
+        <Footer />
+      </MemberAuthProvider>
     </MemoryRouter>,
   );
 }
 
+const UNAUTHENTICATED = {
+  json: async () => ({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+} as Response;
+
 describe("Footer", () => {
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    fetchMock.mockReset().mockResolvedValue(UNAUTHENTICATED);
+    vi.stubGlobal("fetch", fetchMock);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("로그인하지 않았으면 내 계정·회원 탈퇴 링크가 없다", async () => {
+    renderFooter();
+    await screen.findByRole("link", { name: "이용약관" });
+
+    expect(screen.queryByRole("link", { name: /회원 탈퇴/ })).not.toBeInTheDocument();
+  });
+
+  it("카카오 회원으로 로그인했으면 내 계정·회원 탈퇴 링크가 있다", async () => {
+    fetchMock.mockImplementation((input: string) =>
+      Promise.resolve(
+        input === "/api/auth/member/refresh"
+          ? ({ json: async () => ({ success: true, data: { accountId: 4, accessToken: "t", nickname: "손님" }, error: null }) } as Response)
+          : UNAUTHENTICATED,
+      ),
+    );
+    renderFooter();
+
+    expect(await screen.findByRole("link", { name: /회원 탈퇴/ })).toHaveAttribute("href", "/account");
+  });
+
   it("저작권 표기를 렌더한다", () => {
     renderFooter();
 

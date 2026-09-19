@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { FACEBOOK_URL, INSTAGRAM_URL, YOUTUBE_URL } from "../../constants/social";
+import { useMemberAuth } from "../../contexts/MemberAuthContext";
 import styles from "./Footer.module.css";
 
 // 사업자 정보(§8.5)는 상호·주소 등 사실 값이라 로케일에 따라 달라지지 않는다 — 라벨만
@@ -53,6 +54,7 @@ const SOCIAL_LINKS = [
 // 로그인/로그아웃 진입점은 헤더로 옮겼다 — 푸터에 숨어 있으면 너무 안 보인다는 피드백.
 export function Footer() {
   const { t } = useTranslation();
+  const { session: memberSession } = useMemberAuth();
 
   return (
     <footer className={styles.footer}>
@@ -72,6 +74,7 @@ export function Footer() {
       <nav aria-label={t("footer.legalNav")} className={styles.legalLinks}>
         <Link to="/privacy">{t("footer.privacyPolicy")}</Link>
         <Link to="/terms">{t("footer.terms")}</Link>
+        {memberSession && <Link to="/account">{t("footer.account")}</Link>}
       </nav>
       <div className={styles.bottomRow}>
         <p className={styles.copyright}>{t("footer.copyright")}</p>
