@@ -174,7 +174,9 @@
 
 .submit:hover:not(:disabled),
 .submit:focus-visible {
-  border-color: var(--c-spot);
+  background: var(--c-orange);
+  border-color: var(--c-orange);
+  color: var(--c-ink);
 }
 
 .submit:focus-visible {

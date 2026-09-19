@@ -61,12 +61,15 @@
   letter-spacing: var(--ls-wide);
   text-transform: uppercase;
   text-decoration: none;
+  transition: color var(--d-fast) var(--e-out), background-color var(--d-fast) var(--e-out),
+    border-color var(--d-fast) var(--e-out);
 }
 
 .actionLink:hover,
 .actionLink:focus-visible {
-  border-color: var(--c-spot);
-  color: var(--c-spot);
+  background: var(--c-orange);
+  border-color: var(--c-orange);
+  color: var(--c-ink);
   outline: none;
 }
 

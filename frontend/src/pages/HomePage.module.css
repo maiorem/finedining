@@ -27,8 +27,9 @@
 
 .bookingCta:hover,
 .bookingCta:focus-visible {
-  border-color: var(--c-spot);
-  color: var(--c-spot);
+  background: var(--c-orange);
+  border-color: var(--c-orange);
+  color: var(--c-ink);
   outline: none;
 }
 
