@@ -2,6 +2,7 @@ package com.finediningtheater.artist;
 
 import com.finediningtheater.artist.dto.ArtistAdminResponse;
 import com.finediningtheater.artist.dto.ChangeArtistLinkRequest;
+import com.finediningtheater.artist.dto.ChangeArtistPeopleInfoRequest;
 import com.finediningtheater.artist.dto.CreateArtistRequest;
 import com.finediningtheater.artist.dto.UpsertArtistTranslationRequest;
 import com.finediningtheater.global.audit.AuditLogger;
@@ -82,7 +83,7 @@ public class ArtistEditController {
             @PathVariable SiteLocale locale,
             @Valid @RequestBody UpsertArtistTranslationRequest request) {
         artistService.saveDraftTranslation(
-                id, locale, request.name(), request.role(), request.bio(), request.credits());
+                id, locale, request.name(), request.role(), request.bio(), request.credits(), request.quote());
         return ApiResponse.success(toAdminResponse(artistService.getForAdmin(id)));
     }
 
@@ -90,6 +91,44 @@ public class ArtistEditController {
     public ApiResponse<ArtistAdminResponse> changeLink(
             @PathVariable Long id, @Valid @RequestBody ChangeArtistLinkRequest request) {
         return ApiResponse.success(toAdminResponse(artistService.changeLinkUrl(id, request.linkUrl())));
+    }
+
+    /** 이메일·노출 순서·인터뷰 영상 링크. 발행을 거치지 않고 즉시 반영된다. */
+    @PutMapping("/{id}/people-info")
+    public ApiResponse<ArtistAdminResponse> changePeopleInfo(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangeArtistPeopleInfoRequest request,
+            @AuthenticationPrincipal AdminPrincipal principal,
+            HttpServletRequest httpRequest) {
+        Artist before = artistService.getForAdmin(id);
+        Map<String, Object> beforeValues = peopleInfoValues(before.getEmail(), before.getDisplayOrder(), before.getInterviewUrl());
+
+        Artist after =
+                artistService.changePeopleInfo(
+                        id, blankToNull(request.email()), request.displayOrder(), blankToNull(request.interviewUrl()));
+
+        auditLogger.record(
+                principal.id(),
+                "ARTIST_PEOPLE_INFO_CHANGE",
+                "Artist",
+                id,
+                beforeValues,
+                peopleInfoValues(after.getEmail(), after.getDisplayOrder(), after.getInterviewUrl()),
+                ClientIp.resolve(httpRequest));
+
+        return ApiResponse.success(toAdminResponse(after));
+    }
+
+    private static Map<String, Object> peopleInfoValues(String email, int displayOrder, String interviewUrl) {
+        Map<String, Object> values = new java.util.LinkedHashMap<>();
+        values.put("email", email);
+        values.put("displayOrder", displayOrder);
+        values.put("interviewUrl", interviewUrl);
+        return values;
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     /** 파괴적·공개적 동작 — PIN sudo 모드가 열려 있어야 한다(§3.4). */

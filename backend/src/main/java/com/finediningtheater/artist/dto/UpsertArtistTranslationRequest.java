@@ -7,5 +7,6 @@ import jakarta.validation.constraints.Size;
 public record UpsertArtistTranslationRequest(
         @NotBlank @Size(max = 100) String name,
         @Size(max = 100) String role,
-        @Size(max = 2000) String bio,
-        @Size(max = 2000) String credits) {}
+        @Size(max = 4000) String bio,
+        @Size(max = 2000) String credits,
+        @Size(max = 500) String quote) {}

@@ -12,6 +12,9 @@ public record ArtistDetailResponse(
         String role,
         String bio,
         String credits,
+        String quote,
+        String email,
+        String interviewUrl,
         String linkUrl,
         MediaAssetResponse photo) {
 
@@ -24,6 +27,9 @@ public record ArtistDetailResponse(
                 translation == null ? null : translation.getRole(),
                 translation == null ? null : translation.getBio(),
                 translation == null ? null : translation.getCredits(),
+                translation == null ? null : translation.getQuote(),
+                artist.getEmail(),
+                artist.getInterviewUrl(),
                 artist.getLinkUrl(),
                 photo);
     }

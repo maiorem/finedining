@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -116,5 +117,38 @@ class ArtistEditControllerTest {
         mockMvc.perform(post("/api/artists/1/publish"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("PUBLISHED"));
+    }
+
+    @Test
+    void 이메일_순서_인터뷰링크를_바꾸고_감사로그를_남긴다() throws Exception {
+        loginAs(1L);
+        Artist artist = new Artist("kim-artist");
+        when(artistService.getForAdmin(1L)).thenReturn(artist);
+        Artist after = new Artist("kim-artist");
+        after.changePeopleInfo("kim@example.com", 3, "https://youtu.be/abc123");
+        when(artistService.changePeopleInfo(1L, "kim@example.com", 3, "https://youtu.be/abc123")).thenReturn(after);
+
+        mockMvc.perform(
+                        put("/api/artists/1/people-info")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"email\":\"kim@example.com\",\"displayOrder\":3,\"interviewUrl\":\"https://youtu.be/abc123\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.email").value("kim@example.com"))
+                .andExpect(jsonPath("$.data.displayOrder").value(3));
+
+        verify(auditLogger)
+                .record(eq(1L), eq("ARTIST_PEOPLE_INFO_CHANGE"), eq("Artist"), any(), any(), any(), any());
+    }
+
+    @Test
+    void 유튜브가_아닌_인터뷰링크는_거부한다() throws Exception {
+        loginAs(1L);
+
+        mockMvc.perform(
+                        put("/api/artists/1/people-info")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"displayOrder\":0,\"interviewUrl\":\"https://evil.example.com/x\"}"))
+                .andExpect(status().isBadRequest());
     }
 }

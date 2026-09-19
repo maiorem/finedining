@@ -35,6 +35,18 @@ public class Artist extends Publishable {
     @Column(length = 500)
     private String linkUrl;
 
+    /** 카드에 공개하는 연락 이메일. 본인 동의를 받은 사람만 채운다(2026-09-19). */
+    @Column(length = 200)
+    private String email;
+
+    /** 사람들 목록 노출 순서 — 작을수록 앞이다. 같으면 등록순. */
+    @Column(nullable = false)
+    private int displayOrder;
+
+    /** 인터뷰 유튜브 영상 주소. 영상 파일은 우리가 받지 않는다(§5). */
+    @Column(length = 500)
+    private String interviewUrl;
+
     // 번역은 순서가 의미 없으니 List(bag)가 아니라 Set이 자연스럽다.
     @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<ArtistTranslation> translations = new HashSet<>();
@@ -80,5 +92,11 @@ public class Artist extends Publishable {
 
     public void changeLinkUrl(String linkUrl) {
         this.linkUrl = linkUrl;
+    }
+
+    public void changePeopleInfo(String email, int displayOrder, String interviewUrl) {
+        this.email = email;
+        this.displayOrder = displayOrder;
+        this.interviewUrl = interviewUrl;
     }
 }

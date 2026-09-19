@@ -23,7 +23,7 @@ class ArtistTranslationTest {
         Artist artist = new Artist("kim-artist");
         ArtistTranslation translation = artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개", "참여작품");
 
-        translation.updateDraft("새 이름", "새 역할", "새 소개", "새 참여작품");
+        translation.updateDraft("새 이름", "새 역할", "새 소개", "새 참여작품", null);
 
         assertThat(translation.effectiveName()).isEqualTo("새 이름");
         assertThat(translation.getName()).isEqualTo("김아무개");
@@ -33,10 +33,11 @@ class ArtistTranslationTest {
     void promoteDraftToPublished는_draft를_공개본으로_복사한다() {
         Artist artist = new Artist("kim-artist");
         ArtistTranslation translation = artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개", "참여작품");
-        translation.updateDraft("새 이름", "새 역할", "새 소개", "새 참여작품");
+        translation.updateDraft("새 이름", "새 역할", "새 소개", "새 참여작품", "새 한마디");
 
         translation.promoteDraftToPublished();
 
+        assertThat(translation.getQuote()).isEqualTo("새 한마디");
         assertThat(translation.getName()).isEqualTo("새 이름");
         assertThat(translation.getRole()).isEqualTo("새 역할");
         assertThat(translation.getBio()).isEqualTo("새 소개");

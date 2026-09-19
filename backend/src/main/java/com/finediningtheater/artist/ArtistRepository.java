@@ -12,14 +12,14 @@ public interface ArtistRepository extends JpaRepository<Artist, Long> {
     Optional<Artist> findBySlugAndStatus(String slug, ContentStatus status);
 
     @EntityGraph(attributePaths = "translations")
-    List<Artist> findAllByStatusOrderByCreatedAtAsc(ContentStatus status);
+    List<Artist> findAllByStatusOrderByDisplayOrderAscCreatedAtAsc(ContentStatus status);
 
     // 관리자용: 상태 무관 조회.
     @EntityGraph(attributePaths = "translations")
     Optional<Artist> findWithDetailsById(Long id);
 
     @EntityGraph(attributePaths = "translations")
-    List<Artist> findAllByOrderByCreatedAtAsc();
+    List<Artist> findAllByOrderByDisplayOrderAscCreatedAtAsc();
 
     // 관리자 미리보기 전용(§3.9 ?preview=true) — 상태 무관으로 슬러그만으로 찾는다.
     @EntityGraph(attributePaths = "translations")

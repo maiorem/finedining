@@ -24,7 +24,7 @@ public class ArtistService {
 
     @Cacheable("artists")
     public List<Artist> listPublished() {
-        return artistRepository.findAllByStatusOrderByCreatedAtAsc(ContentStatus.PUBLISHED);
+        return artistRepository.findAllByStatusOrderByDisplayOrderAscCreatedAtAsc(ContentStatus.PUBLISHED);
     }
 
     @Cacheable(value = "artistDetail", key = "#slug")
@@ -47,7 +47,7 @@ public class ArtistService {
     }
 
     public List<Artist> listForAdmin() {
-        return artistRepository.findAllByOrderByCreatedAtAsc();
+        return artistRepository.findAllByOrderByDisplayOrderAscCreatedAtAsc();
     }
 
     @Transactional
@@ -60,13 +60,13 @@ public class ArtistService {
 
     @Transactional
     public void saveDraftTranslation(
-            Long id, SiteLocale locale, String name, String role, String bio, String credits) {
+            Long id, SiteLocale locale, String name, String role, String bio, String credits, String quote) {
         Artist artist = getForAdmin(id);
         ArtistTranslation translation = artist.translationRowFor(locale);
         if (translation == null) {
             translation = artist.addTranslation(locale, null, null, null, null);
         }
-        translation.updateDraft(name, role, bio, credits);
+        translation.updateDraft(name, role, bio, credits, quote);
     }
 
     // draft*처럼 발행을 거치지 않고 즉시 공개본에 반영되는 필드라, 이미 PUBLISHED인 아티스트라면
@@ -77,6 +77,15 @@ public class ArtistService {
     public Artist changeLinkUrl(Long id, String linkUrl) {
         Artist artist = getForAdmin(id);
         artist.changeLinkUrl(linkUrl);
+        return artist;
+    }
+
+    // 이메일·순서·인터뷰 링크도 발행을 거치지 않고 즉시 반영된다 — changeLinkUrl과 같은 이유로 evict한다.
+    @Transactional
+    @CacheEvict(value = {"artists", "artistDetail"}, allEntries = true)
+    public Artist changePeopleInfo(Long id, String email, int displayOrder, String interviewUrl) {
+        Artist artist = getForAdmin(id);
+        artist.changePeopleInfo(email, displayOrder, interviewUrl);
         return artist;
     }
 

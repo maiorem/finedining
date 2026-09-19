@@ -40,7 +40,7 @@ class ArtistServiceTest {
         artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개", "참여작품");
         when(artistRepository.findWithDetailsById(1L)).thenReturn(Optional.of(artist));
 
-        service().saveDraftTranslation(1L, SiteLocale.KO, "새 이름", "새 역할", "새 소개", "새 참여작품");
+        service().saveDraftTranslation(1L, SiteLocale.KO, "새 이름", "새 역할", "새 소개", "새 참여작품", null);
 
         assertThat(artist.nameFor(SiteLocale.KO)).isEqualTo("김아무개");
         assertThat(artist.translationRowFor(SiteLocale.KO).effectiveName()).isEqualTo("새 이름");
@@ -62,7 +62,7 @@ class ArtistServiceTest {
     void 발행하면_draft가_공개본으로_승격되고_PUBLISHED가_된다() {
         Artist artist = new Artist("kim-artist");
         ArtistTranslation ko = artist.addTranslation(SiteLocale.KO, null, null, null, null);
-        ko.updateDraft("새 이름", "연출", "소개", "참여작품");
+        ko.updateDraft("새 이름", "연출", "소개", "참여작품", null);
         when(artistRepository.findWithDetailsById(1L)).thenReturn(Optional.of(artist));
 
         Artist result = service().publish(1L, 99L);

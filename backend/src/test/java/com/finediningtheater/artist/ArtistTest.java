@@ -29,7 +29,7 @@ class ArtistTest {
         Artist artist = new Artist("kim-artist");
         artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개", "참여작품");
         ArtistTranslation en = artist.addTranslation(SiteLocale.EN, null, null, null, null);
-        en.updateDraft("Kim Artist (draft)", "Director", "Bio", "Credits");
+        en.updateDraft("Kim Artist (draft)", "Director", "Bio", "Credits", null);
 
         assertThat(artist.nameFor(SiteLocale.EN)).isEqualTo("김아무개");
     }
@@ -38,7 +38,7 @@ class ArtistTest {
     void promoteAllDrafts는_draft가_있는_로케일만_공개본으로_승격한다() {
         Artist artist = new Artist("kim-artist");
         ArtistTranslation ko = artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "소개", "참여작품");
-        ko.updateDraft("새 이름", "새 역할", "새 소개", "새 참여작품");
+        ko.updateDraft("새 이름", "새 역할", "새 소개", "새 참여작품", null);
 
         artist.promoteAllDrafts();
 

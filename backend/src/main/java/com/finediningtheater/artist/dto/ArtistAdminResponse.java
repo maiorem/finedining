@@ -9,6 +9,9 @@ public record ArtistAdminResponse(
         String slug,
         String status,
         String linkUrl,
+        String email,
+        int displayOrder,
+        String interviewUrl,
         List<TranslationView> translations,
         List<MediaAssetResponse> images) {
 
@@ -18,10 +21,12 @@ public record ArtistAdminResponse(
             String role,
             String bio,
             String credits,
+            String quote,
             String draftName,
             String draftRole,
             String draftBio,
             String draftCredits,
+            String draftQuote,
             boolean hasPendingDraft) {}
 
     public static ArtistAdminResponse from(Artist artist, List<MediaAssetResponse> images) {
@@ -35,13 +40,23 @@ public record ArtistAdminResponse(
                                                 t.getRole(),
                                                 t.getBio(),
                                                 t.getCredits(),
+                                                t.getQuote(),
                                                 t.getDraftName(),
                                                 t.getDraftRole(),
                                                 t.getDraftBio(),
                                                 t.getDraftCredits(),
+                                                t.getDraftQuote(),
                                                 t.getDraftName() != null))
                         .toList();
         return new ArtistAdminResponse(
-                artist.getId(), artist.getSlug(), artist.getStatus().name(), artist.getLinkUrl(), views, images);
+                artist.getId(),
+                artist.getSlug(),
+                artist.getStatus().name(),
+                artist.getLinkUrl(),
+                artist.getEmail(),
+                artist.getDisplayOrder(),
+                artist.getInterviewUrl(),
+                views,
+                images);
     }
 }
