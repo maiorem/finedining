@@ -41,7 +41,7 @@ export function Header() {
   const panelRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const { session: adminSession, logout: adminLogout } = useAdminAuth();
-  const { session: memberSession, logout: memberLogout } = useMemberAuth();
+  const { session: memberSession } = useMemberAuth();
   const canViewMembers = useCan("account:view");
 
   // 관리자 로그인 상태에서만 보이는 항목 — 서버가 이미 /api/accounts/manage를 막고 있으니
@@ -49,8 +49,7 @@ export function Header() {
   const navItems = canViewMembers ? [...NAV_ITEMS, { to: "/members", labelKey: "nav.members" }] : NAV_ITEMS;
 
   const nextLocale = i18n.language === "en" ? "ko" : "en";
-  const loggedIn = Boolean(adminSession || memberSession);
-  const accountLabel = adminSession ? t("nav.adminLogout") : memberSession ? t("login.logout") : t("nav.login");
+  const accountLabel = adminSession ? t("nav.adminLogout") : memberSession ? t("account.title") : t("nav.login");
 
   function toggleLanguage() {
     void i18n.changeLanguage(nextLocale);
@@ -60,10 +59,9 @@ export function Header() {
     // 아이콘 하나로 로그인/로그아웃을 겸하다 보니 실수로 눌러 로그아웃되기 쉽다 — 한 번 더 확인한다.
     if (!window.confirm(t("nav.logoutConfirm"))) return;
 
+    // 관리자만 이 아이콘이 로그아웃이다. 회원은 아래에서 /account로 이동한다(로그아웃·탈퇴는 거기서).
     if (adminSession) {
       await adminLogout();
-    } else if (memberSession) {
-      await memberLogout();
     }
   }
 
@@ -142,7 +140,7 @@ export function Header() {
         </button>
 
         {/* 스크롤이나 메뉴를 열지 않아도 항상 보이도록 모바일·데스크톱 공통 헤더 줄에 둔다. */}
-        {loggedIn ? (
+        {adminSession ? (
           <button
             type="button"
             className={styles.accountButton}
@@ -153,12 +151,12 @@ export function Header() {
           </button>
         ) : (
           <Link
-            to="/login"
+            to={memberSession ? "/account" : "/login"}
             className={styles.accountButton}
             aria-label={accountLabel}
             onClick={() => setMenuOpen(false)}
           >
-            <AccountIcon active={false} />
+            <AccountIcon active={Boolean(memberSession)} />
           </Link>
         )}
 

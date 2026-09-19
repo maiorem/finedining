@@ -89,4 +89,19 @@ describe("AccountPage", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("탈퇴를 처리하지 못했습니다");
   });
+
+  it("로그아웃 버튼은 확인 후 세션을 비우고 홈으로 이동한다", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    fetchMock.mockImplementation((input: string) => {
+      if (input === "/api/auth/member/refresh") return Promise.resolve(MEMBER);
+      return Promise.resolve(json({ success: true, data: null, error: null }));
+    });
+    renderPage();
+
+    await user.click(await screen.findByRole("button", { name: "로그아웃" }));
+
+    expect(await screen.findByText("홈")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith("/api/auth/member/logout", expect.objectContaining({ method: "POST" }));
+  });
 });

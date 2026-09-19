@@ -24,6 +24,34 @@
   line-height: var(--lh-body);
 }
 
+.loggedIn {
+  margin: 0 0 1rem;
+  color: var(--c-ink-60);
+  line-height: var(--lh-body);
+}
+
+.logout {
+  margin-bottom: 3rem;
+  min-height: 44px;
+  padding: 0 1.25em;
+  border: 1px solid var(--c-line);
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+  cursor: pointer;
+}
+
+.logout:hover,
+.logout:focus-visible {
+  border-color: var(--c-spot);
+}
+
+.logout:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}
+
 .withdraw {
   border-top: 1px solid var(--c-line);
   padding-top: 2rem;

@@ -51,7 +51,18 @@ export default function AccountPage() {
   return (
     <main className={styles.page}>
       <h1 className={styles.title}>{t("account.title")}</h1>
-      <p className={styles.text}>{t("account.loggedInAs", { nickname: session.nickname })}</p>
+      <p className={styles.loggedIn}>{t("account.loggedInAs", { nickname: session.nickname })}</p>
+      <button
+        type="button"
+        className={styles.logout}
+        onClick={() => {
+          if (window.confirm(t("nav.logoutConfirm"))) {
+            void logout().then(() => navigate("/"));
+          }
+        }}
+      >
+        {t("login.logout")}
+      </button>
 
       <section className={styles.withdraw}>
         <h2 className={styles.heading}>{t("account.withdraw.heading")}</h2>

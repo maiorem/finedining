@@ -143,9 +143,7 @@ describe("Header", () => {
     expect(fetchMock).toHaveBeenCalledWith("/api/auth/admin/logout", expect.objectContaining({ method: "POST" }));
   });
 
-  it("카카오로 로그인된 일반 회원이면 로그아웃 버튼을 보여주고 확인하면 로그아웃한다", async () => {
-    const user = userEvent.setup();
-    vi.spyOn(window, "confirm").mockReturnValue(true);
+  it("카카오로 로그인된 일반 회원이면 아이콘이 로그아웃이 아니라 내 계정 페이지로 이동한다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input === "/api/auth/member/refresh") {
         return Promise.resolve(
@@ -156,21 +154,14 @@ describe("Header", () => {
           }),
         );
       }
-      if (input === "/api/auth/member/logout") {
-        return Promise.resolve(jsonResponse({ success: true, data: null, error: null }));
-      }
       return Promise.resolve(UNAUTHENTICATED);
     });
 
     renderHeader();
 
-    const logoutButton = await screen.findByRole("button", { name: "로그아웃" });
+    expect(await screen.findByRole("link", { name: "내 계정" })).toHaveAttribute("href", "/account");
+    expect(screen.queryByRole("button", { name: "로그아웃" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "로그인" })).not.toBeInTheDocument();
-
-    await user.click(logoutButton);
-
-    expect(await screen.findByRole("link", { name: "로그인" })).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledWith("/api/auth/member/logout", expect.objectContaining({ method: "POST" }));
   });
 
   it("로그아웃 확인을 취소하면 로그인 상태를 유지한다", async () => {
