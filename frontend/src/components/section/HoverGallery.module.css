@@ -1,0 +1,73 @@
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.large {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  background-color: var(--c-paper);
+}
+
+.thumbs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.thumbs li {
+  flex: 0 0 auto;
+}
+
+.thumb {
+  display: block;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: 1px solid var(--c-line);
+  background: none;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity var(--d-fast) var(--e-out), border-color var(--d-fast) var(--e-out);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbActive,
+.thumb:hover {
+  opacity: 1;
+  border-color: var(--c-ink);
+}
+
+.thumb:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+  opacity: 1;
+}
+
+/* 데스크톱: 큰 사진은 왼쪽, 작은 사진 창은 오른쪽 세로 열. */
+@media (min-width: 768px) {
+  .gallery {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .large {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .thumbs {
+    flex-direction: column;
+  }
+}

@@ -6,6 +6,8 @@ import { ApiError } from "../api/http";
 import { useAdminAuth } from "../contexts/AdminAuthContext";
 import { useCan } from "../hooks/useCan";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { FathersTableDetail } from "../components/section/FathersTableDetail";
+import { FATHERS_TABLE_SLUG } from "../constants/fathersTable";
 import { EditableSection } from "../features/editing/EditableSection";
 import styles from "./ProductionDetailPage.module.css";
 
@@ -45,6 +47,37 @@ export default function ProductionDetailPage() {
   }
 
   const showPanel = canEdit && editMode;
+  const editControls = (
+    <>
+      {canEdit && (
+        <button
+          type="button"
+          className={styles.editToggle}
+          aria-pressed={editMode}
+          onClick={() => setEditMode((prev) => !prev)}
+        >
+          {editMode ? t("editing.exitEditMode") : t("editing.enterEditMode")}
+        </button>
+      )}
+      {showPanel && !isDesktop && <p className={styles.desktopOnlyNotice}>{t("editing.desktopOnly")}</p>}
+    </>
+  );
+
+  if (production.slug === FATHERS_TABLE_SLUG) {
+    return (
+      <div className={showPanel ? styles.layoutWithPanel : styles.layout}>
+        <main className={styles.pageFlush}>
+          <FathersTableDetail production={production} editSlot={<div className={styles.editBar}>{editControls}</div>} />
+        </main>
+        {showPanel && isDesktop && (
+          <Suspense fallback={<aside className={styles.panelLoading}>{t("editing.panel.loading")}</aside>}>
+            <ProductionEditPanel productionId={production.id} />
+          </Suspense>
+        )}
+      </div>
+    );
+  }
+
   const [heroImage, ...editorialImages] = production.images;
 
   return (

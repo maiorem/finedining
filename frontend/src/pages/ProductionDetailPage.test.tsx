@@ -49,7 +49,7 @@ describe("ProductionDetailPage", () => {
           success: true,
           data: {
             id: 1,
-            slug: "showcase",
+            slug: "sample",
             title: "쇼케이스",
             subtitle: "부제",
             description: "9코스로 이어지는 공연형 다이닝입니다.",
@@ -69,7 +69,7 @@ describe("ProductionDetailPage", () => {
       );
     });
 
-    renderAt("/productions/showcase");
+    renderAt("/productions/sample");
 
     expect(await screen.findByRole("heading", { name: "쇼케이스" })).toBeInTheDocument();
     expect(screen.getByText("부제")).toBeInTheDocument();
@@ -90,7 +90,7 @@ describe("ProductionDetailPage", () => {
           success: true,
           data: {
             id: 1,
-            slug: "showcase",
+            slug: "sample",
             title: "쇼케이스",
             subtitle: "부제",
             description: "설명",
@@ -111,7 +111,7 @@ describe("ProductionDetailPage", () => {
       );
     });
 
-    renderAt("/productions/showcase");
+    renderAt("/productions/sample");
 
     expect(await screen.findByRole("img", { name: "히어로 사진" })).toHaveAttribute(
       "src",
@@ -141,7 +141,7 @@ describe("ProductionDetailPage", () => {
           success: true,
           data: {
             id: 1,
-            slug: "showcase",
+            slug: "sample",
             title: "쇼케이스",
             subtitle: null,
             description: null,
@@ -154,7 +154,7 @@ describe("ProductionDetailPage", () => {
       );
     });
 
-    renderAt("/productions/showcase");
+    renderAt("/productions/sample");
 
     const bookingLink = await screen.findByRole("link", { name: /예약하기/ });
     expect(bookingLink).toHaveAttribute("href", "https://booking.naver.com/bizes/1");
@@ -196,7 +196,37 @@ describe("ProductionDetailPage", () => {
       return Promise.resolve(
         jsonResponse({
           success: true,
-          data: { id: 1, slug: "showcase", title: "쇼케이스", subtitle: null, images: [] },
+          data: { id: 1, slug: "sample", title: "쇼케이스", subtitle: null, images: [] },
+          error: null,
+        }),
+      );
+    });
+
+    renderAt("/productions/sample");
+
+    expect(await screen.findByRole("button", { name: "편집 모드 켜기" })).toBeInTheDocument();
+  });
+
+  it("아버지의 식탁 슬러그면 전용 상세를 보여주고 예약 링크는 DB 값을 쓴다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: {
+            id: 1,
+            slug: "showcase",
+            title: "아버지의 식탁",
+            subtitle: null,
+            description: null,
+            bookingUrl: "https://booking.naver.com/x",
+            locationUrl: "https://map.naver.com/y",
+            images: [],
+          },
           error: null,
         }),
       );
@@ -204,6 +234,10 @@ describe("ProductionDetailPage", () => {
 
     renderAt("/productions/showcase");
 
-    expect(await screen.findByRole("button", { name: "편집 모드 켜기" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent("아버지의 삶을 맛.보.는.");
+    const reserve = screen.getAllByRole("link", { name: /예약하기/ })[0];
+    expect(reserve).toHaveAttribute("href", "https://booking.naver.com/x");
+    expect(reserve).toHaveAttribute("target", "_blank");
+    expect(screen.getByRole("link", { name: /위치보기/ })).toHaveAttribute("href", "https://map.naver.com/y");
   });
 });

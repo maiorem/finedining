@@ -19,6 +19,22 @@
   }
 }
 
+/* 전용 상세(아버지의 식탁)는 섹션이 자기 여백을 가진다. */
+.pageFlush {
+  flex: 1;
+  min-width: 0;
+}
+
+.editBar {
+  padding: 1.5rem var(--gutter-mobile) 0;
+}
+
+@media (min-width: 1024px) {
+  .editBar {
+    padding: 1.5rem var(--gutter-desktop) 0;
+  }
+}
+
 .status {
   color: var(--c-ink-60);
 }

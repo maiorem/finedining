@@ -21,6 +21,8 @@
      --c-ink를 쓴다 — 흰색은 대비가 약 2.9:1이라 §8.8(4.5:1)을 통과하지 못한다. */
   --c-orange: #e97643;
   --c-brown: #3b2418;
+  /* 작품 상세 예약 버튼 hover 채움 — 요청서의 "밝은 브라운"(2026-09-14). */
+  --c-brown-light: #c49a6c;
 
   /* --- 타이포그래피 ---
      Display/Body/Utility 세 갈래(Hahmlet+Pretendard+IBM Plex Mono)에서 Pretendard

@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { FACEBOOK_URL, INSTAGRAM_URL, YOUTUBE_URL } from "../../constants/social";
 import styles from "./Footer.module.css";
 
 // 사업자 정보(§8.5)는 상호·주소 등 사실 값이라 로케일에 따라 달라지지 않는다 — 라벨만
@@ -18,7 +19,7 @@ const BUSINESS_INFO = {
 const SOCIAL_LINKS = [
   {
     key: "youtube",
-    href: `https://www.youtube.com/@${encodeURIComponent("파인다이닝씨어터")}`,
+    href: YOUTUBE_URL,
     icon: (
       <>
         <rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" strokeWidth="1.6" />
@@ -28,7 +29,7 @@ const SOCIAL_LINKS = [
   },
   {
     key: "instagram",
-    href: "https://www.instagram.com/finediningtheater/",
+    href: INSTAGRAM_URL,
     icon: (
       <>
         <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="1.6" />
@@ -39,7 +40,7 @@ const SOCIAL_LINKS = [
   },
   {
     key: "facebook",
-    href: "https://www.facebook.com/people/Finediningtheater/61584524015779/",
+    href: FACEBOOK_URL,
     icon: (
       <path
         d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.6-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.9v3h2.6V21z"
