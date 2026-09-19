@@ -81,6 +81,37 @@ describe("ArtistDetailPage", () => {
     expect(screen.queryByRole("button", { name: "편집 모드 켜기" })).not.toBeInTheDocument();
   });
 
+  it("본문의 **질문** 줄은 굵은 제목으로, 나머지는 문단으로 렌더한다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: {
+            id: 1,
+            slug: "kim-artist",
+            name: "김아무개",
+            role: "연출",
+            bio: "**어떤 삶을 살아왔나요?**\n\n오랫동안 주방에서 일했습니다.",
+            credits: null,
+            photo: null,
+          },
+          error: null,
+        }),
+      );
+    });
+
+    renderAt("/artists/kim-artist");
+
+    expect(await screen.findByRole("heading", { level: 2, name: "어떤 삶을 살아왔나요?" })).toBeInTheDocument();
+    expect(screen.getByText("오랫동안 주방에서 일했습니다.")).toBeInTheDocument();
+    expect(screen.queryByText(/\*\*/)).not.toBeInTheDocument();
+  });
+
   it("존재하지 않는 프로필이면 안내 문구를 보여준다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {

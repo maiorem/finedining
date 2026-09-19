@@ -218,12 +218,14 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
       <label className={styles.field}>
         <span>{t("editing.panel.artistBioLabel")}</span>
         <textarea
-          rows={6}
+          rows={12}
+          maxLength={4000}
           value={drafts[activeLocale].bio}
           onChange={(e) =>
             setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], bio: e.target.value } }))
           }
         />
+        <small className={styles.hint}>{t("editing.panel.artistBioHint")}</small>
       </label>
 
       <label className={styles.field}>

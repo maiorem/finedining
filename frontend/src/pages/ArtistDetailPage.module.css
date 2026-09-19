@@ -105,11 +105,21 @@
   outline-offset: 3px;
 }
 
+.question {
+  max-width: 38em;
+  margin: 2.5rem 0 0.75rem;
+  font-family: var(--f-body);
+  font-size: var(--t-lead);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  word-break: keep-all;
+}
+
 .bio {
   line-height: var(--lh-body);
   color: var(--c-ink);
   white-space: pre-wrap;
-  margin: 0 0 2rem;
+  margin: 0 0 1.25rem;
   max-width: 38em;
 }
 

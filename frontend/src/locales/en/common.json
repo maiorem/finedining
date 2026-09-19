@@ -372,5 +372,6 @@
   "reviews.adminName": "Name",
   "reviews.adminContact": "Contact",
   "reviews.adminNoAuthorInfo": "(older post — no name or contact)",
-  "reviews.consentDetail": "Collected: name (required), contact (optional), attached photos · Purpose: posting your story and contacting you about a thank-you reward · Retention: until the story is deleted or you leave"
+  "reviews.consentDetail": "Collected: name (required), contact (optional), attached photos · Purpose: posting your story and contacting you about a thank-you reward · Retention: until the story is deleted or you leave",
+  "editing.panel.artistBioHint": "Wrap a whole line in two asterisks, like **question text**, to show it as a bold question. Separate paragraphs with a blank line."
 }

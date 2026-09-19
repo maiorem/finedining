@@ -8,6 +8,7 @@ import { useCan } from "../hooks/useCan";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { TrailerVideo } from "../components/section/TrailerVideo";
 import { extractYoutubeId } from "../utils/youtube";
+import { parseStoryBlocks } from "../utils/storyBlocks";
 import { EditableSection } from "../features/editing/EditableSection";
 import styles from "./ArtistDetailPage.module.css";
 
@@ -78,7 +79,17 @@ export default function ArtistDetailPage() {
           <h1 className={styles.name}>{artist.name}</h1>
           {artist.quote && <p className={styles.quote}>“{artist.quote}”</p>}
 
-          {artist.bio && <p className={styles.bio}>{artist.bio}</p>}
+          {parseStoryBlocks(artist.bio).map((block, index) =>
+            block.type === "question" ? (
+              <h2 key={index} className={styles.question}>
+                {block.text}
+              </h2>
+            ) : (
+              <p key={index} className={styles.bio}>
+                {block.text}
+              </p>
+            ),
+          )}
 
           {interviewId && (
             <div className={styles.interview}>

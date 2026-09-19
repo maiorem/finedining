@@ -372,5 +372,6 @@
   "reviews.adminName": "이름",
   "reviews.adminContact": "연락처",
   "reviews.adminNoAuthorInfo": "(이전 글 — 이름·연락처 없음)",
-  "reviews.consentDetail": "수집 항목: 이름(필수), 연락처(선택), 첨부 사진 · 목적: 이야기 게시와 감사 리워드 안내 연락 · 보유: 이야기 삭제 또는 회원 탈퇴 시까지"
+  "reviews.consentDetail": "수집 항목: 이름(필수), 연락처(선택), 첨부 사진 · 목적: 이야기 게시와 감사 리워드 안내 연락 · 보유: 이야기 삭제 또는 회원 탈퇴 시까지",
+  "editing.panel.artistBioHint": "질문은 **질문 내용** 처럼 한 줄 전체를 별표 두 개로 감싸면 굵게 표시됩니다. 문단은 빈 줄로 나눕니다."
 }
