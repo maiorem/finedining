@@ -14,7 +14,14 @@ public record ProgramAdminResponse(
         List<MediaAssetResponse> images) {
 
     public record TranslationView(
-            String locale, String title, String description, String draftTitle, String draftDescription, boolean hasPendingDraft) {}
+            String locale,
+            String title,
+            String subtitle,
+            String description,
+            String draftTitle,
+            String draftSubtitle,
+            String draftDescription,
+            boolean hasPendingDraft) {}
 
     public static ProgramAdminResponse from(Program program, List<MediaAssetResponse> images) {
         List<TranslationView> views =
@@ -24,8 +31,10 @@ public record ProgramAdminResponse(
                                         new TranslationView(
                                                 t.getLocale().name(),
                                                 t.getTitle(),
+                                                t.getSubtitle(),
                                                 t.getDescription(),
                                                 t.getDraftTitle(),
+                                                t.getDraftSubtitle(),
                                                 t.getDraftDescription(),
                                                 t.getDraftTitle() != null))
                         .toList();

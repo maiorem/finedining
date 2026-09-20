@@ -64,13 +64,14 @@ public class ProgramService {
     }
 
     @Transactional
-    public void saveDraftTranslation(Long id, SiteLocale locale, String title, String description) {
+    public void saveDraftTranslation(
+            Long id, SiteLocale locale, String title, String subtitle, String description) {
         Program program = getForAdmin(id);
         ProgramTranslation translation = program.translationRowFor(locale);
         if (translation == null) {
             translation = program.addTranslation(locale, null, null);
         }
-        translation.updateDraft(title, description);
+        translation.updateDraft(title, subtitle, description);
     }
 
     @Transactional

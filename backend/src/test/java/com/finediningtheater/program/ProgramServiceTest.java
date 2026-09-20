@@ -39,7 +39,7 @@ class ProgramServiceTest {
     void 발행하면_draft가_공개본으로_승격되고_PUBLISHED가_된다() {
         Program program = new Program("summer-tasting");
         ProgramTranslation ko = program.addTranslation(SiteLocale.KO, null, null);
-        ko.updateDraft("여름 시식회", "참가는 구글폼으로");
+        ko.updateDraft("여름 시식회", "한여름 저녁", "참가는 구글폼으로");
         when(programRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(program));
 
         Program result = service().publish(1L, 99L);

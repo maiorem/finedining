@@ -96,4 +96,24 @@ class ProgramControllerTest {
 
         verify(programService, never()).getPublished("draft-program");
     }
+
+    @Test
+    void 목록에는_부제만_상세에는_부제와_설명이_함께_나온다() throws Exception {
+        Program program = new Program("fun-brunch");
+        ProgramTranslation ko = program.addTranslation(SiteLocale.KO, null, null);
+        ko.updateDraft("FUN한 브RUN치", "달리고, 먹고, 이야기하는 시간", "함께 달리고,\n함께 음식을 먹고,\n삶의 이야기를 나눕니다.");
+        ko.promoteDraftToPublished();
+        when(programService.listPublished()).thenReturn(List.of(program));
+        when(programService.getPublished("fun-brunch")).thenReturn(program);
+
+        mockMvc.perform(get("/api/programs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].subtitle").value("달리고, 먹고, 이야기하는 시간"))
+                .andExpect(jsonPath("$.data[0].description").doesNotExist());
+
+        mockMvc.perform(get("/api/programs/fun-brunch"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.subtitle").value("달리고, 먹고, 이야기하는 시간"))
+                .andExpect(jsonPath("$.data.description").value("함께 달리고,\n함께 음식을 먹고,\n삶의 이야기를 나눕니다."));
+    }
 }

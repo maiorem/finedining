@@ -81,7 +81,7 @@ public class ProgramEditController {
             @PathVariable Long id,
             @PathVariable SiteLocale locale,
             @Valid @RequestBody UpsertProgramTranslationRequest request) {
-        programService.saveDraftTranslation(id, locale, request.title(), request.description());
+        programService.saveDraftTranslation(id, locale, request.title(), request.subtitle(), request.description());
         return ApiResponse.success(toAdminResponse(programService.getForAdmin(id)));
     }
 

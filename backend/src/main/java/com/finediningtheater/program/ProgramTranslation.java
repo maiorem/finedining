@@ -39,11 +39,18 @@ public class ProgramTranslation extends BaseTimeEntity {
     @Column(length = 200)
     private String title;
 
+    /** 목록 카드에 보이는 한 줄 부제. 긴 설명(description)은 상세에서만 보인다. */
+    @Column(length = 200)
+    private String subtitle;
+
     @Column(length = 4000)
     private String description;
 
     @Column(length = 200)
     private String draftTitle;
+
+    @Column(length = 200)
+    private String draftSubtitle;
 
     @Column(length = 4000)
     private String draftDescription;
@@ -57,14 +64,16 @@ public class ProgramTranslation extends BaseTimeEntity {
         this.description = description;
     }
 
-    public void updateDraft(String title, String description) {
+    public void updateDraft(String title, String subtitle, String description) {
         this.draftTitle = title;
+        this.draftSubtitle = subtitle;
         this.draftDescription = description;
     }
 
     public void promoteDraftToPublished() {
         if (draftTitle != null) {
             this.title = draftTitle;
+            this.subtitle = draftSubtitle;
             this.description = draftDescription;
         }
     }
