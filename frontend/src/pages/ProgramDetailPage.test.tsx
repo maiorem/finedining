@@ -202,4 +202,40 @@ describe("ProgramDetailPage", () => {
 
     expect(await screen.findByRole("button", { name: "편집 모드 켜기" })).toBeInTheDocument();
   });
+
+  it("설명은 마크다운으로 그리고, 본문에 넣은 사진은 아래 갤러리에서 뺀다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: {
+            id: 1,
+            slug: "sample",
+            title: "여름 시식회",
+            subtitle: null,
+            description: "**어떤 시간인가요?**\n\n함께 달립니다.\n\n![본문 사진](image:20)",
+            applyUrl: null,
+            locationUrl: null,
+            images: [
+              { id: 10, status: "READY", altText: "히어로", url640: "http://example.com/hero.jpg", width: 640, height: 400 },
+              { id: 20, status: "READY", altText: "본문용", url640: "http://example.com/inline.jpg", width: 640, height: 400 },
+            ],
+          },
+          error: null,
+        }),
+      );
+    });
+
+    renderAt("/programs/sample");
+
+    expect(await screen.findByRole("heading", { level: 2, name: "어떤 시간인가요?" })).toBeInTheDocument();
+    expect(screen.getByText("함께 달립니다.")).toBeInTheDocument();
+    expect(screen.getAllByRole("img", { name: "본문 사진" })).toHaveLength(1); // 본문에만 나온다
+    expect(screen.getByRole("img", { name: "히어로" })).toBeInTheDocument();
+  });
 });

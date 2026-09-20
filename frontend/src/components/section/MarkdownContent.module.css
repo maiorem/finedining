@@ -1,0 +1,81 @@
+.root {
+  max-width: 38em;
+  color: var(--c-ink);
+}
+
+.paragraph {
+  margin: 0 0 1.25rem;
+  line-height: var(--lh-body);
+  word-break: keep-all;
+}
+
+.heading {
+  margin: 2.5rem 0 0.75rem;
+  font-family: var(--f-display);
+  font-weight: var(--w-display);
+  font-size: var(--t-h2);
+  line-height: var(--lh-tight);
+  word-break: keep-all;
+}
+
+.subheading {
+  margin: 2rem 0 0.6rem;
+  font-size: var(--t-lead);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  word-break: keep-all;
+}
+
+/* 한 줄 전체를 **로 감싼 문단 — 인터뷰의 질문. */
+.question {
+  margin: 2.5rem 0 0.75rem;
+  font-family: var(--f-body);
+  font-size: var(--t-lead);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  word-break: keep-all;
+}
+
+.list {
+  margin: 0 0 1.25rem;
+  padding-left: 1.3em;
+  line-height: var(--lh-body);
+}
+
+.quote {
+  margin: 0 0 1.25rem;
+  padding: 0.25rem 0 0.25rem 1rem;
+  border-left: 2px solid var(--c-ink);
+  color: var(--c-ink-60);
+  line-height: var(--lh-body);
+}
+
+.hr {
+  margin: 2.5rem 0;
+  border: 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.figure {
+  margin: 2rem 0;
+}
+
+.figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.video {
+  margin: 2rem 0;
+}
+
+.root a {
+  color: var(--c-ink);
+  text-decoration: underline;
+}
+
+.root a:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 3px;
+}

@@ -1,9 +1,10 @@
-/* 편집 패널은 데스크톱 전용이다(CLAUDE.md §8.5) — 모바일 게이트는 페이지 쪽에서 처리한다. */
+/* 편집은 데스크톱 전용이다(CLAUDE.md §8.5) — 모바일 게이트는 페이지 쪽에서 처리한다. 글을 길게
+   쓰는 화면이라 옆 패널이 아니라 페이지 가운데에 놓는다(2026-09-20 요청). */
 .panel {
-  width: 360px;
-  flex-shrink: 0;
-  padding: 1.5rem;
-  border-left: 1px solid var(--c-line);
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 1rem;

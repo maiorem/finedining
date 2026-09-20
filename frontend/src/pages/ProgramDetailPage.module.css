@@ -103,6 +103,18 @@
   word-break: keep-all;
 }
 
+.editPage {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--section-y-mobile) var(--gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+  .editPage {
+    padding: 6rem var(--gutter-desktop) var(--section-y-desktop);
+  }
+}
+
 .editToggle {
   margin-bottom: 1.5rem;
   min-height: 40px;
@@ -129,17 +141,13 @@
   font-size: var(--t-caption);
 }
 
-.lead {
-  max-width: 38em;
-  color: var(--c-ink);
-  font-size: var(--t-lead);
-  line-height: var(--lh-body);
-  white-space: pre-wrap;
+.description {
   margin: 0 0 var(--section-y-mobile);
+  font-size: var(--t-lead);
 }
 
 @media (min-width: 1024px) {
-  .lead {
+  .description {
     margin: 0 0 var(--section-y-desktop);
   }
 }

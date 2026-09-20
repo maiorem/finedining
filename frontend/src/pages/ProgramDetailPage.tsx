@@ -6,6 +6,8 @@ import { ApiError } from "../api/http";
 import { useAdminAuth } from "../contexts/AdminAuthContext";
 import { useCan } from "../hooks/useCan";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { MarkdownContent } from "../components/section/MarkdownContent";
+import { referencedImageIds } from "../utils/markdown";
 import { EditableSection } from "../features/editing/EditableSection";
 import styles from "./ProgramDetailPage.module.css";
 
@@ -45,10 +47,32 @@ export default function ProgramDetailPage() {
   }
 
   const showPanel = canEdit && editMode;
-  const [heroImage, ...editorialImages] = program.images;
+  // 본문에 이미지를 직접 넣었으면(`image:번호`) 그 사진은 히어로·아래 갤러리에서 뺀다 — 두 번 나오지 않게.
+  const inlineImageIds = referencedImageIds(program.description);
+  const [heroImage, ...editorialImages] = program.images.filter((image) => !inlineImageIds.has(image.id));
+
+  // 편집 모드(데스크톱)에서는 공개 화면 대신 가운데에 편집 폼을 보여준다. "발행하기"가 끝나면
+  // 편집 모드를 끄고 발행된 상세를 바로 보여준다.
+  if (showPanel && isDesktop) {
+    return (
+      <main className={styles.editPage}>
+        <button
+          type="button"
+          className={styles.editToggle}
+          aria-pressed={editMode}
+          onClick={() => setEditMode(false)}
+        >
+          {t("editing.exitEditMode")}
+        </button>
+        <Suspense fallback={<p className={styles.status}>{t("editing.panel.loading")}</p>}>
+          <ProgramEditPanel programId={program.id} onPublished={() => setEditMode(false)} />
+        </Suspense>
+      </main>
+    );
+  }
 
   return (
-    <div className={showPanel ? styles.layoutWithPanel : styles.layout}>
+    <div className={styles.layout}>
       <main className={styles.page}>
         {heroImage ? (
           <EditableSection active={showPanel}>
@@ -89,7 +113,9 @@ export default function ProgramDetailPage() {
 
         {program.description && (
           <EditableSection active={showPanel}>
-            <p className={styles.lead}>{program.description}</p>
+            <div className={styles.description}>
+              <MarkdownContent source={program.description} images={program.images} />
+            </div>
           </EditableSection>
         )}
 
@@ -151,12 +177,6 @@ export default function ProgramDetailPage() {
           </EditableSection>
         )}
       </main>
-
-      {showPanel && isDesktop && (
-        <Suspense fallback={<aside className={styles.panelLoading}>{t("editing.panel.loading")}</aside>}>
-          <ProgramEditPanel programId={program.id} />
-        </Suspense>
-      )}
     </div>
   );
 }

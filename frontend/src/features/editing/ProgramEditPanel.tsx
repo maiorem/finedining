@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
@@ -13,6 +13,7 @@ import {
 import { ApiError } from "../../api/http";
 import { queryKeys } from "../../api/queryKeys";
 import { ImageDropzone } from "./ImageDropzone";
+import MarkdownEditor from "./MarkdownEditor";
 import { PinModal } from "./PinModal";
 import styles from "./ProgramEditPanel.module.css";
 
@@ -23,6 +24,8 @@ type DraftState = Record<Locale, { title: string; subtitle: string; description:
 
 type ProgramEditPanelProps = {
   programId: number;
+  /** 발행이 끝나면 부른다 — 페이지가 편집 모드를 끄고 발행된 상세를 보여주는 데 쓴다. */
+  onPublished: () => void;
 };
 
 const EMPTY_DRAFTS: DraftState = {
@@ -34,7 +37,7 @@ const EMPTY_DRAFTS: DraftState = {
  * §3.9의 "같은 페이지, 편집 패널" — ProductionEditPanel과 같은 패턴이다. 이 모듈은
  * `features/editing/`에 있으므로 React.lazy로만 import된다(§3.5·§9).
  */
-export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
+export default function ProgramEditPanel({ programId, onPublished }: ProgramEditPanelProps) {
   const { t } = useTranslation();
   const { session } = useAdminAuth();
   const queryClient = useQueryClient();
@@ -56,8 +59,13 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
 
+  // 서버 값으로 입력칸을 채우는 건 처음 한 번뿐이다. 이미지를 올릴 때마다 서버 데이터를 다시 불러오는데,
+  // 그때마다 채우면 아직 저장하지 않은 글(방금 본문에 넣은 `![…](image:번호)` 포함)이 지워진다.
+  const seededRef = useRef(false);
+
   useEffect(() => {
-    if (!data) return;
+    if (!data || seededRef.current) return;
+    seededRef.current = true;
     setDrafts((prev) => {
       const next = { ...prev };
       for (const translation of data.translations) {
@@ -157,6 +165,7 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
       }
       await publishProgram(session.accessToken, programId);
       invalidate();
+      onPublished();
     } catch (err) {
       if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
         setPinAction("publish");
@@ -184,7 +193,7 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
   });
 
   if (!data) {
-    return <aside className={styles.panel}>{t("editing.panel.loading")}</aside>;
+    return <section className={styles.panel}>{t("editing.panel.loading")}</section>;
   }
 
   // "발행하기"가 저장까지 함께 하므로(handlePublish) 서버 상태가 아니라 지금 입력 중인
@@ -193,7 +202,7 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
   const hasEnTitle = drafts.EN.title.trim() !== "";
 
   return (
-    <aside className={styles.panel} aria-label={t("editing.panel.heading")}>
+    <section className={styles.panel} aria-label={t("editing.panel.heading")}>
       <div className={styles.tabs} role="tablist">
         {LOCALES.map((locale) => (
           <button
@@ -232,19 +241,18 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
         />
       </label>
 
-      <label className={styles.field}>
-        <span>{t("programs.form.descriptionLabel")}</span>
-        <textarea
-          rows={6}
-          value={drafts[activeLocale].description}
-          onChange={(e) =>
-            setDrafts((prev) => ({
-              ...prev,
-              [activeLocale]: { ...prev[activeLocale], description: e.target.value },
-            }))
-          }
-        />
-      </label>
+      <MarkdownEditor
+        id={`program-${programId}-description`}
+        label={t("programs.form.descriptionLabel")}
+        value={drafts[activeLocale].description}
+        onChange={(description) =>
+          setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], description } }))
+        }
+        ownerType="PROGRAM"
+        ownerId={programId}
+        onImagesChanged={invalidate}
+        maxLength={4000}
+      />
 
       {/* 제목·설명과 별개 저장 버튼으로 나눠뒀더니 운영자가 링크 저장 버튼을 놓치고 값이 비는
           사고가 실제로 있었다 — 아래 발행하기 버튼 하나로 전부 같이 저장한다. */}
@@ -337,6 +345,6 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
           }}
         />
       )}
-    </aside>
+    </section>
   );
 }
