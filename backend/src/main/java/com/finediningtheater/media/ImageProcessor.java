@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 /**
  * 리사이즈 + JPEG 파생본만 만든다 — 진짜 딥줌(DZI 타일)·WebP는 다음 단계로 미뤘다
  * (2026-08-27 결정, CLAUDE.md §7.5·§15). {@code java.awt}/{@code ImageIO}만 쓰고 별도
- * 이미지 라이브러리(Thumbnailator 등)는 들이지 않는다.
+ * 이미지 라이브러리(Thumbnailator 등)는 들이지 않는다. EXIF 방향은 {@link ExifOrientation}이 보정한다.
  */
 @Component
 public class ImageProcessor {
@@ -27,10 +27,12 @@ public class ImageProcessor {
             int width, int height, Map<Integer, byte[]> jpegDerivativesByWidth, String lqipBase64) {}
 
     public ProcessedImage process(byte[] originalBytes) throws IOException {
-        BufferedImage original = ImageIO.read(new ByteArrayInputStream(originalBytes));
-        if (original == null) {
+        BufferedImage decoded = ImageIO.read(new ByteArrayInputStream(originalBytes));
+        if (decoded == null) {
             throw new IOException("이미지를 디코딩할 수 없습니다.");
         }
+        // 휴대폰 사진의 EXIF 방향 값대로 먼저 똑바로 세운다 — 저장하는 가로·세로도 세운 뒤의 값이다.
+        BufferedImage original = ExifOrientation.apply(decoded, ExifOrientation.read(originalBytes));
 
         int width = original.getWidth();
         int height = original.getHeight();
