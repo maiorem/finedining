@@ -200,15 +200,6 @@
   word-break: keep-all;
 }
 
-.centered {
-  margin: 0 auto 3rem;
-  text-align: center;
-}
-
-.centered .body {
-  margin: 0 auto;
-}
-
 .photo,
 .smallPhoto {
   width: 100%;
@@ -230,7 +221,6 @@
   height: auto;
 }
 
-.trio,
 .archive {
   list-style: none;
   margin: 0;
@@ -238,13 +228,6 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
-}
-
-.trio img {
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  display: block;
 }
 
 .archive img {
@@ -261,10 +244,6 @@
 }
 
 @media (min-width: 768px) {
-  .trio {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
   .archive {
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;

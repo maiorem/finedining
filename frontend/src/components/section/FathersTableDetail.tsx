@@ -106,7 +106,7 @@ export function FathersTableDetail({ production, editSlot }: Props) {
         </section>
       )}
 
-      <section className={`${styles.section} ${styles.split}`}>
+      <section className={`${styles.section} ${styles.split} ${styles.reverse}`}>
         <div className={styles.text}>
           <h2 className={styles.heading}>{t("ft.father.heading")}</h2>
           <p className={styles.body}>{t("ft.father.body")}</p>
@@ -120,39 +120,39 @@ export function FathersTableDetail({ production, editSlot }: Props) {
         />
       </section>
 
-      <section className={`${styles.section} ${styles.split} ${styles.reverse}`}>
+      <section className={`${styles.section} ${styles.split}`}>
         <div className={styles.text}>
           <h2 className={styles.heading}>{t("ft.labor.heading")}</h2>
           <p className={styles.body}>{t("ft.labor.body")}</p>
         </div>
-        <HoverGallery
-          items={[
-            { src: labor1, alt: t("ft.labor.alt1") },
-            { src: labor2, alt: t("ft.labor.alt2") },
-          ]}
-        />
+        <img className={styles.photo} src={labor1} alt={t("ft.labor.alt1")} loading="lazy" decoding="async" />
       </section>
 
       <section className={`${styles.section} ${styles.split}`}>
-        <img className={styles.photo} src={labor3} alt={t("ft.cutlet.alt")} loading="lazy" decoding="async" />
+        <HoverGallery
+          items={[
+            { src: labor2, alt: t("ft.cutlet.alt1") },
+            { src: labor3, alt: t("ft.cutlet.alt2") },
+          ]}
+        />
         <div className={styles.text}>
           <h2 className={styles.heading}>{t("ft.cutlet.heading")}</h2>
           <p className={styles.body}>{t("ft.cutlet.body")}</p>
         </div>
       </section>
 
-      <section className={styles.section}>
-        <div className={`${styles.text} ${styles.centered}`}>
+      <section className={`${styles.section} ${styles.split}`}>
+        <div className={styles.text}>
           <h2 className={styles.heading}>{t("ft.stage.heading")}</h2>
           <p className={styles.body}>{t("ft.stage.body")}</p>
         </div>
-        <ul className={styles.trio}>
-          {[stage1, stage2, stage3].map((src, index) => (
-            <li key={src}>
-              <img src={src} alt={t(`ft.stage.alt${index + 1}`)} loading="lazy" decoding="async" />
-            </li>
-          ))}
-        </ul>
+        <HoverGallery
+          items={[
+            { src: stage1, alt: t("ft.stage.alt1") },
+            { src: stage2, alt: t("ft.stage.alt2") },
+            { src: stage3, alt: t("ft.stage.alt3") },
+          ]}
+        />
       </section>
 
       <section className={`${styles.section} ${styles.split} ${styles.reverse}`}>
@@ -164,11 +164,11 @@ export function FathersTableDetail({ production, editSlot }: Props) {
       </section>
 
       <section className={`${styles.section} ${styles.split}`}>
-        <img className={`${styles.photo} ${styles.tall}`} src={question} alt={t("ft.question.alt")} loading="lazy" decoding="async" />
         <div className={styles.text}>
           <h2 className={styles.heading}>{t("ft.question.heading")}</h2>
           <p className={styles.body}>{t("ft.question.body")}</p>
         </div>
+        <img className={`${styles.photo} ${styles.tall}`} src={question} alt={t("ft.question.alt")} loading="lazy" decoding="async" />
       </section>
 
       <section className={`${styles.section} ${styles.split} ${styles.reverse}`}>

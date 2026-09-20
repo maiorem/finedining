@@ -275,4 +275,37 @@ describe("ProductionDetailPage", () => {
     expect(screen.getAllByRole("img", { name: "본문 사진" })).toHaveLength(1);
     expect(screen.getByRole("img", { name: "히어로" })).toBeInTheDocument();
   });
+
+  it("고정 상세의 사진 구성: 노동 이야기는 사진 한 장, 돈까스와 공연 순간은 갤러리다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: { id: 1, slug: "showcase", title: "아버지의 식탁", subtitle: null, description: null, bookingUrl: null, locationUrl: null, images: [] },
+          error: null,
+        }),
+      );
+    });
+
+    renderAt("/productions/showcase");
+
+    await screen.findByRole("heading", { level: 1 });
+    // 노동 이야기: 요리 장면 사진 한 장(갤러리 아님)
+    expect(screen.getByRole("img", { name: "주방에서 요리하는 장면" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "주방에서 요리하는 장면" })).not.toBeInTheDocument();
+    // 이 돈까스에는…: 노동의 기억 1·2 갤러리
+    expect(screen.getByRole("button", { name: "한 사람의 노동의 기억 1" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "한 사람의 노동의 기억 2" })).toBeInTheDocument();
+    // 삶이 공연이 되는 순간: 공연 장면 1·2·3 갤러리
+    for (const n of [1, 2, 3]) {
+      expect(screen.getByRole("button", { name: `공연 장면 ${n}` })).toBeInTheDocument();
+    }
+    // 아버지 이야기: 사진 3장 갤러리
+    expect(screen.getAllByRole("button", { name: /아버지의 사진/ })).toHaveLength(3);
+  });
 });

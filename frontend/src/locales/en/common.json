@@ -322,10 +322,8 @@
   "ft.labor.heading": "The story of labor",
   "ft.labor.body": "A father who was a cook,\nand who kept living while doing other work as well.\nWe look together at the time it takes for a single dish to be made,\nand the time one person\nhas kept working for his family.",
   "ft.labor.alt1": "A scene of cooking in the kitchen",
-  "ft.labor.alt2": "A memory of one person's labor",
   "ft.cutlet.heading": "There is one person's time\nin this pork cutlet.",
   "ft.cutlet.body": "The pork cutlet a father once made,\nworking as a cook in a 1990s diner-style restaurant.\nWe remember that taste, research the recipe,\nand bring it back to today's table.\nThis one plate holds not only flavor,\nbut the years one person lived\nand the memory of his labor.",
-  "ft.cutlet.alt": "The memory of labor held in a pork cutlet",
   "ft.stage.heading": "The moment one life\nbecomes a performance",
   "ft.stage.body": "The actors do not simply re-enact the father's story.\nThey remake the memories and feelings that began in one life\ninto movement, music and story.\nThe audience crosses the distance between stage and seats\nand sits inside the story, together, at one table.",
   "ft.stage.alt1": "Performance scene 1",
@@ -418,5 +416,7 @@
   "editing.md.widthInvalid": "Enter a whole number between {{min}} and {{max}} for the width.",
   "editing.panel.artistPhotoHint": "The first photo is the profile photo on the list and detail. Photos uploaded after it can be placed in the text with `Insert image`.",
   "reviews.imageAltLabel": "{{name}} — photo description (optional; read aloud to people who cannot see the screen)",
-  "reviews.imageInsertDeferred": "Put in the text (uploaded when you post)"
+  "reviews.imageInsertDeferred": "Put in the text (uploaded when you post)",
+  "ft.cutlet.alt1": "A memory of one person's labor 1",
+  "ft.cutlet.alt2": "A memory of one person's labor 2"
 }
