@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
@@ -13,6 +13,7 @@ import {
 import { ApiError } from "../../api/http";
 import { queryKeys } from "../../api/queryKeys";
 import { ImageDropzone } from "./ImageDropzone";
+import MarkdownEditor from "./MarkdownEditor";
 import { PinModal } from "./PinModal";
 import styles from "./ArtistEditPanel.module.css";
 
@@ -23,6 +24,8 @@ type DraftState = Record<Locale, { name: string; role: string; bio: string; cred
 
 type ArtistEditPanelProps = {
   artistId: number;
+  /** 발행이 끝나면 부른다 — 페이지가 편집 모드를 끄고 발행된 상세를 보여주는 데 쓴다. */
+  onPublished: () => void;
 };
 
 const EMPTY_DRAFTS: DraftState = {
@@ -31,12 +34,12 @@ const EMPTY_DRAFTS: DraftState = {
 };
 
 /**
- * §3.9의 "같은 페이지, 편집 패널" — Production 패턴을 그대로 따른다. `features/editing/`에
- * 있으므로 React.lazy로만 import된다(§3.5·§9). 프로필 사진은 아티스트당 1장으로 제한한다
- * (ImageDropzone의 maxImages). 참여 작품은 이 사이트의 Production 선택형이 아니라 자유
- * 텍스트다(2026-08-29 결정) — 외부 프로젝트 이력도 적을 수 있어야 한다.
+ * §3.9의 "같은 페이지, 편집 화면" — Production 패턴을 따른다. `features/editing/`에 있으므로
+ * React.lazy로만 import된다(§3.5·§9). 프로필 사진은 첫 번째 사진이고, 본문(마크다운)에 넣는 사진은
+ * 그 뒤에 올라간다. 참여 작품은 이 사이트의 Production 선택형이 아니라 자유 텍스트다(2026-08-29 결정).
+ * "발행하기" 한 번이 두 로케일의 글·이메일·순서·링크를 전부 저장한 뒤 발행까지 마친다(ProgramEditPanel과 같은 이유).
  */
-export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
+export default function ArtistEditPanel({ artistId, onPublished }: ArtistEditPanelProps) {
   const { t } = useTranslation();
   const { session } = useAdminAuth();
   const queryClient = useQueryClient();
@@ -58,9 +61,15 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
   const [pinAction, setPinAction] = useState<"publish" | "unpublish" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  // 서버 값으로 입력칸을 채우는 건 처음 한 번뿐이다 — 이미지를 올릴 때마다 데이터를 다시 불러오는데
+  // 그때 채우면 저장하지 않은 글(본문에 넣은 이미지 표시 포함)이 지워진다.
+  const seededRef = useRef(false);
 
   useEffect(() => {
-    if (!data) return;
+    if (!data || seededRef.current) return;
+    seededRef.current = true;
     setDrafts((prev) => {
       const next = { ...prev };
       for (const translation of data.translations) {
@@ -85,74 +94,68 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
     void queryClient.invalidateQueries({ queryKey: queryKeys.artists.all });
   }
 
-  const saveDraftMutation = useMutation({
-    mutationFn: () =>
-      saveArtistDraftTranslation(
-        session!.accessToken,
+  /** 두 로케일의 글(이름이 있는 쪽만)과 이메일·순서·링크를 전부 저장한다 — 임시저장과 발행이 함께 쓴다. */
+  async function saveAll() {
+    if (!session) return;
+    for (const locale of LOCALES) {
+      // 이름이 비어 있는 로케일(대개 EN)은 보내지 않는다 — name은 서버에서 NotBlank 검증한다.
+      if (drafts[locale].name.trim() === "") continue;
+      await saveArtistDraftTranslation(
+        session.accessToken,
         artistId,
-        activeLocale,
-        drafts[activeLocale].name,
-        drafts[activeLocale].role || null,
-        drafts[activeLocale].bio || null,
-        drafts[activeLocale].credits || null,
-        drafts[activeLocale].quote || null,
-      ),
-    onSuccess: () => {
-      setActionError(null);
+        locale,
+        drafts[locale].name,
+        drafts[locale].role || null,
+        drafts[locale].bio || null,
+        drafts[locale].credits || null,
+        drafts[locale].quote || null,
+      );
+    }
+    if (linkUrlDraft !== (data?.linkUrl ?? "")) {
+      await changeArtistLinkUrl(session.accessToken, artistId, linkUrlDraft || null);
+    }
+    await changeArtistPeopleInfo(session.accessToken, artistId, {
+      email: emailDraft || null,
+      displayOrder: Number.parseInt(orderDraft, 10) || 0,
+      interviewUrl: interviewDraft || null,
+    });
+  }
+
+  async function handleSaveDraft() {
+    setSaveNotice(null);
+    setActionError(null);
+    setBusy(true);
+    try {
+      await saveAll();
       setSaveNotice(t("editing.panel.saved"));
       invalidate();
-    },
-    onError: (err: unknown) => {
-      setSaveNotice(null);
+    } catch (err) {
       setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
-    },
-  });
+    } finally {
+      setBusy(false);
+    }
+  }
 
-  const linkMutation = useMutation({
-    mutationFn: () => changeArtistLinkUrl(session!.accessToken, artistId, linkUrlDraft || null),
-    onSuccess: () => {
-      setActionError(null);
-      setSaveNotice(t("editing.panel.saved"));
+  async function handlePublish() {
+    if (!session) return;
+    setSaveNotice(null);
+    setActionError(null);
+    setBusy(true);
+    try {
+      await saveAll();
+      await publishArtist(session.accessToken, artistId);
       invalidate();
-    },
-    onError: (err: unknown) => {
-      setSaveNotice(null);
-      setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
-    },
-  });
-
-  const peopleInfoMutation = useMutation({
-    mutationFn: () =>
-      changeArtistPeopleInfo(session!.accessToken, artistId, {
-        email: emailDraft || null,
-        displayOrder: Number.parseInt(orderDraft, 10) || 0,
-        interviewUrl: interviewDraft || null,
-      }),
-    onSuccess: () => {
-      setActionError(null);
-      setSaveNotice(t("editing.panel.saved"));
-      invalidate();
-    },
-    onError: (err: unknown) => {
-      setSaveNotice(null);
-      setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
-    },
-  });
-
-  const publishMutation = useMutation({
-    mutationFn: () => publishArtist(session!.accessToken, artistId),
-    onSuccess: () => {
-      setActionError(null);
-      invalidate();
-    },
-    onError: (err: unknown) => {
+      onPublished();
+    } catch (err) {
       if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
         setPinAction("publish");
         return;
       }
       setActionError(err instanceof ApiError ? err.message : t("editing.panel.publishFailed"));
-    },
-  });
+    } finally {
+      setBusy(false);
+    }
+  }
 
   const unpublishMutation = useMutation({
     mutationFn: () => unpublishArtist(session!.accessToken, artistId),
@@ -170,14 +173,14 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
   });
 
   if (!data) {
-    return <aside className={styles.panel}>{t("editing.panel.loading")}</aside>;
+    return <section className={styles.panel}>{t("editing.panel.loading")}</section>;
   }
 
-  const koTranslation = data.translations.find((tr) => tr.locale === "KO");
-  const hasKoName = Boolean(koTranslation?.name ?? koTranslation?.draftName);
+  // 발행하기가 저장까지 함께 하므로 서버 상태가 아니라 지금 입력 중인 값으로 발행 가능 여부를 본다.
+  const hasKoName = drafts.KO.name.trim() !== "";
 
   return (
-    <aside className={styles.panel} aria-label={t("editing.panel.heading")}>
+    <section className={styles.panel} aria-label={t("editing.panel.heading")}>
       <div className={styles.tabs} role="tablist">
         {LOCALES.map((locale) => (
           <button
@@ -216,19 +219,6 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
       </label>
 
       <label className={styles.field}>
-        <span>{t("editing.panel.artistBioLabel")}</span>
-        <textarea
-          rows={12}
-          maxLength={4000}
-          value={drafts[activeLocale].bio}
-          onChange={(e) =>
-            setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], bio: e.target.value } }))
-          }
-        />
-        <small className={styles.hint}>{t("editing.panel.artistBioHint")}</small>
-      </label>
-
-      <label className={styles.field}>
         <span>{t("editing.panel.artistQuoteLabel")}</span>
         <input
           type="text"
@@ -239,6 +229,17 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
           }
         />
       </label>
+
+      <MarkdownEditor
+        id={`artist-${artistId}-bio`}
+        label={t("editing.panel.artistBioLabel")}
+        value={drafts[activeLocale].bio}
+        onChange={(bio) => setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], bio } }))}
+        ownerType="ARTIST"
+        ownerId={artistId}
+        onImagesChanged={invalidate}
+        maxLength={4000}
+      />
 
       <label className={styles.field}>
         <span>{t("editing.panel.artistCreditsLabel")}</span>
@@ -262,12 +263,8 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
       <button
         type="button"
         className={styles.saveButton}
-        disabled={saveDraftMutation.isPending}
-        onClick={() => {
-          setSaveNotice(null);
-          setActionError(null);
-          saveDraftMutation.mutate();
-        }}
+        disabled={busy}
+        onClick={() => void handleSaveDraft()}
       >
         {t("editing.panel.saveDraft")}
       </button>
@@ -275,11 +272,12 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
       <hr className={styles.divider} />
 
       <h3 className={styles.imagesHeading}>{t("editing.panel.artistPhotoHeading")}</h3>
-      <ImageDropzone ownerType="ARTIST" ownerId={artistId} images={data.images} onChanged={invalidate} maxImages={1} />
+      <ImageDropzone ownerType="ARTIST" ownerId={artistId} images={data.images} onChanged={invalidate} />
+      <small className={styles.hint}>{t("editing.panel.artistPhotoHint")}</small>
 
       <hr className={styles.divider} />
 
-      {/* SNS 링크는 draft가 아니라 즉시 공개본에 반영된다 — 발행 버튼을 거치지 않는다. */}
+      {/* SNS 링크·이메일·순서·인터뷰 링크는 임시저장·발행하기를 누를 때 함께 저장된다. */}
       <label className={styles.field}>
         <span>{t("editing.panel.artistLinkLabel")}</span>
         <input
@@ -289,22 +287,9 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
           placeholder="https://instagram.com/..."
         />
       </label>
-      <button
-        type="button"
-        className={styles.saveButton}
-        disabled={linkMutation.isPending}
-        onClick={() => {
-          setSaveNotice(null);
-          setActionError(null);
-          linkMutation.mutate();
-        }}
-      >
-        {t("editing.image.save")}
-      </button>
 
       <hr className={styles.divider} />
 
-      {/* 이메일·순서·인터뷰 링크도 발행을 거치지 않고 즉시 반영된다. */}
       <label className={styles.field}>
         <span>{t("editing.panel.artistEmailLabel")}</span>
         <input type="email" value={emailDraft} onChange={(e) => setEmailDraft(e.target.value)} />
@@ -322,18 +307,6 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
           placeholder="https://www.youtube.com/watch?v=..."
         />
       </label>
-      <button
-        type="button"
-        className={styles.saveButton}
-        disabled={peopleInfoMutation.isPending}
-        onClick={() => {
-          setSaveNotice(null);
-          setActionError(null);
-          peopleInfoMutation.mutate();
-        }}
-      >
-        {t("editing.image.save")}
-      </button>
 
       <hr className={styles.divider} />
 
@@ -345,8 +318,8 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
           <button
             type="button"
             className={styles.publishButton}
-            disabled={publishMutation.isPending || !hasKoName}
-            onClick={() => publishMutation.mutate()}
+            disabled={busy || !hasKoName}
+            onClick={() => void handlePublish()}
           >
             {t("editing.panel.publish")}
           </button>
@@ -369,11 +342,11 @@ export default function ArtistEditPanel({ artistId }: ArtistEditPanelProps) {
           onVerified={() => {
             const action = pinAction;
             setPinAction(null);
-            if (action === "publish") publishMutation.mutate();
+            if (action === "publish") void handlePublish();
             if (action === "unpublish") unpublishMutation.mutate();
           }}
         />
       )}
-    </aside>
+    </section>
   );
 }

@@ -219,4 +219,39 @@ describe("ReviewDetailPage", () => {
 
     expect(await screen.findByText("reviews-list")).toBeInTheDocument();
   });
+
+  it("본문은 마크다운으로 그리되 링크·유튜브는 그리지 않고, 본문에 넣은 사진은 아래 목록에서 뺀다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/")) {
+        return Promise.resolve(jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }));
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: {
+            id: 1,
+            title: "후기",
+            body: "**좋았어요**\n\n[광고](https://spam.example.com)\n\n![본문 사진](image:20)\n\n@[youtube](https://youtu.be/abc123XYZ_-)",
+            accountId: 4,
+            createdAt: "2026-01-01T00:00:00Z",
+            comments: [],
+            images: [
+              { id: 20, status: "READY", altText: "본문용", url640: "http://example.com/a.jpg", width: 640, height: 400 },
+              { id: 21, status: "READY", altText: "아래 사진", url640: "http://example.com/b.jpg", width: 640, height: 400 },
+            ],
+          },
+          error: null,
+        }),
+      );
+    });
+
+    renderAt("/reviews/1");
+
+    expect(await screen.findByRole("heading", { level: 2, name: "좋았어요" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /광고/ })).not.toBeInTheDocument(); // 링크는 글자만 남는다
+    expect(screen.getByText("광고")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /예고편|재생/ })).not.toBeInTheDocument(); // 유튜브 없음
+    expect(screen.getAllByRole("img", { name: "본문 사진" })).toHaveLength(1);
+    expect(screen.getByRole("img", { name: "아래 사진" })).toBeInTheDocument();
+  });
 });

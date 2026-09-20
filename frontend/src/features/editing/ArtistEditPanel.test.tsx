@@ -60,7 +60,7 @@ function renderPanel(status: "DRAFT" | "PUBLISHED") {
   return render(
     <QueryClientProvider client={queryClient}>
       <AdminAuthProvider>
-        <ArtistEditPanel artistId={1} />
+        <ArtistEditPanel artistId={1} onPublished={() => {}} />
       </AdminAuthProvider>
     </QueryClientProvider>,
   );
@@ -128,7 +128,7 @@ describe("ArtistEditPanel", () => {
     render(
       <QueryClientProvider client={queryClient}>
         <AdminAuthProvider>
-          <ArtistEditPanel artistId={1} />
+          <ArtistEditPanel artistId={1} onPublished={() => {}} />
         </AdminAuthProvider>
       </QueryClientProvider>,
     );

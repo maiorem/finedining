@@ -27,6 +27,7 @@ export type ArtistDetail = {
   interviewUrl: string | null;
   linkUrl: string | null;
   photo: MediaAsset | null;
+  images: MediaAsset[];
 };
 
 export function useArtists(i18nLanguage: string) {

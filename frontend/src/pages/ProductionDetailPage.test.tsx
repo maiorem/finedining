@@ -240,4 +240,39 @@ describe("ProductionDetailPage", () => {
     expect(reserve).toHaveAttribute("target", "_blank");
     expect(screen.getByRole("link", { name: /위치보기/ })).toHaveAttribute("href", "https://map.naver.com/y");
   });
+
+  it("고정 상세가 아닌 작품은 설명을 마크다운으로 그리고 본문에 넣은 사진은 갤러리에서 뺀다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: {
+            id: 2,
+            slug: "sample",
+            title: "새 공연",
+            subtitle: null,
+            description: "**어떤 공연인가요?**\n\n![본문 사진](image:20)\n\n끝",
+            bookingUrl: null,
+            locationUrl: null,
+            images: [
+              { id: 10, status: "READY", altText: "히어로", url640: "http://example.com/hero.jpg", width: 640, height: 400 },
+              { id: 20, status: "READY", altText: "본문용", url640: "http://example.com/inline.jpg", width: 640, height: 400 },
+            ],
+          },
+          error: null,
+        }),
+      );
+    });
+
+    renderAt("/productions/sample");
+
+    expect(await screen.findByRole("heading", { level: 2, name: "어떤 공연인가요?" })).toBeInTheDocument();
+    expect(screen.getAllByRole("img", { name: "본문 사진" })).toHaveLength(1);
+    expect(screen.getByRole("img", { name: "히어로" })).toBeInTheDocument();
+  });
 });

@@ -176,3 +176,12 @@
   border-color: var(--c-line);
   cursor: not-allowed;
 }
+
+/* 글을 길게 쓰는 화면은 옆 패널이 아니라 페이지 가운데에 놓는다(2026-09-20 요청). */
+.panelCenter {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0;
+  border-left: none;
+}

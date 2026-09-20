@@ -8,6 +8,8 @@ import { useCan } from "../hooks/useCan";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { FathersTableDetail } from "../components/section/FathersTableDetail";
 import { FATHERS_TABLE_SLUG } from "../constants/fathersTable";
+import { MarkdownContent } from "../components/section/MarkdownContent";
+import { referencedImageIds } from "../utils/markdown";
 import { EditableSection } from "../features/editing/EditableSection";
 import styles from "./ProductionDetailPage.module.css";
 
@@ -78,10 +80,27 @@ export default function ProductionDetailPage() {
     );
   }
 
-  const [heroImage, ...editorialImages] = production.images;
+  // 편집 모드(데스크톱)에서는 공개 화면 대신 가운데에 글쓰기 폼을 보여준다. "발행하기"가 끝나면
+  // 편집 모드를 끄고 발행된 상세를 바로 보여준다. 고정 상세(아버지의 식탁)는 위에서 따로 처리한다.
+  if (showPanel && isDesktop) {
+    return (
+      <main className={styles.editPage}>
+        <button type="button" className={styles.editToggle} aria-pressed={editMode} onClick={() => setEditMode(false)}>
+          {t("editing.exitEditMode")}
+        </button>
+        <Suspense fallback={<p className={styles.status}>{t("editing.panel.loading")}</p>}>
+          <ProductionEditPanel productionId={production.id} variant="center" onPublished={() => setEditMode(false)} />
+        </Suspense>
+      </main>
+    );
+  }
+
+  // 본문에 이미지를 직접 넣었으면(`image:번호`) 그 사진은 히어로·아래 갤러리에서 뺀다 — 두 번 나오지 않게.
+  const inlineImageIds = referencedImageIds(production.description);
+  const [heroImage, ...editorialImages] = production.images.filter((image) => !inlineImageIds.has(image.id));
 
   return (
-    <div className={showPanel ? styles.layoutWithPanel : styles.layout}>
+    <div className={styles.layout}>
       <main className={styles.page}>
         {heroImage ? (
           <EditableSection active={showPanel}>
@@ -122,7 +141,9 @@ export default function ProductionDetailPage() {
 
         {production.description && (
           <EditableSection active={showPanel}>
-            <p className={styles.lead}>{production.description}</p>
+            <div className={styles.description}>
+              <MarkdownContent source={production.description} images={production.images} />
+            </div>
           </EditableSection>
         )}
 
@@ -181,12 +202,6 @@ export default function ProductionDetailPage() {
           </EditableSection>
         )}
       </main>
-
-      {showPanel && isDesktop && (
-        <Suspense fallback={<aside className={styles.panelLoading}>{t("editing.panel.loading")}</aside>}>
-          <ProductionEditPanel productionId={production.id} />
-        </Suspense>
-      )}
     </div>
   );
 }

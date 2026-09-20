@@ -3,7 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import { useReview } from "../api/reviews";
-import { deleteOwnReview, updateOwnReview } from "../api/reviewMember";
+import { MarkdownContent } from "../components/section/MarkdownContent";
+import { referencedImageIds } from "../utils/markdown";
+import { deleteOwnReview, updateOwnReview, uploadReviewImage } from "../api/reviewMember";
 import { queryKeys } from "../api/queryKeys";
 import { ApiError } from "../api/http";
 import { useCan } from "../hooks/useCan";
@@ -14,6 +16,10 @@ import styles from "./ReviewDetailPage.module.css";
 // 관리자 전용 API 경로가 익명 방문자 번들에 섞이면 안 되므로 React.lazy로만 import한다
 // (CLAUDE.md §3.5·§9).
 const ReviewEditForm = lazy(() => import("../features/editing/ReviewEditForm"));
+const ReviewMarkdownEditor = lazy(() => import("../components/section/ReviewMarkdownEditor"));
+
+// 회원이 쓴 글에서는 링크·유튜브를 그리지 않는다 — 스팸이 링크로 들어온다(§3.6).
+const MEMBER_CONTENT_OPTIONS = { links: false, youtube: false } as const;
 
 const KNOWN_ERROR_CODES = ["VALIDATION_ERROR", "RATE_LIMITED", "POST_NOT_OWNED"] as const;
 
@@ -108,6 +114,9 @@ export default function ReviewDetailPage() {
     }
 
     const isOwner = memberSession?.accountId === review.accountId;
+    // 본문에 직접 넣은 사진은 그 자리에만 나온다 — 나머지 사진만 글 아래에 순서대로 보여준다.
+    const inlineImageIds = referencedImageIds(review.body);
+    const galleryImages = review.images.filter((image) => !inlineImageIds.has(image.id));
 
     if (selfEditing) {
       return (
@@ -116,10 +125,25 @@ export default function ReviewDetailPage() {
             <label htmlFor="review-title">{t("editing.panel.titleLabel")}</label>
             <input id="review-title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
           </div>
-          <div className={styles.field}>
-            <label htmlFor="review-body">{t("reviews.bodyLabel")}</label>
-            <textarea id="review-body" rows={8} value={body} onChange={(e) => setBody(e.target.value)} required />
-          </div>
+          <Suspense fallback={<p className={styles.status}>{t("reviews.loading")}</p>}>
+            <ReviewMarkdownEditor
+              id="review-body"
+              label={t("reviews.bodyLabel")}
+              value={body}
+              onChange={setBody}
+              required
+              rows={12}
+              images={{
+                kind: "immediate",
+                imageCount: review.images.length,
+                onUpload: async (file) => {
+                  const asset = await uploadReviewImage(memberSession!.accessToken, reviewId, file);
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.reviews.all });
+                  return asset.id;
+                },
+              }}
+            />
+          </Suspense>
 
           {formError && (
             <p className={styles.error} role="alert">
@@ -142,11 +166,11 @@ export default function ReviewDetailPage() {
     return (
       <>
         <h1 className={styles.title}>{review.title}</h1>
-        <p className={styles.body}>{review.body}</p>
+        <MarkdownContent source={review.body} images={review.images} options={MEMBER_CONTENT_OPTIONS} className={styles.body} />
 
-        {review.images.length > 0 && (
+        {galleryImages.length > 0 && (
           <ul className={styles.images}>
-            {review.images.map((image) => (
+            {galleryImages.map((image) => (
               <li key={image.id}>
                 <img
                   src={image.url960 ?? image.url640 ?? undefined}

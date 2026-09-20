@@ -5,6 +5,7 @@ import { ApiError } from "../../api/http";
 import { deleteReviewComment, getReviewForAdmin, updateReviewContent } from "../../api/reviewAdmin";
 import { queryKeys } from "../../api/queryKeys";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
+import ReviewMarkdownEditor from "../../components/section/ReviewMarkdownEditor";
 import styles from "./ReviewEditForm.module.css";
 
 type ReviewEditFormProps = {
@@ -76,10 +77,14 @@ export default function ReviewEditForm({ reviewId }: ReviewEditFormProps) {
           <span>{t("editing.panel.titleLabel")}</span>
           <input type="text" value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} />
         </label>
-        <label className={styles.field}>
-          <span>{t("reviews.bodyLabel")}</span>
-          <textarea rows={8} value={draftBody} onChange={(e) => setDraftBody(e.target.value)} />
-        </label>
+        <ReviewMarkdownEditor
+          id={`admin-review-${reviewId}-body`}
+          label={t("reviews.bodyLabel")}
+          value={draftBody}
+          onChange={setDraftBody}
+          images={{ kind: "none" }}
+          rows={12}
+        />
         {saveNotice && <p className={styles.notice}>{saveNotice}</p>}
         {saveError && (
           <p className={styles.error} role="alert">

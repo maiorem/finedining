@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
@@ -13,6 +13,7 @@ import {
 import { ApiError } from "../../api/http";
 import { queryKeys } from "../../api/queryKeys";
 import { ImageDropzone } from "./ImageDropzone";
+import MarkdownEditor from "./MarkdownEditor";
 import { PinModal } from "./PinModal";
 import styles from "./ProductionEditPanel.module.css";
 
@@ -23,6 +24,12 @@ type DraftState = Record<Locale, { title: string; subtitle: string; description:
 
 type ProductionEditPanelProps = {
   productionId: number;
+  /**
+   * center: 페이지 가운데에 놓는 글쓰기 화면 — 설명을 마크다운 편집기로 쓰고, 발행이 끝나면 onPublished를 부른다.
+   * side: 고정 상세(아버지의 식탁) 옆 패널 — 예약·위치 링크만 쓰므로 예전 입력칸 그대로다.
+   */
+  variant?: "center" | "side";
+  onPublished?: () => void;
 };
 
 const EMPTY_DRAFTS: DraftState = {
@@ -34,7 +41,11 @@ const EMPTY_DRAFTS: DraftState = {
  * §3.9의 "같은 페이지, 편집 패널" 그 자체. 이 모듈은 `features/editing/`에 있으므로
  * React.lazy로만 import된다 — 익명 방문자 번들에 섞이지 않는다(§3.5·§9).
  */
-export default function ProductionEditPanel({ productionId }: ProductionEditPanelProps) {
+export default function ProductionEditPanel({
+  productionId,
+  variant = "side",
+  onPublished,
+}: ProductionEditPanelProps) {
   const { t } = useTranslation();
   const { session } = useAdminAuth();
   const queryClient = useQueryClient();
@@ -56,8 +67,13 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
 
+  // 서버 값으로 입력칸을 채우는 건 처음 한 번뿐이다 — 이미지를 올릴 때마다 데이터를 다시 불러오는데
+  // 그때 채우면 저장하지 않은 글(본문에 넣은 이미지 표시 포함)이 지워진다.
+  const seededRef = useRef(false);
+
   useEffect(() => {
-    if (!data) return;
+    if (!data || seededRef.current) return;
+    seededRef.current = true;
     setDrafts((prev) => {
       const next = { ...prev };
       for (const translation of data.translations) {
@@ -162,6 +178,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
       }
       await publishProduction(session.accessToken, productionId);
       invalidate();
+      onPublished?.();
     } catch (err) {
       if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
         setPinAction("publish");
@@ -188,8 +205,10 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
     },
   });
 
+  const panelClass = variant === "center" ? `${styles.panel} ${styles.panelCenter}` : styles.panel;
+
   if (!data) {
-    return <aside className={styles.panel}>{t("editing.panel.loading")}</aside>;
+    return <aside className={panelClass}>{t("editing.panel.loading")}</aside>;
   }
 
   // 서버에 아직 저장되지 않은 방금 입력한 제목으로도 발행 버튼이 바로 켜져야 한다 — "발행하기"가
@@ -198,7 +217,7 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
   const hasEnTitle = drafts.EN.title.trim() !== "";
 
   return (
-    <aside className={styles.panel} aria-label={t("editing.panel.heading")}>
+    <aside className={panelClass} aria-label={t("editing.panel.heading")}>
       <div className={styles.tabs} role="tablist">
         {LOCALES.map((locale) => (
           <button
@@ -236,19 +255,34 @@ export default function ProductionEditPanel({ productionId }: ProductionEditPane
         />
       </label>
 
-      <label className={styles.field}>
-        <span>{t("editing.panel.descriptionLabel")}</span>
-        <textarea
-          rows={6}
+      {variant === "center" ? (
+        <MarkdownEditor
+          id={`production-${productionId}-description`}
+          label={t("editing.panel.descriptionLabel")}
           value={drafts[activeLocale].description}
-          onChange={(e) =>
-            setDrafts((prev) => ({
-              ...prev,
-              [activeLocale]: { ...prev[activeLocale], description: e.target.value },
-            }))
+          onChange={(description) =>
+            setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], description } }))
           }
+          ownerType="PRODUCTION"
+          ownerId={productionId}
+          onImagesChanged={invalidate}
+          maxLength={4000}
         />
-      </label>
+      ) : (
+        <label className={styles.field}>
+          <span>{t("editing.panel.descriptionLabel")}</span>
+          <textarea
+            rows={6}
+            value={drafts[activeLocale].description}
+            onChange={(e) =>
+              setDrafts((prev) => ({
+                ...prev,
+                [activeLocale]: { ...prev[activeLocale], description: e.target.value },
+              }))
+            }
+          />
+        </label>
+      )}
 
       {/* 캘린더는 만들지 않는다 — 네이버 예약이 이미 제공한다(CLAUDE.md §4). 예약/위치 링크만 붙인다.
           제목·설명과 별개 저장 버튼으로 나눠뒀더니 운영자가 URL 저장 버튼을 놓치고 값이 비는

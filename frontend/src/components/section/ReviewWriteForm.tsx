@@ -1,10 +1,14 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { lazy, Suspense, useState, type ChangeEvent, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ApiError } from "../../api/http";
-import { createReview, uploadReviewImage } from "../../api/reviewMember";
+import { createReview, updateOwnReview, uploadReviewImage } from "../../api/reviewMember";
 import { useMemberAuth } from "../../contexts/MemberAuthContext";
+import { removeNewImage, resolveNewImageTokens } from "../../utils/reviewImages";
 import styles from "./ReviewWriteForm.module.css";
+
+// 서식 편집기는 글을 쓸 때만 필요하다 — 초기 번들에 넣지 않는다.
+const ReviewMarkdownEditor = lazy(() => import("./ReviewMarkdownEditor"));
 
 const MAX_IMAGES = 3;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -66,9 +70,19 @@ export function ReviewWriteForm({ onCreated }: Props) {
       });
       // 글은 이미 만들어졌다 — 사진이 실패해도 글을 되돌리지 않고 몇 장이 실패했는지만 알린다.
       let failed = 0;
+      const mediaIds: (number | null)[] = [];
       for (const file of files) {
         try {
-          await uploadReviewImage(session.accessToken, review.id, file);
+          mediaIds.push((await uploadReviewImage(session.accessToken, review.id, file)).id);
+        } catch {
+          mediaIds.push(null);
+          failed += 1;
+        }
+      }
+      // 본문에 넣어 둔 임시 표시(image:new1…)를 올라간 사진의 실제 번호로 바꿔 다시 저장한다.
+      if (body.includes("image:new")) {
+        try {
+          await updateOwnReview(session.accessToken, review.id, title, resolveNewImageTokens(body, mediaIds));
         } catch {
           failed += 1;
         }
@@ -88,10 +102,20 @@ export function ReviewWriteForm({ onCreated }: Props) {
         <label htmlFor="review-title">{t("editing.panel.titleLabel")}</label>
         <input id="review-title" type="text" maxLength={200} value={title} onChange={(e) => setTitle(e.target.value)} required />
       </div>
-      <div className={styles.field}>
-        <label htmlFor="review-body">{t("reviews.bodyLabel")}</label>
-        <textarea id="review-body" rows={6} maxLength={4000} value={body} onChange={(e) => setBody(e.target.value)} required />
-      </div>
+      <Suspense fallback={<p className={styles.hint}>{t("reviews.loading")}</p>}>
+        <ReviewMarkdownEditor
+          id="review-body"
+          label={t("reviews.bodyLabel")}
+          value={body}
+          onChange={setBody}
+          required
+          images={{
+            kind: "deferred",
+            fileCount: files.length,
+            onAttach: (file) => setFiles((prev) => [...prev, file]),
+          }}
+        />
+      </Suspense>
 
       <div className={styles.field}>
         <label htmlFor="review-name">{t("reviews.nameLabel")}</label>
@@ -119,7 +143,13 @@ export function ReviewWriteForm({ onCreated }: Props) {
             {files.map((file, index) => (
               <li key={`${file.name}-${index}`}>
                 <span>{file.name}</span>
-                <button type="button" onClick={() => setFiles((prev) => prev.filter((_, i) => i !== index))}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFiles((prev) => prev.filter((_, i) => i !== index));
+                    setBody((prev) => removeNewImage(prev, index + 1)); // 본문에 넣어 둔 그 사진의 자리도 지운다
+                  }}
+                >
                   {t("reviews.imagesRemove")}
                 </button>
               </li>

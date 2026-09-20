@@ -8,7 +8,7 @@ import { useCan } from "../hooks/useCan";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { TrailerVideo } from "../components/section/TrailerVideo";
 import { extractYoutubeId } from "../utils/youtube";
-import { parseStoryBlocks } from "../utils/storyBlocks";
+import { MarkdownContent } from "../components/section/MarkdownContent";
 import { EditableSection } from "../features/editing/EditableSection";
 import styles from "./ArtistDetailPage.module.css";
 
@@ -46,8 +46,23 @@ export default function ArtistDetailPage() {
   const showPanel = canEdit && editMode;
   const interviewId = extractYoutubeId(artist.interviewUrl);
 
+  // 편집 모드(데스크톱)에서는 공개 화면 대신 가운데에 편집 폼을 보여준다. "발행하기"가 끝나면
+  // 편집 모드를 끄고 발행된 상세를 바로 보여준다.
+  if (showPanel && isDesktop) {
+    return (
+      <main className={styles.editPage}>
+        <button type="button" className={styles.editToggle} aria-pressed={editMode} onClick={() => setEditMode(false)}>
+          {t("editing.exitEditMode")}
+        </button>
+        <Suspense fallback={<p className={styles.status}>{t("editing.panel.loading")}</p>}>
+          <ArtistEditPanel artistId={artist.id} onPublished={() => setEditMode(false)} />
+        </Suspense>
+      </main>
+    );
+  }
+
   return (
-    <div className={showPanel ? styles.layoutWithPanel : styles.layout}>
+    <div className={styles.layout}>
       <main className={styles.page}>
         {canEdit && (
           <button
@@ -79,17 +94,7 @@ export default function ArtistDetailPage() {
           <h1 className={styles.name}>{artist.name}</h1>
           {artist.quote && <p className={styles.quote}>“{artist.quote}”</p>}
 
-          {parseStoryBlocks(artist.bio).map((block, index) =>
-            block.type === "question" ? (
-              <h2 key={index} className={styles.question}>
-                {block.text}
-              </h2>
-            ) : (
-              <p key={index} className={styles.bio}>
-                {block.text}
-              </p>
-            ),
-          )}
+          <MarkdownContent source={artist.bio} images={artist.images ?? []} />
 
           {interviewId && (
             <div className={styles.interview}>
@@ -128,12 +133,6 @@ export default function ArtistDetailPage() {
           {t("artists.backToList")}
         </Link>
       </main>
-
-      {showPanel && isDesktop && (
-        <Suspense fallback={<aside className={styles.panelLoading}>{t("editing.panel.loading")}</aside>}>
-          <ArtistEditPanel artistId={artist.id} />
-        </Suspense>
-      )}
     </div>
   );
 }

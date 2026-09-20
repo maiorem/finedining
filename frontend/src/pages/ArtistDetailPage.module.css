@@ -20,6 +20,18 @@
   }
 }
 
+.editPage {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--section-y-mobile) var(--gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+  .editPage {
+    padding: 6rem var(--gutter-desktop) var(--section-y-desktop);
+  }
+}
+
 .editToggle {
   margin-bottom: 1.5rem;
   min-height: 40px;
@@ -103,24 +115,6 @@
 .backLink:focus-visible {
   outline: 2px solid var(--c-spot);
   outline-offset: 3px;
-}
-
-.question {
-  max-width: 38em;
-  margin: 2.5rem 0 0.75rem;
-  font-family: var(--f-body);
-  font-size: var(--t-lead);
-  font-weight: 700;
-  line-height: var(--lh-tight);
-  word-break: keep-all;
-}
-
-.bio {
-  line-height: var(--lh-body);
-  color: var(--c-ink);
-  white-space: pre-wrap;
-  margin: 0 0 1.25rem;
-  max-width: 38em;
 }
 
 .link {
