@@ -388,5 +388,6 @@
   "account.withdraw.confirm": "위 내용을 확인했으며 탈퇴합니다.",
   "account.withdraw.submit": "회원 탈퇴하기",
   "account.withdraw.error": "탈퇴를 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.",
-  "footer.account": "내 계정 · 회원 탈퇴"
+  "footer.account": "내 계정 · 회원 탈퇴",
+  "programs.form.subtitleLabel": "부제 (목록 카드에 표시)"
 }

@@ -80,12 +80,27 @@
   margin: 0;
 }
 
+.heroSubtitle {
+  margin: 0.75rem 0 0;
+  font-size: var(--t-lead);
+  line-height: var(--lh-body);
+  word-break: keep-all;
+}
+
 /* 이미지가 없는 프로그램(드물다)만 쓰는 기본 헤더 — 히어로 없이 텍스트만 있다. */
 .title {
   font-family: var(--f-display);
   font-weight: var(--w-display);
   font-size: var(--t-h1);
   margin: 0 0 2rem;
+}
+
+.subtitle {
+  margin: -1.25rem 0 2rem;
+  color: var(--c-ink-60);
+  font-size: var(--t-lead);
+  line-height: var(--lh-body);
+  word-break: keep-all;
 }
 
 .editToggle {

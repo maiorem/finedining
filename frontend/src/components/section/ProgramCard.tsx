@@ -27,7 +27,7 @@ export function ProgramCard({ program }: { program: ProgramSummary }) {
         </div>
         <h3 className={styles.title}>{program.title}</h3>
       </Link>
-      {program.description && <p className={styles.description}>{program.description}</p>}
+      {program.subtitle && <p className={styles.subtitle}>{program.subtitle}</p>}
 
       <div className={styles.actions}>
         {program.applyUrl ? (

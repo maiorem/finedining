@@ -63,12 +63,14 @@ export default function ProgramDetailPage() {
               <div className={styles.heroScrim} />
               <div className={styles.heroOverlay}>
                 {program.title && <h1 className={styles.heroTitle}>{program.title}</h1>}
+                {program.subtitle && <p className={styles.heroSubtitle}>{program.subtitle}</p>}
               </div>
             </section>
           </EditableSection>
         ) : (
           <EditableSection active={showPanel}>
             {program.title && <h1 className={styles.title}>{program.title}</h1>}
+            {program.subtitle && <p className={styles.subtitle}>{program.subtitle}</p>}
           </EditableSection>
         )}
 

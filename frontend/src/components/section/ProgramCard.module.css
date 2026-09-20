@@ -43,18 +43,12 @@
   color: var(--c-spot);
 }
 
-.description {
-  max-width: 38em;
+.subtitle {
   color: var(--c-ink-60);
   font-size: var(--t-body);
   line-height: var(--lh-body);
-  white-space: pre-line;
-  margin: 0.75rem 0 0;
-  /* 3열 목록에서 카드 높이가 들쭉날쭉하지 않게 자른다 — 전문은 상세 페이지에 있다. */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  overflow: hidden;
+  margin: 0.5rem 0 0;
+  word-break: keep-all;
 }
 
 /* 참가/위치 — 1px 아웃라인 CTA(§8.1). ProductionCard의 actionLink와 같은 스타일이다. */

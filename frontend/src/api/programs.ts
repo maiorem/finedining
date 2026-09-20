@@ -9,7 +9,7 @@ export type ProgramSummary = {
   id: number;
   slug: string;
   title: string | null;
-  description: string | null;
+  subtitle: string | null;
   applyUrl: string | null;
   locationUrl: string | null;
   thumbnail: MediaAsset | null;
@@ -19,6 +19,7 @@ export type ProgramDetail = {
   id: number;
   slug: string;
   title: string | null;
+  subtitle: string | null;
   description: string | null;
   applyUrl: string | null;
   locationUrl: string | null;

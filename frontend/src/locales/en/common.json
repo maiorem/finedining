@@ -388,5 +388,6 @@
   "account.withdraw.confirm": "I have read the above and want to leave.",
   "account.withdraw.submit": "Leave the membership",
   "account.withdraw.error": "We could not process your withdrawal. Please try again shortly.",
-  "footer.account": "My account · Leave membership"
+  "footer.account": "My account · Leave membership",
+  "programs.form.subtitleLabel": "Subtitle (shown on the list card)"
 }

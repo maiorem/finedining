@@ -4,8 +4,10 @@ import type { MediaAsset } from "./media";
 export type ProgramTranslationView = {
   locale: "KO" | "EN";
   title: string | null;
+  subtitle: string | null;
   description: string | null;
   draftTitle: string | null;
+  draftSubtitle: string | null;
   draftDescription: string | null;
   hasPendingDraft: boolean;
 };
@@ -39,10 +41,12 @@ export function saveProgramDraftTranslation(
   id: number,
   locale: "KO" | "EN",
   title: string,
+  subtitle: string | null,
   description: string | null,
 ): Promise<ProgramAdmin> {
   return apiAdminPut<ProgramAdmin>(`/api/programs/${id}/translations/${locale}`, accessToken, {
     title,
+    subtitle,
     description,
   });
 }

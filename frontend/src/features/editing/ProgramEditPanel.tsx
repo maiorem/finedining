@@ -19,15 +19,15 @@ import styles from "./ProgramEditPanel.module.css";
 type Locale = "KO" | "EN";
 const LOCALES: Locale[] = ["KO", "EN"];
 
-type DraftState = Record<Locale, { title: string; description: string }>;
+type DraftState = Record<Locale, { title: string; subtitle: string; description: string }>;
 
 type ProgramEditPanelProps = {
   programId: number;
 };
 
 const EMPTY_DRAFTS: DraftState = {
-  KO: { title: "", description: "" },
-  EN: { title: "", description: "" },
+  KO: { title: "", subtitle: "", description: "" },
+  EN: { title: "", subtitle: "", description: "" },
 };
 
 /**
@@ -63,6 +63,7 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
       for (const translation of data.translations) {
         next[translation.locale] = {
           title: translation.draftTitle ?? translation.title ?? "",
+          subtitle: translation.draftSubtitle ?? translation.subtitle ?? "",
           description: translation.draftDescription ?? translation.description ?? "",
         };
       }
@@ -85,6 +86,7 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
         programId,
         activeLocale,
         drafts[activeLocale].title,
+        drafts[activeLocale].subtitle || null,
         drafts[activeLocale].description || null,
       ),
     onSuccess: () => {
@@ -143,6 +145,7 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
           programId,
           locale,
           drafts[locale].title,
+          drafts[locale].subtitle || null,
           drafts[locale].description || null,
         );
       }
@@ -213,6 +216,18 @@ export default function ProgramEditPanel({ programId }: ProgramEditPanelProps) {
           value={drafts[activeLocale].title}
           onChange={(e) =>
             setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], title: e.target.value } }))
+          }
+        />
+      </label>
+
+      <label className={styles.field}>
+        <span>{t("programs.form.subtitleLabel")}</span>
+        <input
+          type="text"
+          maxLength={200}
+          value={drafts[activeLocale].subtitle}
+          onChange={(e) =>
+            setDrafts((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], subtitle: e.target.value } }))
           }
         />
       </label>

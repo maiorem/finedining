@@ -51,6 +51,7 @@ describe("ProgramDetailPage", () => {
             id: 1,
             slug: "summer-tasting",
             title: "여름 시식회",
+            subtitle: "달리고, 먹고, 이야기하는 시간",
             description: "성북천 달리기 이벤트입니다.",
             applyUrl: null,
             locationUrl: null,
@@ -73,6 +74,7 @@ describe("ProgramDetailPage", () => {
     renderAt("/programs/summer-tasting");
 
     expect(await screen.findByRole("heading", { name: "여름 시식회" })).toBeInTheDocument();
+    expect(screen.getByText("달리고, 먹고, 이야기하는 시간")).toBeInTheDocument();
     expect(screen.getByText("성북천 달리기 이벤트입니다.")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "행사 사진" })).toHaveAttribute("src", "http://example.com/640.jpg");
     expect(screen.queryByRole("button", { name: "편집 모드 켜기" })).not.toBeInTheDocument();

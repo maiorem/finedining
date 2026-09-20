@@ -50,7 +50,7 @@ describe("ProgramsPage", () => {
               id: 1,
               slug: "summer-tasting",
               title: "여름 시식회",
-              description: "참가는 구글폼으로 접수합니다.",
+              subtitle: "한여름 저녁의 시식회",
               applyUrl: "https://forms.gle/abcd",
               locationUrl: "https://map.naver.com/p/somewhere",
               thumbnail: null,
@@ -65,7 +65,8 @@ describe("ProgramsPage", () => {
 
     const titleLink = await screen.findByRole("link", { name: /여름 시식회/ });
     expect(titleLink).toHaveAttribute("href", "/programs/summer-tasting");
-    expect(screen.getByText("참가는 구글폼으로 접수합니다.")).toBeInTheDocument();
+    expect(screen.getByText("한여름 저녁의 시식회")).toBeInTheDocument(); // 목록에는 부제만 보인다
+    expect(screen.queryByText("참가는 구글폼으로 접수합니다.")).not.toBeInTheDocument();
 
     const applyLink = screen.getByRole("link", { name: /예약하기/ });
     expect(applyLink).toHaveAttribute("href", "https://forms.gle/abcd");
