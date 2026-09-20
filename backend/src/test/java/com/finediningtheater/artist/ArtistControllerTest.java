@@ -90,4 +90,17 @@ class ArtistControllerTest {
 
         verify(artistService, never()).getPublished("draft-artist");
     }
+
+    @Test
+    void 상세는_본문에_쓸_수_있게_발행된_이미지_목록을_함께_준다() throws Exception {
+        Artist artist = new Artist("kim-artist");
+        artist.addTranslation(SiteLocale.KO, "김아무개", "연출", "**질문**\n\n![현장](image:9)", "참여작품");
+        when(artistService.getPublished("kim-artist")).thenReturn(artist);
+        when(mediaService.listPublished(com.finediningtheater.media.MediaOwnerType.ARTIST, null)).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/artists/kim-artist"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.bio").value("**질문**\n\n![현장](image:9)"))
+                .andExpect(jsonPath("$.data.images").isArray());
+    }
 }

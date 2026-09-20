@@ -4,6 +4,7 @@ import com.finediningtheater.artist.Artist;
 import com.finediningtheater.artist.ArtistTranslation;
 import com.finediningtheater.global.support.SiteLocale;
 import com.finediningtheater.media.dto.MediaAssetResponse;
+import java.util.List;
 
 public record ArtistDetailResponse(
         Long id,
@@ -16,9 +17,11 @@ public record ArtistDetailResponse(
         String email,
         String interviewUrl,
         String linkUrl,
-        MediaAssetResponse photo) {
+        MediaAssetResponse photo,
+        List<MediaAssetResponse> images) {
 
-    public static ArtistDetailResponse from(Artist artist, SiteLocale locale, MediaAssetResponse photo) {
+    public static ArtistDetailResponse from(
+            Artist artist, SiteLocale locale, MediaAssetResponse photo, List<MediaAssetResponse> images) {
         ArtistTranslation translation = artist.translationFor(locale);
         return new ArtistDetailResponse(
                 artist.getId(),
@@ -31,6 +34,7 @@ public record ArtistDetailResponse(
                 artist.getEmail(),
                 artist.getInterviewUrl(),
                 artist.getLinkUrl(),
-                photo);
+                photo,
+                images);
     }
 }

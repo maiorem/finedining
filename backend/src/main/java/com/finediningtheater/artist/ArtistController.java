@@ -47,7 +47,14 @@ public class ArtistController {
             @AuthenticationPrincipal AdminPrincipal principal) {
         Artist artist =
                 (preview && principal != null) ? artistService.getForPreview(slug) : artistService.getPublished(slug);
-        return ApiResponse.success(ArtistDetailResponse.from(artist, lang, photoFor(artist)));
+        return ApiResponse.success(ArtistDetailResponse.from(artist, lang, photoFor(artist), imagesFor(artist)));
+    }
+
+    // 본문 마크다운의 image:번호를 풀어 그리는 데 쓴다. 프로필 사진(photo)은 이 중 첫 장이다.
+    private List<MediaAssetResponse> imagesFor(Artist artist) {
+        return mediaService.listPublished(MediaOwnerType.ARTIST, artist.getId()).stream()
+                .map(asset -> MediaAssetResponse.from(asset, mediaService))
+                .toList();
     }
 
     private MediaAssetResponse photoFor(Artist artist) {
