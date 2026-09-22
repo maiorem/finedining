@@ -17,6 +17,7 @@ export type ProductionAdmin = {
   slug: string;
   status: "DRAFT" | "PUBLISHED";
   bookingUrl: string | null;
+  nolBookingUrl: string | null;
   locationUrl: string | null;
   translations: ProductionTranslationView[];
   images: MediaAsset[];
@@ -67,6 +68,15 @@ export function changeProductionBookingUrl(
   bookingUrl: string | null,
 ): Promise<ProductionAdmin> {
   return apiAdminPut<ProductionAdmin>(`/api/productions/${id}/booking-url`, accessToken, { bookingUrl });
+}
+
+/** 놀(NOL) 예약 URL 변경 — bookingUrl(네이버)과 같은 취급이다. PIN sudo 모드가 필요하다(CLAUDE.md §3.4). */
+export function changeProductionNolBookingUrl(
+  accessToken: string,
+  id: number,
+  nolBookingUrl: string | null,
+): Promise<ProductionAdmin> {
+  return apiAdminPut<ProductionAdmin>(`/api/productions/${id}/nol-booking-url`, accessToken, { nolBookingUrl });
 }
 
 export function changeProductionLocationUrl(

@@ -152,7 +152,7 @@
   "editing.panel.artistCreditsLabel": "Credits",
   "editing.panel.artistCreditsPlaceholder": "List credits freely, including work outside this site. Separate entries with line breaks.",
   "editing.panel.aboutIntroLabel": "Intro",
-  "editing.panel.productionBookingUrlLabel": "Booking link",
+  "editing.panel.productionBookingUrlLabel": "Naver booking link",
   "editing.panel.productionLocationUrlLabel": "Location link",
   "editing.panel.saveDraft": "Save draft",
   "editing.panel.saved": "Draft saved.",
@@ -338,7 +338,7 @@
   "ft.banjul.heading": "Meet at a table\nholding 52 years of time.",
   "ft.banjul.body": "A place that has made people's meals\nin the same spot for a long time.\n\"Finedining – Father's Table\" meets its audience\nat Banjul in Jongno.\nOn top of the time this place has held,\nanother story is laid.\n\nToday, sit down\nat a table that holds someone's life.",
   "ft.banjul.alt": "Banjul, Jongno",
-  "ft.finalCta": "Book Finedining – Father's Table",
+  "ft.finalCta": "Finedining – Father's Table",
   "ft.reserveUnavailable": "The booking link is being prepared.",
   "ft.archive.heading": "Past performances",
   "ft.archive.alt2023": "2023 pilot performance poster",
@@ -418,5 +418,8 @@
   "reviews.imageAltLabel": "{{name}} — photo description (optional; read aloud to people who cannot see the screen)",
   "reviews.imageInsertDeferred": "Put in the text (uploaded when you post)",
   "ft.cutlet.alt1": "A memory of one person's labor 1",
-  "ft.cutlet.alt2": "A memory of one person's labor 2"
+  "ft.cutlet.alt2": "A memory of one person's labor 2",
+  "ft.reserveNaver": "Reserve via Naver",
+  "ft.reserveNol": "Reserve via NOL",
+  "editing.panel.productionNolBookingUrlLabel": "NOL booking link"
 }

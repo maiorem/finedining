@@ -44,18 +44,36 @@ function ExternalLink({ href, label, className }: { href: string; label: string;
   );
 }
 
-export function FathersTableDetail({ production, editSlot }: Props) {
+// 예약 플랫폼이 네이버 예약 + 놀(NOL) 둘로 확정됐다(2026-09-22) — 있는 링크만 버튼으로 보여주고,
+// 둘 다 없으면(아직 미확정) 자리표시 문구를 보여준다. 하나만 채워진 과도기에도 그대로 동작한다.
+function ReserveButtons({
+  bookingUrl,
+  nolBookingUrl,
+  className,
+}: {
+  bookingUrl: string | null;
+  nolBookingUrl: string | null;
+  className: string;
+}) {
   const { t } = useTranslation();
-  const { bookingUrl, locationUrl } = production;
-
-  const reserve = (label: string, className: string) =>
-    bookingUrl ? (
-      <ExternalLink href={bookingUrl} label={label} className={className} />
-    ) : (
+  if (!bookingUrl && !nolBookingUrl) {
+    return (
       <span className={`${className} ${styles.disabled}`} aria-disabled="true">
         {t("ft.reserveUnavailable")}
       </span>
     );
+  }
+  return (
+    <>
+      {bookingUrl && <ExternalLink href={bookingUrl} label={t("ft.reserveNaver")} className={className} />}
+      {nolBookingUrl && <ExternalLink href={nolBookingUrl} label={t("ft.reserveNol")} className={className} />}
+    </>
+  );
+}
+
+export function FathersTableDetail({ production, editSlot }: Props) {
+  const { t } = useTranslation();
+  const { bookingUrl, nolBookingUrl, locationUrl } = production;
 
   return (
     <>
@@ -66,7 +84,9 @@ export function FathersTableDetail({ production, editSlot }: Props) {
           <p className={styles.eyebrow}>{t("ft.eyebrow")}</p>
           <h1 className={styles.headline}>{t("ft.headline")}</h1>
           <p className={styles.intro}>{t("ft.intro")}</p>
-          {reserve(t("booking.reserve"), styles.cta)}
+          <div className={styles.actions}>
+            <ReserveButtons bookingUrl={bookingUrl} nolBookingUrl={nolBookingUrl} className={styles.cta} />
+          </div>
         </div>
       </section>
 
@@ -87,7 +107,7 @@ export function FathersTableDetail({ production, editSlot }: Props) {
           </dl>
           <p className={styles.infoTagline}>{t("ft.info.tagline")}</p>
           <div className={styles.actions}>
-            {reserve(t("booking.reserve"), styles.cta)}
+            <ReserveButtons bookingUrl={bookingUrl} nolBookingUrl={nolBookingUrl} className={styles.cta} />
             {locationUrl && <ExternalLink href={locationUrl} label={t("booking.location")} className={styles.cta} />}
           </div>
         </div>
@@ -179,7 +199,12 @@ export function FathersTableDetail({ production, editSlot }: Props) {
         <img className={styles.smallPhoto} src={banjul} alt={t("ft.banjul.alt")} width={309} height={288} loading="lazy" decoding="async" />
       </section>
 
-      <section className={`${styles.section} ${styles.finalCta}`}>{reserve(t("ft.finalCta"), styles.cta)}</section>
+      <section className={`${styles.section} ${styles.finalCta}`}>
+        <p className={styles.finalCtaHeading}>{t("ft.finalCta")}</p>
+        <div className={`${styles.actions} ${styles.finalCtaActions}`}>
+          <ReserveButtons bookingUrl={bookingUrl} nolBookingUrl={nolBookingUrl} className={styles.cta} />
+        </div>
+      </section>
 
       <section className={styles.section}>
         <h2 className={styles.archiveHeading}>{t("ft.archive.heading")}</h2>

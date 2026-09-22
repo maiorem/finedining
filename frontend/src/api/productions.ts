@@ -21,6 +21,7 @@ export type ProductionDetail = {
   subtitle: string | null;
   description: string | null;
   bookingUrl: string | null;
+  nolBookingUrl: string | null;
   locationUrl: string | null;
   images: MediaAsset[];
 };

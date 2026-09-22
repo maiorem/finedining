@@ -239,8 +239,24 @@
 
 .finalCta {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
   color: var(--c-ink);
+}
+
+.finalCtaHeading {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: var(--w-display);
+  font-size: var(--t-h2);
+  line-height: var(--lh-tight);
+  white-space: pre-line;
+}
+
+.finalCtaActions {
+  justify-content: center;
 }
 
 @media (min-width: 768px) {

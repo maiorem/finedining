@@ -130,6 +130,43 @@ describe("ProductionEditPanel", () => {
     });
   });
 
+  // 예약 플랫폼이 네이버+놀(NOL) 둘로 늘었다(2026-09-22) — 저장 버튼 하나로 둘 다 저장되는지 고정한다.
+  it("저장 버튼 하나로 놀(NOL) 예약 링크도 함께 저장한다", async () => {
+    const user = userEvent.setup();
+    const putCalls: string[] = [];
+    const fetchMock = vi.fn((input: string, init?: RequestInit) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: true, data: { accessToken: "t", username: "admin", role: "EDITOR" }, error: null }),
+        );
+      }
+      if (init?.method === "PUT") {
+        putCalls.push(input);
+      }
+      return Promise.resolve(jsonResponse({ success: true, data: adminData("DRAFT"), error: null }));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AdminAuthProvider>
+          <ProductionEditPanel productionId={1} />
+        </AdminAuthProvider>
+      </QueryClientProvider>,
+    );
+
+    await user.type(
+      await screen.findByPlaceholderText("https://nol.yanolja.com/..."),
+      "https://nol.yanolja.com/ticket/products/26013867",
+    );
+    await user.click(screen.getByRole("button", { name: "임시저장" }));
+
+    await waitFor(() => {
+      expect(putCalls).toEqual(expect.arrayContaining(["/api/productions/1/nol-booking-url"]));
+    });
+  });
+
   // "임시저장"을 따로 눌러야만 발행이 최신 값을 반영하던 게 귀찮다는 피드백 — 이제 "발행하기"
   // 한 번으로 제목·링크 저장과 발행이 함께 일어나야 한다.
   it("임시저장 없이 발행하기만 눌러도 제목·링크 저장과 발행이 함께 일어난다", async () => {

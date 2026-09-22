@@ -152,7 +152,7 @@
   "editing.panel.artistCreditsLabel": "참여 작품",
   "editing.panel.artistCreditsPlaceholder": "다른 프로젝트 참여 이력도 자유롭게 적어 주세요. 줄바꿈으로 구분됩니다.",
   "editing.panel.aboutIntroLabel": "소개문",
-  "editing.panel.productionBookingUrlLabel": "예약 링크",
+  "editing.panel.productionBookingUrlLabel": "네이버 예약 링크",
   "editing.panel.productionLocationUrlLabel": "위치 링크",
   "editing.panel.saveDraft": "임시저장",
   "editing.panel.saved": "임시저장되었습니다.",
@@ -338,7 +338,7 @@
   "ft.banjul.heading": "52년의 시간을 품은\n식탁에서 만납니다.",
   "ft.banjul.body": "오랜 시간 한자리에서\n사람들의 식사를 만들어온 공간.\n〈파인다이닝 – 아버지의 식탁〉은\n종로 반쥴에서 관객을 만납니다.\n이 공간이 품어온 시간 위에\n또 하나의 이야기가 놓입니다.\n\n오늘,\n누군가의 삶이 담긴 식탁에\n마주 앉아보세요.",
   "ft.banjul.alt": "종로 반쥴",
-  "ft.finalCta": "파인다이닝 – 아버지의 식탁 예약하기",
+  "ft.finalCta": "파인다이닝 – 아버지의 식탁",
   "ft.reserveUnavailable": "예약 링크를 준비하고 있습니다.",
   "ft.archive.heading": "지난 공연",
   "ft.archive.alt2023": "2023 시범공연 포스터",
@@ -418,5 +418,8 @@
   "reviews.imageAltLabel": "{{name}} — 사진 설명 (선택, 화면을 못 보는 분께 읽어 줍니다)",
   "reviews.imageInsertDeferred": "본문에 넣기 (등록할 때 올라갑니다)",
   "ft.cutlet.alt1": "한 사람의 노동의 기억 1",
-  "ft.cutlet.alt2": "한 사람의 노동의 기억 2"
+  "ft.cutlet.alt2": "한 사람의 노동의 기억 2",
+  "ft.reserveNaver": "네이버 예약하기",
+  "ft.reserveNol": "놀(NOL) 예약하기",
+  "editing.panel.productionNolBookingUrlLabel": "놀(NOL) 예약 링크"
 }

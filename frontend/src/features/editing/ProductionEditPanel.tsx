@@ -5,6 +5,7 @@ import { useAdminAuth } from "../../contexts/AdminAuthContext";
 import {
   changeProductionBookingUrl,
   changeProductionLocationUrl,
+  changeProductionNolBookingUrl,
   getProductionForAdmin,
   publishProduction,
   saveDraftTranslation,
@@ -61,6 +62,7 @@ export default function ProductionEditPanel({
   const [activeLocale, setActiveLocale] = useState<Locale>("KO");
   const [drafts, setDrafts] = useState<DraftState>(EMPTY_DRAFTS);
   const [bookingUrlDraft, setBookingUrlDraft] = useState("");
+  const [nolBookingUrlDraft, setNolBookingUrlDraft] = useState("");
   const [locationUrlDraft, setLocationUrlDraft] = useState("");
   const [pinAction, setPinAction] = useState<"publish" | "unpublish" | "save-links" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -86,6 +88,7 @@ export default function ProductionEditPanel({
       return next;
     });
     setBookingUrlDraft(data.bookingUrl ?? "");
+    setNolBookingUrlDraft(data.nolBookingUrl ?? "");
     setLocationUrlDraft(data.locationUrl ?? "");
   }, [data]);
 
@@ -117,6 +120,23 @@ export default function ProductionEditPanel({
 
   const bookingUrlMutation = useMutation({
     mutationFn: () => changeProductionBookingUrl(session!.accessToken, productionId, bookingUrlDraft || null),
+    onSuccess: () => {
+      setActionError(null);
+      setSaveNotice(t("editing.panel.saved"));
+      invalidate();
+    },
+    onError: (err: unknown) => {
+      setSaveNotice(null);
+      if (err instanceof ApiError && err.code === "PIN_REQUIRED") {
+        setPinAction("save-links");
+        return;
+      }
+      setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
+    },
+  });
+
+  const nolBookingUrlMutation = useMutation({
+    mutationFn: () => changeProductionNolBookingUrl(session!.accessToken, productionId, nolBookingUrlDraft || null),
     onSuccess: () => {
       setActionError(null);
       setSaveNotice(t("editing.panel.saved"));
@@ -175,6 +195,9 @@ export default function ProductionEditPanel({
       }
       if (bookingUrlDraft !== (data.bookingUrl ?? "")) {
         await changeProductionBookingUrl(session.accessToken, productionId, bookingUrlDraft || null);
+      }
+      if (nolBookingUrlDraft !== (data.nolBookingUrl ?? "")) {
+        await changeProductionNolBookingUrl(session.accessToken, productionId, nolBookingUrlDraft || null);
       }
       await publishProduction(session.accessToken, productionId);
       invalidate();
@@ -298,6 +321,16 @@ export default function ProductionEditPanel({
       </label>
 
       <label className={styles.field}>
+        <span>{t("editing.panel.productionNolBookingUrlLabel")}</span>
+        <input
+          type="url"
+          value={nolBookingUrlDraft}
+          onChange={(e) => setNolBookingUrlDraft(e.target.value)}
+          placeholder="https://nol.yanolja.com/..."
+        />
+      </label>
+
+      <label className={styles.field}>
         <span>{t("editing.panel.productionLocationUrlLabel")}</span>
         <input
           type="url"
@@ -317,15 +350,21 @@ export default function ProductionEditPanel({
       <button
         type="button"
         className={styles.saveButton}
-        disabled={saveDraftMutation.isPending || bookingUrlMutation.isPending || locationUrlMutation.isPending}
+        disabled={
+          saveDraftMutation.isPending ||
+          bookingUrlMutation.isPending ||
+          nolBookingUrlMutation.isPending ||
+          locationUrlMutation.isPending
+        }
         onClick={() => {
           setSaveNotice(null);
           setActionError(null);
           saveDraftMutation.mutate();
-          // 값이 바뀌지 않았으면 보내지 않는다 — bookingUrl은 매번 sudo(PIN)를 요구하므로(§3.4),
+          // 값이 바뀌지 않았으면 보내지 않는다 — 예약 URL은 매번 sudo(PIN)를 요구하므로(§3.4),
           // 건드리지 않은 예약 링크 때문에 제목만 고치려는 저장에도 PIN이 뜨면 안 된다.
           if (locationUrlDraft !== (data.locationUrl ?? "")) locationUrlMutation.mutate();
           if (bookingUrlDraft !== (data.bookingUrl ?? "")) bookingUrlMutation.mutate();
+          if (nolBookingUrlDraft !== (data.nolBookingUrl ?? "")) nolBookingUrlMutation.mutate();
         }}
       >
         {t("editing.panel.saveDraft")}
@@ -374,7 +413,11 @@ export default function ProductionEditPanel({
             setPinAction(null);
             if (action === "publish") void handlePublish();
             if (action === "unpublish") unpublishMutation.mutate();
-            if (action === "save-links") bookingUrlMutation.mutate();
+            if (action === "save-links") {
+              // 둘 중 어느 쪽이 PIN_REQUIRED를 냈는지 알 수 없으니, 바뀐 값이 있는 쪽을 다시 보낸다.
+              if (bookingUrlDraft !== (data.bookingUrl ?? "")) bookingUrlMutation.mutate();
+              if (nolBookingUrlDraft !== (data.nolBookingUrl ?? "")) nolBookingUrlMutation.mutate();
+            }
           }}
         />
       )}

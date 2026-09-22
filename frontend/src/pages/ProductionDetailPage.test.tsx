@@ -241,6 +241,48 @@ describe("ProductionDetailPage", () => {
     expect(screen.getByRole("link", { name: /위치보기/ })).toHaveAttribute("href", "https://map.naver.com/y");
   });
 
+  it("아버지의 식탁은 네이버·놀 예약 링크가 둘 다 있으면 두 버튼을 각각 보여준다", async () => {
+    fetchMock.mockImplementation((input: string) => {
+      if (input.includes("/api/auth/admin/refresh")) {
+        return Promise.resolve(
+          jsonResponse({ success: false, data: null, error: { code: "UNAUTHORIZED", message: "x" } }),
+        );
+      }
+      return Promise.resolve(
+        jsonResponse({
+          success: true,
+          data: {
+            id: 1,
+            slug: "showcase",
+            title: "아버지의 식탁",
+            subtitle: null,
+            description: null,
+            bookingUrl: "https://booking.naver.com/booking/12/bizes/1741081",
+            nolBookingUrl: "https://nol.yanolja.com/ticket/products/26013867",
+            locationUrl: null,
+            images: [],
+          },
+          error: null,
+        }),
+      );
+    });
+
+    renderAt("/productions/showcase");
+
+    await screen.findByRole("heading", { level: 1 });
+    const naverLinks = screen.getAllByRole("link", { name: /네이버 예약하기/ });
+    const nolLinks = screen.getAllByRole("link", { name: /놀\(NOL\) 예약하기/ });
+    expect(naverLinks.length).toBeGreaterThan(0);
+    expect(nolLinks.length).toBeGreaterThan(0);
+    for (const link of naverLinks) {
+      expect(link).toHaveAttribute("href", "https://booking.naver.com/booking/12/bizes/1741081");
+      expect(link).toHaveAttribute("target", "_blank");
+    }
+    for (const link of nolLinks) {
+      expect(link).toHaveAttribute("href", "https://nol.yanolja.com/ticket/products/26013867");
+    }
+  });
+
   it("고정 상세가 아닌 작품은 설명을 마크다운으로 그리고 본문에 넣은 사진은 갤러리에서 뺀다", async () => {
     fetchMock.mockImplementation((input: string) => {
       if (input.includes("/api/auth/admin/refresh")) {
