@@ -13,6 +13,7 @@ public record ProductionDetailResponse(
         String subtitle,
         String description,
         String bookingUrl,
+        String nolBookingUrl,
         String locationUrl,
         List<MediaAssetResponse> images) {
 
@@ -26,6 +27,7 @@ public record ProductionDetailResponse(
                 translation == null ? null : translation.getSubtitle(),
                 translation == null ? null : translation.getDescription(),
                 production.getBookingUrl(),
+                production.getNolBookingUrl(),
                 production.getLocationUrl(),
                 images);
     }

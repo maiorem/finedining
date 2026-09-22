@@ -11,6 +11,7 @@ import com.finediningtheater.media.MediaService;
 import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.production.dto.ChangeProductionBookingUrlRequest;
 import com.finediningtheater.production.dto.ChangeProductionLocationUrlRequest;
+import com.finediningtheater.production.dto.ChangeProductionNolBookingUrlRequest;
 import com.finediningtheater.production.dto.CreateProductionRequest;
 import com.finediningtheater.production.dto.ProductionAdminResponse;
 import com.finediningtheater.production.dto.UpsertTranslationRequest;
@@ -174,6 +175,30 @@ public class ProductionEditController {
                 id,
                 Map.of("bookingUrl", beforeUrl),
                 Map.of("bookingUrl", String.valueOf(after.getBookingUrl())),
+                ClientIp.resolve(httpRequest));
+
+        return ApiResponse.success(toAdminResponse(after));
+    }
+
+    /** 놀(NOL) 예약 URL 변경 — bookingUrl(네이버)과 같은 취급이다. 화이트리스트 검증 + PIN sudo 필요(§3.4). */
+    @PutMapping("/{id}/nol-booking-url")
+    public ApiResponse<ProductionAdminResponse> changeNolBookingUrl(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangeProductionNolBookingUrlRequest request,
+            @AuthenticationPrincipal AdminPrincipal principal,
+            HttpServletRequest httpRequest) {
+        sudoMode.requireActive(principal.id());
+
+        String beforeUrl = String.valueOf(productionService.getForAdmin(id).getNolBookingUrl());
+        Production after = productionService.changeNolBookingUrl(id, request.nolBookingUrl());
+
+        auditLogger.record(
+                principal.id(),
+                "PRODUCTION_NOL_BOOKING_URL_CHANGE",
+                "Production",
+                id,
+                Map.of("nolBookingUrl", beforeUrl),
+                Map.of("nolBookingUrl", String.valueOf(after.getNolBookingUrl())),
                 ClientIp.resolve(httpRequest));
 
         return ApiResponse.success(toAdminResponse(after));

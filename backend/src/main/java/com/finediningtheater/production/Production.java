@@ -36,6 +36,10 @@ public class Production extends Publishable {
     @Column(length = 500)
     private String locationUrl;
 
+    /** 놀(NOL by Yanolja) 예약 URL — 네이버 예약과 별개의 두 번째 예매 플랫폼(2026-09-22 확정). */
+    @Column(length = 500)
+    private String nolBookingUrl;
+
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProductionTranslation> translations = new ArrayList<>();
 
@@ -52,6 +56,11 @@ public class Production extends Publishable {
 
     public void changeLocationUrl(String locationUrl) {
         this.locationUrl = locationUrl;
+    }
+
+    /** 놀 예약 URL 변경도 bookingUrl과 같이 §3.4의 PIN 필수 목록에 있다 — 호출부가 sudo 모드를 강제한다. */
+    public void changeNolBookingUrl(String nolBookingUrl) {
+        this.nolBookingUrl = nolBookingUrl;
     }
 
     /**

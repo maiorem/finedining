@@ -9,6 +9,7 @@ public record ProductionAdminResponse(
         String slug,
         String status,
         String bookingUrl,
+        String nolBookingUrl,
         String locationUrl,
         List<TranslationView> translations,
         List<MediaAssetResponse> images) {
@@ -43,6 +44,7 @@ public record ProductionAdminResponse(
                 production.getSlug(),
                 production.getStatus().name(),
                 production.getBookingUrl(),
+                production.getNolBookingUrl(),
                 production.getLocationUrl(),
                 views,
                 images);

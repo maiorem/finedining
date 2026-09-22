@@ -179,4 +179,47 @@ class ProductionEditControllerTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error.code").value("PIN_REQUIRED"));
     }
+
+    @Test
+    void sudo가_열려있지_않으면_놀_예약_URL_변경도_거부한다() throws Exception {
+        loginAs(1L);
+        when(productionService.getForAdmin(1L)).thenReturn(new Production("showcase"));
+
+        mockMvc.perform(
+                        put("/api/productions/1/nol-booking-url")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"nolBookingUrl\":\"https://nol.yanolja.com/ticket/products/26013867\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error.code").value("PIN_REQUIRED"));
+    }
+
+    @Test
+    @DirtiesContext
+    void sudo가_열려있으면_놀_예약_URL_변경에_성공하고_감사로그를_남긴다() throws Exception {
+        loginAs(1L);
+        sudoMode.activate(1L);
+        Production before = new Production("showcase");
+        Production after = new Production("showcase");
+        after.changeNolBookingUrl("https://nol.yanolja.com/ticket/products/26013867");
+        when(productionService.getForAdmin(1L)).thenReturn(before);
+        when(productionService.changeNolBookingUrl(1L, "https://nol.yanolja.com/ticket/products/26013867"))
+                .thenReturn(after);
+
+        mockMvc.perform(
+                        put("/api/productions/1/nol-booking-url")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"nolBookingUrl\":\"https://nol.yanolja.com/ticket/products/26013867\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.nolBookingUrl").value("https://nol.yanolja.com/ticket/products/26013867"));
+
+        verify(auditLogger)
+                .record(
+                        eq(1L),
+                        eq("PRODUCTION_NOL_BOOKING_URL_CHANGE"),
+                        eq("Production"),
+                        eq(1L),
+                        any(),
+                        any(),
+                        any());
+    }
 }

@@ -40,7 +40,7 @@ public class BookingUrlValidator {
 
         if (host == null || !allowedHosts.contains(host.toLowerCase(Locale.ROOT))) {
             throw new BusinessException(
-                    ErrorCode.VALIDATION_ERROR, "허용되지 않은 예약 플랫폼입니다. 네이버 예약 URL만 등록할 수 있습니다.");
+                    ErrorCode.VALIDATION_ERROR, "허용되지 않은 예약 플랫폼입니다. 네이버 예약·놀(NOL) URL만 등록할 수 있습니다.");
         }
     }
 }
