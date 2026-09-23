@@ -9,6 +9,7 @@ export type ProductionSummary = {
   id: number;
   slug: string;
   title: string;
+  subtitle: string | null;
   bookingUrl: string | null;
   locationUrl: string | null;
   thumbnail: MediaAsset | null;

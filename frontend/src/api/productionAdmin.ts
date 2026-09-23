@@ -19,6 +19,7 @@ export type ProductionAdmin = {
   bookingUrl: string | null;
   nolBookingUrl: string | null;
   locationUrl: string | null;
+  heroImageId: number | null;
   translations: ProductionTranslationView[];
   images: MediaAsset[];
 };
@@ -77,6 +78,19 @@ export function changeProductionNolBookingUrl(
   nolBookingUrl: string | null,
 ): Promise<ProductionAdmin> {
   return apiAdminPut<ProductionAdmin>(`/api/productions/${id}/nol-booking-url`, accessToken, { nolBookingUrl });
+}
+
+/**
+ * 상세에서 제목과 함께 보이는 큰 이미지를 목록 대표사진과 따로 고른다. heroImageId를 null로
+ * 보내면 지정을 해제하고 목록 대표사진(첫 번째 이미지)으로 되돌아간다. locationUrl과 같은
+ * 취급이라 PIN sudo가 필요 없다.
+ */
+export function changeProductionHeroImage(
+  accessToken: string,
+  id: number,
+  heroImageId: number | null,
+): Promise<ProductionAdmin> {
+  return apiAdminPut<ProductionAdmin>(`/api/productions/${id}/hero-image`, accessToken, { heroImageId });
 }
 
 export function changeProductionLocationUrl(

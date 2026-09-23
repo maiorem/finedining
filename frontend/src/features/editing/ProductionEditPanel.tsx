@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAdminAuth } from "../../contexts/AdminAuthContext";
 import {
   changeProductionBookingUrl,
+  changeProductionHeroImage,
   changeProductionLocationUrl,
   changeProductionNolBookingUrl,
   getProductionForAdmin,
@@ -213,6 +214,22 @@ export default function ProductionEditPanel({
     }
   }
 
+  // 대표 이미지 선택은 draft가 아니라 클릭 즉시 반영된다 — 임시저장/발행 버튼을 거치지 않는다.
+  // 현재 선택은 로컬 draft가 아니라 서버 값(data.heroImageId)을 그대로 기준으로 삼는다.
+  const heroImageMutation = useMutation({
+    mutationFn: (heroImageId: number | null) =>
+      changeProductionHeroImage(session!.accessToken, productionId, heroImageId),
+    onSuccess: () => {
+      setActionError(null);
+      setSaveNotice(t("editing.panel.saved"));
+      invalidate();
+    },
+    onError: (err: unknown) => {
+      setSaveNotice(null);
+      setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
+    },
+  });
+
   const unpublishMutation = useMutation({
     mutationFn: () => unpublishProduction(session!.accessToken, productionId),
     onSuccess: () => {
@@ -374,6 +391,55 @@ export default function ProductionEditPanel({
 
       <h3 className={styles.imagesHeading}>{t("editing.panel.imagesHeading")}</h3>
       <ImageDropzone ownerType="PRODUCTION" ownerId={productionId} images={data.images} onChanged={invalidate} />
+
+      {/* 목록 대표사진(첫 번째 이미지)과 별개로, 상세에서 제목과 함께 보이는 큰 이미지를 고른다.
+          고정 상세(아버지의 식탁, variant="side")는 히어로가 이 이미지 목록과 무관하게 하드코딩돼
+          있으므로 여기서는 필요 없다. */}
+      {variant === "center" && (
+        <>
+          <h3 className={styles.imagesHeading}>{t("editing.panel.heroImageHeading")}</h3>
+          <p className={styles.hint}>{t("editing.panel.heroImageHint")}</p>
+          {data.images.length === 0 ? (
+            <p className={styles.hint}>{t("editing.panel.heroImageEmpty")}</p>
+          ) : (
+            <ul className={styles.heroImageList}>
+              {data.images.map((image) => {
+                const isHero = data.heroImageId === image.id;
+                return (
+                  <li key={image.id}>
+                    <button
+                      type="button"
+                      className={isHero ? `${styles.heroImageOption} ${styles.heroImageOptionActive}` : styles.heroImageOption}
+                      aria-pressed={isHero}
+                      aria-label={
+                        isHero ? t("editing.panel.heroImageCurrent") : t("editing.panel.heroImageUse")
+                      }
+                      disabled={heroImageMutation.isPending}
+                      onClick={() => heroImageMutation.mutate(image.id)}
+                    >
+                      {image.url640 ? (
+                        <img src={image.url640} alt="" loading="lazy" decoding="async" />
+                      ) : (
+                        <span className={styles.heroImagePlaceholder}>{image.status}</span>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {data.heroImageId !== null && (
+            <button
+              type="button"
+              className={styles.saveButton}
+              disabled={heroImageMutation.isPending}
+              onClick={() => heroImageMutation.mutate(null)}
+            >
+              {t("editing.panel.heroImageReset")}
+            </button>
+          )}
+        </>
+      )}
 
       <hr className={styles.divider} />
 

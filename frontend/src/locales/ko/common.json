@@ -421,5 +421,11 @@
   "ft.cutlet.alt2": "한 사람의 노동의 기억 2",
   "ft.reserveNaver": "네이버 예약하기",
   "ft.reserveNol": "놀(NOL) 예약하기",
-  "editing.panel.productionNolBookingUrlLabel": "놀(NOL) 예약 링크"
+  "editing.panel.productionNolBookingUrlLabel": "놀(NOL) 예약 링크",
+  "editing.panel.heroImageHeading": "대표 이미지로 쓸 사진",
+  "editing.panel.heroImageHint": "상세 페이지 맨 위, 제목과 함께 보이는 큰 사진입니다. 고르지 않으면 목록의 대표사진(첫 번째 사진)을 그대로 씁니다.",
+  "editing.panel.heroImageEmpty": "먼저 위에서 사진을 올려 주세요.",
+  "editing.panel.heroImageReset": "선택 해제 (목록 대표사진 사용)",
+  "editing.panel.heroImageCurrent": "지금 대표 이미지로 쓰고 있습니다",
+  "editing.panel.heroImageUse": "이 사진을 대표 이미지로 쓰기"
 }

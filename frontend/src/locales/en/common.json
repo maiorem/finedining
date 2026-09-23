@@ -421,5 +421,11 @@
   "ft.cutlet.alt2": "A memory of one person's labor 2",
   "ft.reserveNaver": "Reserve via Naver",
   "ft.reserveNol": "Reserve via NOL",
-  "editing.panel.productionNolBookingUrlLabel": "NOL booking link"
+  "editing.panel.productionNolBookingUrlLabel": "NOL booking link",
+  "editing.panel.heroImageHeading": "Photo to use as the hero image",
+  "editing.panel.heroImageHint": "The large photo shown with the title at the top of the detail page. If you don't pick one, the list's representative photo (the first photo) is used.",
+  "editing.panel.heroImageEmpty": "Upload a photo above first.",
+  "editing.panel.heroImageReset": "Clear selection (use the list's photo)",
+  "editing.panel.heroImageCurrent": "Currently used as the hero image",
+  "editing.panel.heroImageUse": "Use this photo as the hero image"
 }

@@ -128,6 +128,69 @@
   color: var(--c-ink-60);
 }
 
+.hint {
+  margin: -0.5rem 0 0;
+  font-size: var(--t-caption);
+  color: var(--c-ink-60);
+  line-height: var(--lh-body);
+}
+
+.heroImageList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.heroImageOption {
+  display: block;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 1px solid var(--c-line);
+  background: var(--c-paper);
+  cursor: pointer;
+}
+
+.heroImageOption img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.heroImageOption:hover:not(:disabled) {
+  border-color: var(--c-ink);
+}
+
+.heroImageOption:focus-visible {
+  outline: 2px solid var(--c-spot);
+  outline-offset: 2px;
+}
+
+.heroImageOption:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 지금 상세 히어로로 쓰이는 사진 — spot 컬러는 §8.3이 정한 세 곳 전용이라 여기서는 .tabActive와
+   같이 무채색 굵은 테두리로만 표시한다. */
+.heroImageOptionActive {
+  border: 2px solid var(--c-ink);
+}
+
+.heroImagePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--c-ink-35);
+  font-size: var(--t-caption);
+}
+
 .publishRow {
   display: flex;
   align-items: center;

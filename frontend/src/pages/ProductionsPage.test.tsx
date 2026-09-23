@@ -53,6 +53,7 @@ describe("ProductionsPage", () => {
           id: 1,
           slug: "showcase",
           title: "쇼케이스",
+          subtitle: null,
           bookingUrl: null,
           locationUrl: null,
           thumbnail: { id: 2, status: "READY", url640: "http://example.com/640.jpg", lqipBase64: null },
@@ -68,6 +69,38 @@ describe("ProductionsPage", () => {
     // DOM에서 직접 확인한다.
     expect(link.querySelector("img")).toHaveAttribute("src", "http://example.com/640.jpg");
     expect(screen.queryByRole("button", { name: "새 작품 추가" })).not.toBeInTheDocument();
+  });
+
+  it("부제가 있으면 제목 위에 보여주고, 없으면 아무것도 렌더하지 않는다(필수 아님)", async () => {
+    fetchMock.mockImplementation(
+      mockUnauthenticatedThen([
+        {
+          id: 1,
+          slug: "showcase",
+          title: "쇼케이스",
+          subtitle: "한 사람의 삶을 담은 이야기",
+          bookingUrl: null,
+          locationUrl: null,
+          thumbnail: null,
+        },
+        {
+          id: 2,
+          slug: "no-subtitle",
+          title: "부제_없는_작품",
+          subtitle: null,
+          bookingUrl: null,
+          locationUrl: null,
+          thumbnail: null,
+        },
+      ]),
+    );
+
+    renderPage();
+
+    expect(await screen.findByText("한 사람의 삶을 담은 이야기")).toBeInTheDocument();
+    // 부제가 없는 작품은 부제 문구 없이 제목만 렌더된다 — 필수값이 아님을 확인한다.
+    expect(await screen.findByRole("link", { name: /부제_없는_작품/ })).toBeInTheDocument();
+    expect(screen.getAllByText("한 사람의 삶을 담은 이야기")).toHaveLength(1);
   });
 
   it("작품마다 예약하기·위치보기 링크가 있으면 목록에 바로 보여준다", async () => {

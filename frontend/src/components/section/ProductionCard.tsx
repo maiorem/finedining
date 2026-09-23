@@ -25,6 +25,7 @@ export function ProductionCard({ production }: { production: ProductionSummary }
             />
           )}
         </div>
+        {production.subtitle && <p className={styles.subtitle}>{production.subtitle}</p>}
         <h3 className={styles.title}>{production.title}</h3>
       </Link>
 

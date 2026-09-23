@@ -28,12 +28,26 @@
   display: block;
 }
 
+/* 제목 위 작은 글씨 — 상세 히어로의 eyebrow와 같은 스타일이다(선택값, 없는 작품이 더 많다). */
+.subtitle {
+  margin: 0.75rem 0 0;
+  font-family: var(--f-util);
+  font-size: var(--t-caption);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--c-ink-60);
+}
+
 .title {
   font-family: var(--f-display);
   font-size: var(--t-h2);
   font-weight: var(--w-display);
   margin: 0.75rem 0 0;
   transition: color var(--d-fast) var(--e-out);
+}
+
+.subtitle + .title {
+  margin-top: 0.35rem;
 }
 
 .link:hover .title,
