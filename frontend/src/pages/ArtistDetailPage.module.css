@@ -102,8 +102,10 @@
   margin: 0 0 2.5rem;
 }
 
+/* inline-flex였으면 위 이메일/링크(.link, inline-block)와 같은 줄에 붙는다 — 블록으로 줄을 분리한다. */
 .backLink {
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
   align-items: center;
   min-height: 44px;
   margin-top: 3rem;
