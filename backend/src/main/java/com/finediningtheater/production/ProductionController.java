@@ -65,8 +65,10 @@ public class ProductionController {
     /**
      * 관리자가 대표 이미지로 지정한 사진이 있으면 맨 앞으로 보낸다 — 프론트는 첫 번째 사진을
      * 그대로 제목 옆 큰 이미지(히어로)로 쓰고 나머지를 아래 갤러리로 쓴다({@code
-     * ProductionDetailPage.tsx}). 지정한 사진이 삭제됐거나 아직 발행 전이라 목록에 없으면
-     * 조용히 원래 순서(=목록 대표사진이 맨 앞)로 되돌아간다.
+     * ProductionDetailPage.tsx}). 목록 대표사진(원래 첫 번째 이미지)은 대표 이미지로 다시
+     * 쓰이는 게 아니라면 상세에서 아예 뺀다 — 그대로 두면 히어로 자리에서 밀려나 본문 아래
+     * 갤러리에 다시 나타나 목록과 상세에 같은 사진이 두 번 보이게 된다(2026-09-24). 지정한
+     * 사진이 삭제됐거나 아직 발행 전이라 목록에 없으면 조용히 원래 순서로 되돌아간다.
      */
     private List<MediaAssetResponse> imagesFor(Production production) {
         List<MediaAsset> assets = mediaService.listPublished(MediaOwnerType.PRODUCTION, production.getId());
@@ -92,6 +94,7 @@ public class ProductionController {
         }
         List<MediaAsset> reordered = new ArrayList<>(assets);
         MediaAsset hero = reordered.remove(heroIndex);
+        reordered.remove(0); // 목록 대표사진(원래 첫 번째) — 다른 사진이 히어로로 뽑혔으니 상세에서는 더 이상 안 보여준다
         reordered.add(0, hero);
         return reordered;
     }
