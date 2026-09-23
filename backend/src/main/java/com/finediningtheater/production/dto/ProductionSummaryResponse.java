@@ -8,6 +8,7 @@ public record ProductionSummaryResponse(
         Long id,
         String slug,
         String title,
+        String subtitle,
         String bookingUrl,
         String locationUrl,
         MediaAssetResponse thumbnail) {
@@ -18,6 +19,7 @@ public record ProductionSummaryResponse(
                 production.getId(),
                 production.getSlug(),
                 production.titleFor(locale),
+                production.subtitleFor(locale),
                 production.getBookingUrl(),
                 production.getLocationUrl(),
                 thumbnail);

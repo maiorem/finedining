@@ -10,6 +10,7 @@ import com.finediningtheater.media.MediaOwnerType;
 import com.finediningtheater.media.MediaService;
 import com.finediningtheater.media.dto.MediaAssetResponse;
 import com.finediningtheater.production.dto.ChangeProductionBookingUrlRequest;
+import com.finediningtheater.production.dto.ChangeProductionHeroImageRequest;
 import com.finediningtheater.production.dto.ChangeProductionLocationUrlRequest;
 import com.finediningtheater.production.dto.ChangeProductionNolBookingUrlRequest;
 import com.finediningtheater.production.dto.CreateProductionRequest;
@@ -221,6 +222,32 @@ public class ProductionEditController {
                 id,
                 Map.of("locationUrl", beforeUrl),
                 Map.of("locationUrl", String.valueOf(after.getLocationUrl())),
+                ClientIp.resolve(httpRequest));
+
+        return ApiResponse.success(toAdminResponse(after));
+    }
+
+    /**
+     * 상세에서 제목과 함께 보이는 큰 이미지를 목록 대표사진과 따로 고른다. 화이트리스트 검증할
+     * 대상이 없고 공개적으로 바로 노출되긴 하지만 URL 변경처럼 되돌리기 어려운 동작은 아니라서
+     * locationUrl과 같은 취급이다 — PIN sudo를 요구하지 않는다.
+     */
+    @PutMapping("/{id}/hero-image")
+    public ApiResponse<ProductionAdminResponse> changeHeroImage(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangeProductionHeroImageRequest request,
+            @AuthenticationPrincipal AdminPrincipal principal,
+            HttpServletRequest httpRequest) {
+        String beforeId = String.valueOf(productionService.getForAdmin(id).getHeroImageId());
+        Production after = productionService.changeHeroImage(id, request.heroImageId());
+
+        auditLogger.record(
+                principal.id(),
+                "PRODUCTION_HERO_IMAGE_CHANGE",
+                "Production",
+                id,
+                Map.of("heroImageId", beforeId),
+                Map.of("heroImageId", String.valueOf(after.getHeroImageId())),
                 ClientIp.resolve(httpRequest));
 
         return ApiResponse.success(toAdminResponse(after));

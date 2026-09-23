@@ -222,4 +222,42 @@ class ProductionEditControllerTest {
                         any(),
                         any());
     }
+
+    // 대표 이미지 지정은 위치 링크와 같은 취급이다 — PIN sudo 없이 바로 된다.
+    @Test
+    void 대표_이미지_지정은_sudo_없이_성공하고_감사로그를_남긴다() throws Exception {
+        loginAs(1L);
+        Production before = new Production("showcase");
+        Production after = new Production("showcase");
+        after.changeHeroImage(7L);
+        when(productionService.getForAdmin(1L)).thenReturn(before);
+        when(productionService.changeHeroImage(1L, 7L)).thenReturn(after);
+
+        mockMvc.perform(
+                        put("/api/productions/1/hero-image")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"heroImageId\":7}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.heroImageId").value(7));
+
+        verify(auditLogger)
+                .record(eq(1L), eq("PRODUCTION_HERO_IMAGE_CHANGE"), eq("Production"), eq(1L), any(), any(), any());
+    }
+
+    @Test
+    void 대표_이미지_지정을_null로_보내면_해제한다() throws Exception {
+        loginAs(1L);
+        Production before = new Production("showcase");
+        before.changeHeroImage(7L);
+        Production after = new Production("showcase");
+        when(productionService.getForAdmin(1L)).thenReturn(before);
+        when(productionService.changeHeroImage(1L, null)).thenReturn(after);
+
+        mockMvc.perform(
+                        put("/api/productions/1/hero-image")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"heroImageId\":null}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.heroImageId").doesNotExist());
+    }
 }

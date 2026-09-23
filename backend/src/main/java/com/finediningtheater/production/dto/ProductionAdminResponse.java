@@ -11,6 +11,7 @@ public record ProductionAdminResponse(
         String bookingUrl,
         String nolBookingUrl,
         String locationUrl,
+        Long heroImageId,
         List<TranslationView> translations,
         List<MediaAssetResponse> images) {
 
@@ -46,6 +47,7 @@ public record ProductionAdminResponse(
                 production.getBookingUrl(),
                 production.getNolBookingUrl(),
                 production.getLocationUrl(),
+                production.getHeroImageId(),
                 views,
                 images);
     }

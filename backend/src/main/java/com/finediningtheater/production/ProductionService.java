@@ -4,6 +4,7 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.ContentStatus;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaAsset;
 import com.finediningtheater.media.MediaOwnerType;
 import com.finediningtheater.media.MediaService;
 import java.util.List;
@@ -124,6 +125,24 @@ public class ProductionService {
         }
         Production production = getForAdmin(id);
         production.changeNolBookingUrl(nolBookingUrl);
+        return production;
+    }
+
+    /**
+     * 상세의 대표 이미지 지정. null이면 지정을 해제한다(목록 대표사진으로 되돌아간다). 이 작품에
+     * 속한 이미지만 지정할 수 있다 — 다른 작품의 이미지 id를 넣지 못하게 막는다.
+     */
+    @Transactional
+    @CacheEvict(value = {"productions", "productionDetail"}, allEntries = true)
+    public Production changeHeroImage(Long id, Long heroImageId) {
+        Production production = getForAdmin(id);
+        if (heroImageId != null) {
+            MediaAsset asset = mediaService.get(heroImageId);
+            if (asset.getOwnerType() != MediaOwnerType.PRODUCTION || !asset.getOwnerId().equals(id)) {
+                throw new BusinessException(ErrorCode.VALIDATION_ERROR, "이 작품에 속한 이미지만 대표 이미지로 지정할 수 있습니다.");
+            }
+        }
+        production.changeHeroImage(heroImageId);
         return production;
     }
 }

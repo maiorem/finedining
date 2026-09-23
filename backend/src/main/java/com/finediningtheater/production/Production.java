@@ -40,6 +40,14 @@ public class Production extends Publishable {
     @Column(length = 500)
     private String nolBookingUrl;
 
+    /**
+     * 상세에서 제목과 함께 보이는 큰 이미지로 쓸 MediaAsset id(2026-09-23). null이면 목록
+     * 대표사진(첫 번째 이미지)을 그대로 쓴다 — media_asset과 FK로 묶지 않으므로(§6) 가리키는
+     * 사진이 삭제돼도 조회 시점에 조용히 대표사진으로 되돌아간다(ProductionController).
+     */
+    @Column
+    private Long heroImageId;
+
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProductionTranslation> translations = new ArrayList<>();
 
@@ -63,6 +71,11 @@ public class Production extends Publishable {
         this.nolBookingUrl = nolBookingUrl;
     }
 
+    /** null을 넣으면 대표 이미지 지정을 해제하고 목록 대표사진(첫 번째 이미지)으로 되돌린다. */
+    public void changeHeroImage(Long heroImageId) {
+        this.heroImageId = heroImageId;
+    }
+
     /**
      * 공개 조회 전용. 요청 로케일에 공개본 제목이 없으면(아직 미발행) 한국어로 폴백한다
      * (CLAUDE.md §7.6). draft만 있고 title이 null인 행은 여기서 걸러진다 — 초안이 방문자에게
@@ -83,6 +96,12 @@ public class Production extends Publishable {
     public String titleFor(SiteLocale locale) {
         ProductionTranslation translation = translationFor(locale);
         return translation == null ? null : translation.getTitle();
+    }
+
+    /** 목록 카드 제목 위 작은 글씨용 — 필수값이 아니라 없는 작품이 많다(§7.6 한국어 폴백 포함). */
+    public String subtitleFor(SiteLocale locale) {
+        ProductionTranslation translation = translationFor(locale);
+        return translation == null ? null : translation.getSubtitle();
     }
 
     /** 편집용. 공개 여부와 무관하게 정확히 그 로케일 행을 찾는다 — 없으면 null. */

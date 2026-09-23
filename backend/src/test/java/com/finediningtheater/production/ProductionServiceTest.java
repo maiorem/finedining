@@ -10,6 +10,8 @@ import com.finediningtheater.global.error.BusinessException;
 import com.finediningtheater.global.error.ErrorCode;
 import com.finediningtheater.global.support.ContentStatus;
 import com.finediningtheater.global.support.SiteLocale;
+import com.finediningtheater.media.MediaAsset;
+import com.finediningtheater.media.MediaOwnerType;
 import com.finediningtheater.media.MediaService;
 import java.util.List;
 import java.util.Optional;
@@ -176,5 +178,55 @@ class ProductionServiceTest {
         Production result = productionService().changeLocationUrl(1L, "https://map.naver.com/p/somewhere");
 
         assertThat(result.getLocationUrl()).isEqualTo("https://map.naver.com/p/somewhere");
+    }
+
+    @Test
+    void 이_작품에_속한_이미지를_대표_이미지로_지정할_수_있다() {
+        Production production = new Production("showcase");
+        when(productionRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(production));
+        when(mediaService.get(5L)).thenReturn(new MediaAsset(MediaOwnerType.PRODUCTION, 1L, 0, "originals/a.jpg"));
+
+        Production result = productionService().changeHeroImage(1L, 5L);
+
+        assertThat(result.getHeroImageId()).isEqualTo(5L);
+    }
+
+    @Test
+    void 다른_작품에_속한_이미지는_대표_이미지로_지정할_수_없다() {
+        Production production = new Production("showcase");
+        when(productionRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(production));
+        when(mediaService.get(5L)).thenReturn(new MediaAsset(MediaOwnerType.PRODUCTION, 999L, 0, "originals/a.jpg"));
+
+        assertThatThrownBy(() -> productionService().changeHeroImage(1L, 5L))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(
+                        e ->
+                                assertThat(((BusinessException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.VALIDATION_ERROR));
+    }
+
+    @Test
+    void 다른_도메인의_이미지는_대표_이미지로_지정할_수_없다() {
+        Production production = new Production("showcase");
+        when(productionRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(production));
+        when(mediaService.get(5L)).thenReturn(new MediaAsset(MediaOwnerType.ARTIST, 1L, 0, "originals/a.jpg"));
+
+        assertThatThrownBy(() -> productionService().changeHeroImage(1L, 5L))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(
+                        e ->
+                                assertThat(((BusinessException) e).getErrorCode())
+                                        .isEqualTo(ErrorCode.VALIDATION_ERROR));
+    }
+
+    @Test
+    void 대표_이미지_지정을_null로_해제할_수_있다() {
+        Production production = new Production("showcase");
+        production.changeHeroImage(5L);
+        when(productionRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(production));
+
+        Production result = productionService().changeHeroImage(1L, null);
+
+        assertThat(result.getHeroImageId()).isNull();
     }
 }

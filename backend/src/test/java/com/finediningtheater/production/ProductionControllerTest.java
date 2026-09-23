@@ -48,7 +48,7 @@ class ProductionControllerTest {
     @Test
     void 발행된_작품_목록을_반환한다() throws Exception {
         Production production = new Production("showcase");
-        production.addTranslation(SiteLocale.KO, "쇼케이스", null);
+        production.addTranslation(SiteLocale.KO, "쇼케이스", "부제입니다");
         when(productionService.listPublished()).thenReturn(List.of(production));
 
         mockMvc.perform(get("/api/productions"))
@@ -56,7 +56,20 @@ class ProductionControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data", hasSize(1)))
                 .andExpect(jsonPath("$.data[0].slug").value("showcase"))
-                .andExpect(jsonPath("$.data[0].title").value("쇼케이스"));
+                .andExpect(jsonPath("$.data[0].title").value("쇼케이스"))
+                .andExpect(jsonPath("$.data[0].subtitle").value("부제입니다"));
+    }
+
+    @Test
+    void 목록_응답의_부제는_필수가_아니다() throws Exception {
+        Production production = new Production("no-subtitle");
+        production.addTranslation(SiteLocale.KO, "제목만", null);
+        when(productionService.listPublished()).thenReturn(List.of(production));
+
+        mockMvc.perform(get("/api/productions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].title").value("제목만"))
+                .andExpect(jsonPath("$.data[0].subtitle").doesNotExist());
     }
 
     @Test
