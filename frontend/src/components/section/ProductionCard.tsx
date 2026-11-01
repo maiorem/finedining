@@ -29,7 +29,7 @@ export function ProductionCard({ production }: { production: ProductionSummary }
         <h3 className={styles.title}>{production.title}</h3>
       </Link>
 
-      {(production.bookingUrl || production.locationUrl) && (
+      {(production.bookingUrl || production.locationUrl || production.trailerUrl) && (
         <div className={styles.actions}>
           {production.bookingUrl && (
             <a
@@ -51,6 +51,17 @@ export function ProductionCard({ production }: { production: ProductionSummary }
               aria-label={`${t("booking.location")} (${t("booking.opensNewWindow")})`}
             >
               {t("booking.location")}
+            </a>
+          )}
+          {production.trailerUrl && (
+            <a
+              className={styles.actionLink}
+              href={production.trailerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${t("booking.trailer")} (${t("booking.opensNewWindow")})`}
+            >
+              {t("booking.trailer")}
             </a>
           )}
         </div>

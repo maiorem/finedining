@@ -7,6 +7,7 @@ import {
   changeProductionHeroImage,
   changeProductionLocationUrl,
   changeProductionNolBookingUrl,
+  changeProductionTrailerUrl,
   getProductionForAdmin,
   publishProduction,
   saveDraftTranslation,
@@ -65,6 +66,7 @@ export default function ProductionEditPanel({
   const [bookingUrlDraft, setBookingUrlDraft] = useState("");
   const [nolBookingUrlDraft, setNolBookingUrlDraft] = useState("");
   const [locationUrlDraft, setLocationUrlDraft] = useState("");
+  const [trailerUrlDraft, setTrailerUrlDraft] = useState("");
   const [pinAction, setPinAction] = useState<"publish" | "unpublish" | "save-links" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
@@ -91,6 +93,7 @@ export default function ProductionEditPanel({
     setBookingUrlDraft(data.bookingUrl ?? "");
     setNolBookingUrlDraft(data.nolBookingUrl ?? "");
     setLocationUrlDraft(data.locationUrl ?? "");
+    setTrailerUrlDraft(data.trailerUrl ?? "");
   }, [data]);
 
   function invalidate() {
@@ -166,6 +169,19 @@ export default function ProductionEditPanel({
     },
   });
 
+  const trailerUrlMutation = useMutation({
+    mutationFn: () => changeProductionTrailerUrl(session!.accessToken, productionId, trailerUrlDraft || null),
+    onSuccess: () => {
+      setActionError(null);
+      setSaveNotice(t("editing.panel.saved"));
+      invalidate();
+    },
+    onError: (err: unknown) => {
+      setSaveNotice(null);
+      setActionError(err instanceof ApiError ? err.message : t("editing.panel.saveFailed"));
+    },
+  });
+
   /**
    * "발행하기" 한 번으로 제목·설명(양쪽 로케일)·예약/위치 링크를 전부 저장한 뒤 발행까지
    * 마친다 — 따로 "임시저장"을 눌러야 했던 게 귀찮다는 피드백으로 합쳤다. bookingUrl 변경과
@@ -193,6 +209,9 @@ export default function ProductionEditPanel({
       }
       if (locationUrlDraft !== (data.locationUrl ?? "")) {
         await changeProductionLocationUrl(session.accessToken, productionId, locationUrlDraft || null);
+      }
+      if (trailerUrlDraft !== (data.trailerUrl ?? "")) {
+        await changeProductionTrailerUrl(session.accessToken, productionId, trailerUrlDraft || null);
       }
       if (bookingUrlDraft !== (data.bookingUrl ?? "")) {
         await changeProductionBookingUrl(session.accessToken, productionId, bookingUrlDraft || null);
@@ -357,6 +376,16 @@ export default function ProductionEditPanel({
         />
       </label>
 
+      <label className={styles.field}>
+        <span>{t("editing.panel.productionTrailerUrlLabel")}</span>
+        <input
+          type="url"
+          value={trailerUrlDraft}
+          onChange={(e) => setTrailerUrlDraft(e.target.value)}
+          placeholder="https://youtu.be/..."
+        />
+      </label>
+
       {saveNotice && <p className={styles.notice}>{saveNotice}</p>}
       {actionError && (
         <p className={styles.error} role="alert">
@@ -371,7 +400,8 @@ export default function ProductionEditPanel({
           saveDraftMutation.isPending ||
           bookingUrlMutation.isPending ||
           nolBookingUrlMutation.isPending ||
-          locationUrlMutation.isPending
+          locationUrlMutation.isPending ||
+          trailerUrlMutation.isPending
         }
         onClick={() => {
           setSaveNotice(null);
@@ -380,6 +410,7 @@ export default function ProductionEditPanel({
           // 값이 바뀌지 않았으면 보내지 않는다 — 예약 URL은 매번 sudo(PIN)를 요구하므로(§3.4),
           // 건드리지 않은 예약 링크 때문에 제목만 고치려는 저장에도 PIN이 뜨면 안 된다.
           if (locationUrlDraft !== (data.locationUrl ?? "")) locationUrlMutation.mutate();
+          if (trailerUrlDraft !== (data.trailerUrl ?? "")) trailerUrlMutation.mutate();
           if (bookingUrlDraft !== (data.bookingUrl ?? "")) bookingUrlMutation.mutate();
           if (nolBookingUrlDraft !== (data.nolBookingUrl ?? "")) nolBookingUrlMutation.mutate();
         }}

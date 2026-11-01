@@ -103,7 +103,7 @@ describe("ProductionsPage", () => {
     expect(screen.getAllByText("한 사람의 삶을 담은 이야기")).toHaveLength(1);
   });
 
-  it("작품마다 예약하기·위치보기 링크가 있으면 목록에 바로 보여준다", async () => {
+  it("작품마다 예약하기·위치보기·예고편보기 링크가 있으면 목록에 바로 보여준다", async () => {
     fetchMock.mockImplementation(
       mockUnauthenticatedThen([
         {
@@ -112,6 +112,7 @@ describe("ProductionsPage", () => {
           title: "쇼케이스",
           bookingUrl: "https://booking.naver.com/bizes/1",
           locationUrl: "https://map.naver.com/p/somewhere",
+          trailerUrl: "https://youtu.be/dQw4w9WgXcQ",
           thumbnail: null,
         },
       ]),
@@ -126,6 +127,32 @@ describe("ProductionsPage", () => {
 
     const locationLink = screen.getByRole("link", { name: /위치보기/ });
     expect(locationLink).toHaveAttribute("href", "https://map.naver.com/p/somewhere");
+
+    const trailerLink = screen.getByRole("link", { name: /예고편보기/ });
+    expect(trailerLink).toHaveAttribute("href", "https://youtu.be/dQw4w9WgXcQ");
+    expect(trailerLink).toHaveAttribute("target", "_blank");
+    expect(trailerLink).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  it("예고편 링크가 없으면 예고편보기 버튼을 보여주지 않는다", async () => {
+    fetchMock.mockImplementation(
+      mockUnauthenticatedThen([
+        {
+          id: 1,
+          slug: "showcase",
+          title: "쇼케이스",
+          bookingUrl: "https://booking.naver.com/bizes/1",
+          locationUrl: null,
+          trailerUrl: null,
+          thumbnail: null,
+        },
+      ]),
+    );
+
+    renderPage();
+
+    await screen.findByRole("link", { name: /예약하기/ });
+    expect(screen.queryByRole("link", { name: /예고편보기/ })).not.toBeInTheDocument();
   });
 
   it("작품이 없으면 빈 상태 문구를 보여준다", async () => {

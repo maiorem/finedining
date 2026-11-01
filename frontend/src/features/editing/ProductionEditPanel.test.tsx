@@ -117,6 +117,7 @@ describe("ProductionEditPanel", () => {
       "https://booking.naver.com/bizes/1",
     );
     await user.type(screen.getByPlaceholderText("https://map.naver.com/..."), "https://map.naver.com/p/somewhere");
+    await user.type(screen.getByPlaceholderText("https://youtu.be/..."), "https://youtu.be/dQw4w9WgXcQ");
     await user.click(screen.getByRole("button", { name: "임시저장" }));
 
     await waitFor(() => {
@@ -125,6 +126,7 @@ describe("ProductionEditPanel", () => {
           "/api/productions/1/translations/KO",
           "/api/productions/1/booking-url",
           "/api/productions/1/location-url",
+          "/api/productions/1/trailer-url",
         ]),
       );
     });
@@ -199,6 +201,7 @@ describe("ProductionEditPanel", () => {
       "https://booking.naver.com/bizes/1",
     );
     await user.type(screen.getByPlaceholderText("https://map.naver.com/..."), "https://map.naver.com/p/somewhere");
+    await user.type(screen.getByPlaceholderText("https://youtu.be/..."), "https://youtu.be/dQw4w9WgXcQ");
     // "임시저장"은 누르지 않는다 — 발행하기 한 번이 전부 처리해야 한다.
     await user.click(screen.getByRole("button", { name: "발행하기" }));
 
@@ -208,6 +211,7 @@ describe("ProductionEditPanel", () => {
           { url: "/api/productions/1/translations/KO", method: "PUT" },
           { url: "/api/productions/1/booking-url", method: "PUT" },
           { url: "/api/productions/1/location-url", method: "PUT" },
+          { url: "/api/productions/1/trailer-url", method: "PUT" },
           { url: "/api/productions/1/publish", method: "POST" },
         ]),
       );

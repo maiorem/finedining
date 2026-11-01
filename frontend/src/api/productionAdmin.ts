@@ -19,6 +19,7 @@ export type ProductionAdmin = {
   bookingUrl: string | null;
   nolBookingUrl: string | null;
   locationUrl: string | null;
+  trailerUrl: string | null;
   heroImageId: number | null;
   translations: ProductionTranslationView[];
   images: MediaAsset[];
@@ -99,4 +100,13 @@ export function changeProductionLocationUrl(
   locationUrl: string | null,
 ): Promise<ProductionAdmin> {
   return apiAdminPut<ProductionAdmin>(`/api/productions/${id}/location-url`, accessToken, { locationUrl });
+}
+
+/** 예고편 유튜브 URL 변경 — locationUrl과 같은 취급이라 PIN sudo가 필요 없다. */
+export function changeProductionTrailerUrl(
+  accessToken: string,
+  id: number,
+  trailerUrl: string | null,
+): Promise<ProductionAdmin> {
+  return apiAdminPut<ProductionAdmin>(`/api/productions/${id}/trailer-url`, accessToken, { trailerUrl });
 }

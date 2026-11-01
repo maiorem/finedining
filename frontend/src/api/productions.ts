@@ -12,6 +12,7 @@ export type ProductionSummary = {
   subtitle: string | null;
   bookingUrl: string | null;
   locationUrl: string | null;
+  trailerUrl: string | null;
   thumbnail: MediaAsset | null;
 };
 
