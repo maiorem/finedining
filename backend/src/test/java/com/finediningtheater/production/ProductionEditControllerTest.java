@@ -225,6 +225,26 @@ class ProductionEditControllerTest {
 
     // 대표 이미지 지정은 위치 링크와 같은 취급이다 — PIN sudo 없이 바로 된다.
     @Test
+    void 예고편_URL_변경은_sudo_없이_성공하고_감사로그를_남긴다() throws Exception {
+        loginAs(1L);
+        Production before = new Production("showcase");
+        Production after = new Production("showcase");
+        after.changeTrailerUrl("https://youtu.be/dQw4w9WgXcQ");
+        when(productionService.getForAdmin(1L)).thenReturn(before);
+        when(productionService.changeTrailerUrl(1L, "https://youtu.be/dQw4w9WgXcQ")).thenReturn(after);
+
+        mockMvc.perform(
+                        put("/api/productions/1/trailer-url")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"trailerUrl\":\"https://youtu.be/dQw4w9WgXcQ\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.trailerUrl").value("https://youtu.be/dQw4w9WgXcQ"));
+
+        verify(auditLogger)
+                .record(eq(1L), eq("PRODUCTION_TRAILER_URL_CHANGE"), eq("Production"), eq(1L), any(), any(), any());
+    }
+
+    @Test
     void 대표_이미지_지정은_sudo_없이_성공하고_감사로그를_남긴다() throws Exception {
         loginAs(1L);
         Production before = new Production("showcase");

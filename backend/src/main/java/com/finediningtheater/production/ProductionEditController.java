@@ -13,6 +13,7 @@ import com.finediningtheater.production.dto.ChangeProductionBookingUrlRequest;
 import com.finediningtheater.production.dto.ChangeProductionHeroImageRequest;
 import com.finediningtheater.production.dto.ChangeProductionLocationUrlRequest;
 import com.finediningtheater.production.dto.ChangeProductionNolBookingUrlRequest;
+import com.finediningtheater.production.dto.ChangeProductionTrailerUrlRequest;
 import com.finediningtheater.production.dto.CreateProductionRequest;
 import com.finediningtheater.production.dto.ProductionAdminResponse;
 import com.finediningtheater.production.dto.UpsertTranslationRequest;
@@ -222,6 +223,28 @@ public class ProductionEditController {
                 id,
                 Map.of("locationUrl", beforeUrl),
                 Map.of("locationUrl", String.valueOf(after.getLocationUrl())),
+                ClientIp.resolve(httpRequest));
+
+        return ApiResponse.success(toAdminResponse(after));
+    }
+
+    /** 예고편 유튜브 URL 변경 — locationUrl과 같은 취급이다. 화이트리스트 검증·PIN 모두 없다. */
+    @PutMapping("/{id}/trailer-url")
+    public ApiResponse<ProductionAdminResponse> changeTrailerUrl(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangeProductionTrailerUrlRequest request,
+            @AuthenticationPrincipal AdminPrincipal principal,
+            HttpServletRequest httpRequest) {
+        String beforeUrl = String.valueOf(productionService.getForAdmin(id).getTrailerUrl());
+        Production after = productionService.changeTrailerUrl(id, request.trailerUrl());
+
+        auditLogger.record(
+                principal.id(),
+                "PRODUCTION_TRAILER_URL_CHANGE",
+                "Production",
+                id,
+                Map.of("trailerUrl", beforeUrl),
+                Map.of("trailerUrl", String.valueOf(after.getTrailerUrl())),
                 ClientIp.resolve(httpRequest));
 
         return ApiResponse.success(toAdminResponse(after));

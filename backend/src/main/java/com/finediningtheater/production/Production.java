@@ -40,6 +40,10 @@ public class Production extends Publishable {
     @Column(length = 500)
     private String nolBookingUrl;
 
+    /** 예고편 유튜브 URL. 화이트리스트 검증 없음 — locationUrl과 같은 취급이다(2026-11-01). */
+    @Column(length = 500)
+    private String trailerUrl;
+
     /**
      * 상세에서 제목과 함께 보이는 큰 이미지로 쓸 MediaAsset id(2026-09-23). null이면 목록
      * 대표사진(첫 번째 이미지)을 그대로 쓴다 — media_asset과 FK로 묶지 않으므로(§6) 가리키는
@@ -69,6 +73,10 @@ public class Production extends Publishable {
     /** 놀 예약 URL 변경도 bookingUrl과 같이 §3.4의 PIN 필수 목록에 있다 — 호출부가 sudo 모드를 강제한다. */
     public void changeNolBookingUrl(String nolBookingUrl) {
         this.nolBookingUrl = nolBookingUrl;
+    }
+
+    public void changeTrailerUrl(String trailerUrl) {
+        this.trailerUrl = trailerUrl;
     }
 
     /** null을 넣으면 대표 이미지 지정을 해제하고 목록 대표사진(첫 번째 이미지)으로 되돌린다. */

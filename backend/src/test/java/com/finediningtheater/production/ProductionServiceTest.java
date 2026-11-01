@@ -181,6 +181,16 @@ class ProductionServiceTest {
     }
 
     @Test
+    void 예고편_URL은_화이트리스트_검증_없이_즉시_반영된다() {
+        Production production = new Production("showcase");
+        when(productionRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(production));
+
+        Production result = productionService().changeTrailerUrl(1L, "https://youtu.be/dQw4w9WgXcQ");
+
+        assertThat(result.getTrailerUrl()).isEqualTo("https://youtu.be/dQw4w9WgXcQ");
+    }
+
+    @Test
     void 이_작품에_속한_이미지를_대표_이미지로_지정할_수_있다() {
         Production production = new Production("showcase");
         when(productionRepository.findWithTranslationsById(1L)).thenReturn(Optional.of(production));

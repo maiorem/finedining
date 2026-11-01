@@ -116,6 +116,14 @@ public class ProductionService {
         return production;
     }
 
+    @Transactional
+    @CacheEvict(value = {"productions", "productionDetail"}, allEntries = true)
+    public Production changeTrailerUrl(Long id, String trailerUrl) {
+        Production production = getForAdmin(id);
+        production.changeTrailerUrl(trailerUrl);
+        return production;
+    }
+
     /** 놀 예약 URL도 즉시 공개본에 반영된다(draft 없음) — 같은 화이트리스트로 검증한다. */
     @Transactional
     @CacheEvict(value = {"productions", "productionDetail"}, allEntries = true)

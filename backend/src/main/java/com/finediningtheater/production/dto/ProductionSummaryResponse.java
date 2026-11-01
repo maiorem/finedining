@@ -11,6 +11,7 @@ public record ProductionSummaryResponse(
         String subtitle,
         String bookingUrl,
         String locationUrl,
+        String trailerUrl,
         MediaAssetResponse thumbnail) {
 
     public static ProductionSummaryResponse from(
@@ -22,6 +23,7 @@ public record ProductionSummaryResponse(
                 production.subtitleFor(locale),
                 production.getBookingUrl(),
                 production.getLocationUrl(),
+                production.getTrailerUrl(),
                 thumbnail);
     }
 }
